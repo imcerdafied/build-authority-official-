@@ -2,7 +2,7 @@ import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Origin": "https://buildauthorityos.com",
   "Access-Control-Allow-Headers":
     "authorization, x-client-info, apikey, content-type, x-reminder-secret",
 };
@@ -15,6 +15,10 @@ const lifecycleLabels: Record<string, string> = {
   durable: "Durable",
   closed: "Closed",
 };
+
+function escapeHtml(s: string): string {
+  return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+}
 
 serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -99,15 +103,15 @@ serve(async (req) => {
           const statusLabel = lifecycleLabels[String(b.status ?? "").toLowerCase()] ?? "Defined";
           const exposure = b.exposure_value || b.revenue_at_risk || "\u2014";
           return `<tr>
-            <td style="padding:8px 12px;border-bottom:1px solid #eee;font-weight:500;">${b.title}</td>
-            <td style="padding:8px 12px;border-bottom:1px solid #eee;">${statusLabel}</td>
+            <td style="padding:8px 12px;border-bottom:1px solid #eee;font-weight:500;">${escapeHtml(String(b.title))}</td>
+            <td style="padding:8px 12px;border-bottom:1px solid #eee;">${escapeHtml(statusLabel)}</td>
             <td style="padding:8px 12px;border-bottom:1px solid #eee;">${daysSinceUpdate}d ago</td>
-            <td style="padding:8px 12px;border-bottom:1px solid #eee;">${exposure}</td>
+            <td style="padding:8px 12px;border-bottom:1px solid #eee;">${escapeHtml(String(exposure))}</td>
           </tr>`;
         })
         .join("");
 
-      const displayName = profile.display_name || "there";
+      const displayName = escapeHtml(profile.display_name || "there");
 
       const html = `
 <!DOCTYPE html>

@@ -11,13 +11,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   const hasAnthropicKey = Boolean(process.env.ANTHROPIC_API_KEY);
 
   if (!hasSupabaseUrl || !hasSupabaseAnonKey || !hasServiceRoleKey || !hasAnthropicKey) {
-    return res.status(500).json({
-      error: "Missing env vars",
-      hasSupabaseUrl,
-      hasSupabaseAnonKey,
-      hasServiceRoleKey,
-      hasAnthropicKey,
-    });
+    return res.status(500).json({ error: "Server not configured" });
   }
 
   if (req.method !== "POST") {

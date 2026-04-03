@@ -2,7 +2,7 @@ import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Origin": "https://buildauthorityos.com",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
@@ -91,9 +91,30 @@ serve(async (req) => {
       }
     }
 
+    // Whitelist mutable fields — never allow overwriting org_id, created_by, etc.
+    const ALLOWED_FIELDS = new Set([
+      "title", "status", "owner", "owner_user_id", "risk_level",
+      "outcome_target", "expected_impact", "exposure_value", "revenue_at_risk",
+      "surface", "solution_domain", "outcome_category_key", "sponsor",
+      "capacity_allocated", "capacity_diverted", "unplanned_interrupts",
+      "state_changed_at", "state_change_note",
+      "shipped_slice_date", "measured_outcome_result",
+      "executive_attention",
+    ]);
+    const sanitized: Record<string, unknown> = {};
+    for (const [key, value] of Object.entries(updates)) {
+      if (ALLOWED_FIELDS.has(key)) sanitized[key] = value;
+    }
+    if (Object.keys(sanitized).length === 0) {
+      return new Response(JSON.stringify({ error: "No valid fields to update" }), {
+        status: 400,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
     const { data: updated, error: updateError } = await serviceClient
       .from("decisions")
-      .update(updates)
+      .update(sanitized)
       .eq("id", id)
       .select("*")
       .single();
