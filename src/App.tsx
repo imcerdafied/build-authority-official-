@@ -24,7 +24,14 @@ import Auth from "@/pages/Auth";
 import OrgSetup from "@/components/OrgSetup";
 import NotFound from "./pages/NotFound";
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 30_000,
+      retry: 1,
+    },
+  },
+});
 
 function AuthGate({ children }: { children: React.ReactNode }) {
   const { user, loading: authLoading } = useAuth();

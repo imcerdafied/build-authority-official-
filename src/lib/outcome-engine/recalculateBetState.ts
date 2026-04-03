@@ -82,19 +82,20 @@ export async function recalculateBetState(
   // 7. Drift detection
   const driftFlags = detectOutcomeDrift(declaredOutcomes, metrics, ranked);
 
-  // 8. Persist updated initiatives (bulk upsert)
-  const upsertPromises = ranked.map((init) =>
-    supabase
-      .from("bet_initiatives")
-      .update({
-        outcome_multiplier: init.outcome_multiplier,
-        score_v3: init.score_v3,
-        roadmap_position: init.roadmap_position,
-        last_score_delta: init.last_score_delta,
-        updated_at: new Date().toISOString(),
-      })
-      .eq("id", init.id),
-  );
+  // 8. Persist updated initiatives via bulk RPC (single round-trip instead of N+1)
+  const updates: Record<string, { outcome_multiplier: number; score_v3: number; roadmap_position: number; last_score_delta: number }> = {};
+  for (const init of ranked) {
+    updates[init.id] = {
+      outcome_multiplier: init.outcome_multiplier,
+      score_v3: init.score_v3,
+      roadmap_position: init.roadmap_position,
+      last_score_delta: init.last_score_delta,
+    };
+  }
+
+  const bulkUpdate = Object.keys(updates).length > 0
+    ? supabase.rpc("bulk_update_initiative_scores", { updates })
+    : Promise.resolve();
 
   // 9. Persist drift flags to bet_monitoring (upsert)
   const monitoringUpsert = supabase
@@ -109,7 +110,7 @@ export async function recalculateBetState(
     );
 
   // Fire all writes in parallel
-  await Promise.all([...logPromises, ...upsertPromises, monitoringUpsert]);
+  await Promise.all([...logPromises, bulkUpdate, monitoringUpsert]);
 
   return { initiatives: ranked, driftFlags };
 }

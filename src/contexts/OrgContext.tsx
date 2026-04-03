@@ -61,8 +61,6 @@ const LAST_ACTIVE_ORG_STORAGE_KEY = "ba_last_active_org";
 const LEGACY_ORG_STORAGE_KEY = "ba_current_org";
 const PENDING_ORG_JOIN_KEY = "pending_org_join";
 const PENDING_JOIN_TTL_MS = 1000 * 60 * 30;
-const MEMBERSHIP_RETRY_ATTEMPTS = 3;
-const MEMBERSHIP_RETRY_DELAY_MS = 250;
 
 function readLastActiveOrgId(): string | null {
   if (typeof window === "undefined") return null;
@@ -135,19 +133,6 @@ function fallbackOrganization(orgId: string, fallbackName?: string): Tables<"org
   };
 }
 
-function sleep(ms: number) {
-  return new Promise((resolve) => setTimeout(resolve, ms));
-}
-
-async function getAccessTokenWithRetry(): Promise<string | null> {
-  for (let i = 0; i < 8; i += 1) {
-    const { data } = await supabase.auth.getSession();
-    const token = data.session?.access_token;
-    if (token) return token;
-    await sleep(250);
-  }
-  return null;
-}
 
 export function OrgProvider({ children }: { children: ReactNode }) {
   const { user } = useAuth();
@@ -189,64 +174,10 @@ export function OrgProvider({ children }: { children: ReactNode }) {
         organization: m.organizations ?? fallbackOrganization(m.org_id),
       }));
     } else {
-      console.error("Primary membership fetch failed. Falling back:", error);
+      console.error("Primary membership fetch failed. Falling back to edge function:", error);
     }
 
-    // Fallback path: keep bootstrap resilient when relation expansion is blocked/flaky.
-    if (mapped.length === 0) {
-      let membershipRows: Array<{ org_id: string; role: AppRole; role_label?: string | null }> = [];
-      let membershipError: any = null;
-
-      for (let attempt = 0; attempt < MEMBERSHIP_RETRY_ATTEMPTS; attempt += 1) {
-        let { data: rows, error: rowError } = await supabase
-          .from("organization_memberships")
-          .select("org_id, role, role_label")
-          .eq("user_id", user.id);
-        if (rowError && String(rowError.message || "").includes("role_label")) {
-          const retry = await supabase
-            .from("organization_memberships")
-            .select("org_id, role")
-            .eq("user_id", user.id);
-          rows = retry.data?.map((row: any) => ({ ...row, role_label: null })) as any;
-          rowError = retry.error as any;
-        }
-
-        membershipRows = (rows || []) as Array<{ org_id: string; role: AppRole; role_label?: string | null }>;
-        membershipError = rowError;
-
-        if (membershipRows.length > 0) break;
-        if (rowError) break;
-        if (attempt < MEMBERSHIP_RETRY_ATTEMPTS - 1) {
-          await sleep(MEMBERSHIP_RETRY_DELAY_MS * (attempt + 1));
-        }
-      }
-
-      if (membershipError) {
-        console.error("Fallback membership fetch failed. Continuing to edge fallback:", membershipError);
-      } else {
-        const orgIds = Array.from(new Set(membershipRows.map((row) => row.org_id)));
-        const { data: orgRows, error: orgError } = orgIds.length
-          ? await supabase
-              .from("organizations")
-              .select("*")
-              .in("id", orgIds)
-          : { data: [], error: null as any };
-
-        if (orgError) {
-          console.error("Fallback org fetch failed. Using minimal org objects:", orgError);
-        }
-
-        const orgById = new Map((orgRows || []).map((org) => [org.id, org]));
-        mapped = membershipRows.map((row) => ({
-          org_id: row.org_id,
-          role: row.role,
-          role_label: row.role_label ?? null,
-          organization: (orgById.get(row.org_id) as Tables<"organizations"> | undefined) ?? fallbackOrganization(row.org_id),
-        }));
-      }
-    }
-
-    // Final fallback via edge function (service-role backed), avoids RLS drift/timing issues.
+    // Single fallback via edge function (service-role backed) if the primary RLS path returns empty.
     if (mapped.length === 0) {
       const { data: edgeData, error: edgeError } = await supabase.functions.invoke("my-orgs");
       if (edgeError) {
@@ -261,42 +192,6 @@ export function OrgProvider({ children }: { children: ReactNode }) {
           role_label: m.role_label ?? null,
           organization: m.organizations ?? fallbackOrganization(m.org_id),
         }));
-      }
-    }
-
-    // Extra fallback: direct authenticated fetch to avoid invoke/session propagation race.
-    if (mapped.length === 0) {
-      try {
-        const accessToken = await getAccessTokenWithRetry();
-        const supabaseUrl = import.meta.env.VITE_SUPABASE_URL as string;
-        const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY as string;
-        if (accessToken && supabaseUrl && supabaseAnonKey) {
-          const res = await fetch(`${supabaseUrl}/functions/v1/my-orgs`, {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${accessToken}`,
-              apikey: supabaseAnonKey,
-            },
-            body: JSON.stringify({}),
-          });
-          const body = await res.json().catch(() => ({}));
-          if (res.ok) {
-            const edgeMemberships = Array.isArray((body as any)?.memberships)
-              ? (body as any).memberships
-              : [];
-            mapped = edgeMemberships.map((m: any) => ({
-              org_id: m.org_id,
-              role: m.role,
-              role_label: m.role_label ?? null,
-              organization: m.organizations ?? fallbackOrganization(m.org_id),
-            }));
-          } else {
-            console.error("Direct my-orgs fallback failed:", body);
-          }
-        }
-      } catch (directErr) {
-        console.error("Direct my-orgs fallback exception:", directErr);
       }
     }
 
@@ -366,100 +261,16 @@ export function OrgProvider({ children }: { children: ReactNode }) {
       customOutcomeCategories: customOutcomeCategories?.length ? customOutcomeCategories : undefined,
     };
 
-    // Path 1: standard edge invoke
     const { data, error } = await supabase.functions.invoke("create-org", { body: payload });
     if (!error && data?.orgId) {
       await fetchMemberships();
       handleSetCurrentOrgId(data.orgId);
       return data.orgId;
     }
-    let lastError = error?.message ? String(error.message) : "Edge create-org failed.";
 
-    // Path 2: direct HTTP edge call (handles transport/non-2xx inconsistencies)
-    try {
-      const { data: sessionData } = await supabase.auth.getSession();
-      const accessToken = sessionData.session?.access_token;
-      const supabaseUrl = import.meta.env.VITE_SUPABASE_URL as string;
-      const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY as string;
-      if (accessToken && supabaseUrl && supabaseAnonKey) {
-        const res = await fetch(`${supabaseUrl}/functions/v1/create-org`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${accessToken}`,
-            apikey: supabaseAnonKey,
-          },
-          body: JSON.stringify(payload),
-        });
-        const body = await res.json().catch(() => ({}));
-        if (res.ok && body?.orgId) {
-          await fetchMemberships();
-          handleSetCurrentOrgId(body.orgId);
-          return body.orgId;
-        }
-        lastError = String(body?.error || `create-org HTTP ${res.status}`);
-      }
-    } catch (fallbackErr) {
-      lastError = fallbackErr instanceof Error ? fallbackErr.message : String(fallbackErr);
-      console.error("Fallback create-org HTTP failed:", fallbackErr);
-    }
-
-    // Path 3: final local fallback - create directly, then membership.
-    // This keeps onboarding unblocked if edge routing is flaky.
-    const { data: existingMembershipOrgs } = await supabase
-      .from("organization_memberships")
-      .select("org_id, organizations(id,name)")
-      .eq("user_id", user.id);
-    const existingByName = (existingMembershipOrgs || []).find((row: any) => {
-      const orgName = String(row?.organizations?.name || "").trim().toLowerCase();
-      return orgName === name.trim().toLowerCase();
-    });
-    if (existingByName?.org_id) {
-      await fetchMemberships();
-      handleSetCurrentOrgId(existingByName.org_id);
-      return existingByName.org_id;
-    }
-
-    const insertData: any = {
-      name,
-      created_by: user.id,
-      allowed_email_domain: null,
-    };
-
-    const { data: org, error: orgError } = await supabase
-      .from("organizations")
-      .insert(insertData)
-      .select("id")
-      .single();
-    if (orgError || !org?.id) {
-      console.error("Failed to create org (all paths):", error, orgError);
-      throw new Error(orgError?.message || lastError || "Organization insert failed.");
-    }
-
-    const { error: memError } = await supabase
-      .from("organization_memberships")
-      .insert({ user_id: user.id, org_id: org.id, role: "admin" as AppRole });
-    if (memError) {
-      console.error("Failed to create membership after org insert:", memError);
-      throw new Error(memError.message || "Failed to create admin membership.");
-    }
-
-    const optionalUpdate: any = {};
-    if (productAreas?.length) optionalUpdate.product_areas = productAreas;
-    if (customOutcomeCategories?.length) optionalUpdate.custom_outcome_categories = customOutcomeCategories;
-    if (Object.keys(optionalUpdate).length > 0) {
-      const { error: optionalErr } = await supabase
-        .from("organizations")
-        .update(optionalUpdate)
-        .eq("id", org.id);
-      if (optionalErr) {
-        console.warn("Optional org metadata update skipped:", optionalErr.message);
-      }
-    }
-
-    await fetchMemberships();
-    handleSetCurrentOrgId(org.id);
-    return org.id;
+    const errorMsg = error?.message ? String(error.message) : "Failed to create organization.";
+    console.error("create-org edge function failed:", errorMsg);
+    throw new Error(errorMsg);
   };
 
   const updateOrg = async (fields: { product_areas?: ProductArea[]; custom_outcome_categories?: CustomCategory[] }) => {

@@ -1,7 +1,7 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Origin": "https://buildauthorityos.com",
   "Access-Control-Allow-Headers":
     "authorization, x-client-info, apikey, content-type",
 };
@@ -50,28 +50,43 @@ Deno.serve(async (req) => {
     const stamp = new Date().toISOString().replace(/[:.]/g, "-");
     const results: string[] = [];
 
-    // Export each table
-    for (const table of ["decisions", "signals", "pods", "pod_initiatives", "closed_decisions", "decision_events"]) {
-      const { data, error } = await supabase.from(table).select("*");
-      if (error) {
-        console.error(`Error fetching ${table}:`, error.message);
-        continue;
-      }
-      if (!data?.length) continue;
+    // Fetch all orgs and scope backup per org
+    const { data: orgs, error: orgError } = await supabase
+      .from("organizations")
+      .select("id, name");
+    if (orgError) {
+      return new Response(JSON.stringify({ error: "Failed to fetch organizations" }), {
+        status: 500,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
 
-      const csv = toCsv(data);
-      const path = `${stamp}/${table}.csv`;
-      const { error: uploadError } = await supabase.storage
-        .from("data-backups")
-        .upload(path, new Blob([csv], { type: "text/csv" }), {
-          contentType: "text/csv",
-          upsert: true,
-        });
+    const tables = ["decisions", "signals", "pods", "pod_initiatives", "closed_decisions", "decision_events"];
 
-      if (uploadError) {
-        console.error(`Upload error for ${table}:`, uploadError.message);
-      } else {
-        results.push(path);
+    for (const org of orgs || []) {
+      for (const table of tables) {
+        const { data, error } = await supabase.from(table).select("*").eq("org_id", org.id);
+        if (error) {
+          console.error(`Error fetching ${table} for org ${org.id}:`, error.message);
+          continue;
+        }
+        if (!data?.length) continue;
+
+        const csv = toCsv(data);
+        const safeName = (org.name || org.id).replace(/[^a-zA-Z0-9_-]/g, "_").slice(0, 50);
+        const path = `${stamp}/${safeName}/${table}.csv`;
+        const { error: uploadError } = await supabase.storage
+          .from("data-backups")
+          .upload(path, new Blob([csv], { type: "text/csv" }), {
+            contentType: "text/csv",
+            upsert: true,
+          });
+
+        if (uploadError) {
+          console.error(`Upload error for ${table} (org ${org.id}):`, uploadError.message);
+        } else {
+          results.push(path);
+        }
       }
     }
 
