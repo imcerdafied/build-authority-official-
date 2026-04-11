@@ -18,6 +18,7 @@ import Team from "@/pages/Team";
 import FeedbackAdmin from "@/pages/FeedbackAdmin";
 import CapabilityMap from "@/pages/CapabilityMap";
 // ClosedBets moved inline to Decisions page
+import Altitude from "@/pages/Altitude";
 import OrgSettings from "@/pages/OrgSettings";
 import Join from "@/pages/Join";
 import Auth from "@/pages/Auth";
@@ -66,6 +67,7 @@ function AppContent() {
               <Route path="/review" element={<Review />} />
               <Route path="/how-it-works" element={<HowItWorks />} />
               <Route path="/signals" element={<Signals />} />
+              <Route path="/altitude" element={<Altitude />} />
               <Route path="/capability-map" element={<CapabilityMap />} />
               <Route path="/closed-bets" element={<Navigate to="/" replace />} />
               <Route path="/pods" element={<Pods />} />
