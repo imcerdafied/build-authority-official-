@@ -652,6 +652,15 @@ function HypothesesTab({
 
   return (
     <div className="space-y-3">
+      {/* V² explanation */}
+      <div className="rounded-md border border-border/60 bg-muted/30 px-4 py-3 mb-1">
+        <p className="text-xs text-muted-foreground leading-relaxed">
+          <span className="font-semibold text-foreground">V² (Priority Score)</span>
+          {" "}= value² ÷ effort. A hypothesis with high value and low effort scores highest.
+          Scores above 7 are high priority (green), 4–7 are worth considering (amber), below 4 deprioritize.
+          Promote the strongest hypotheses directly to your Roadmap.
+        </p>
+      </div>
       {sorted.map((h) => {
         const v2 = h.v_squared ?? 0;
         const v2Color =
@@ -669,6 +678,7 @@ function HypothesesTab({
               >
                 V² {v2.toFixed(1)}
               </span>
+              <span className="text-xs text-muted-foreground/50">priority</span>
               <span className="text-xs text-muted-foreground border border-border rounded-sm px-1.5 py-0.5 tabular-nums">
                 value: {h.value_score}/5
               </span>
