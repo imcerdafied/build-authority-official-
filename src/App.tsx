@@ -31,6 +31,7 @@ import QuarterReview from "@/pages/goals/QuarterReview";
 import OutcomeList from "@/pages/build/OutcomeList";
 import OutcomeDetail from "@/pages/build/OutcomeDetail";
 import Roadmap from "@/pages/build/Roadmap";
+import Initiatives from "@/pages/build/Initiatives";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -90,6 +91,7 @@ function AppContent() {
               {/* Build altitude */}
               <Route path="/build" element={<OutcomeList />} />
               <Route path="/build/roadmap" element={<Roadmap />} />
+              <Route path="/build/initiatives" element={<Initiatives />} />
               <Route path="/build/:outcomeId" element={<OutcomeDetail />} />
 
               {/* Utility routes */}

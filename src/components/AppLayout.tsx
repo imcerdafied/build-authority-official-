@@ -52,6 +52,7 @@ const SUB_NAV: Record<Altitude, { label: string; to: string }[]> = {
     { label: "Roadmap", to: "/build/roadmap" },
     { label: "Pods", to: "/pods" },
     { label: "Loops", to: "/loops" },
+    { label: "Initiatives", to: "/build/initiatives" },
   ],
 };
 
