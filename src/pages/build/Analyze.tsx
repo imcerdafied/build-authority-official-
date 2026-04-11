@@ -69,6 +69,7 @@ const ANTHROPIC_KEY = import.meta.env.VITE_ANTHROPIC_API_KEY;
 async function analyzeSource(
   content: string,
   sourceName: string,
+  pdfBase64?: string,
 ): Promise<{
   friction_points: Array<{
     title: string;
@@ -109,7 +110,24 @@ You MUST respond with ONLY valid JSON and nothing else — no preamble, no expla
       messages: [
         {
           role: "user",
-          content: `Analyze this source document and extract product intelligence.
+          content: pdfBase64
+            ? [
+                {
+                  type: "document" as const,
+                  source: {
+                    type: "base64" as const,
+                    media_type: "application/pdf" as const,
+                    data: pdfBase64,
+                  },
+                },
+                {
+                  type: "text" as const,
+                  text: `Analyze this PDF document named "${sourceName}" and extract product intelligence.
+
+Return a JSON object with exactly this structure:`,
+                },
+              ]
+            : `Analyze this source document and extract product intelligence.
 
 SOURCE: "${sourceName}"
 
@@ -221,13 +239,31 @@ function AddSourceForm({
   analyzing,
   analyzingStep,
 }: {
-  onSubmit: (name: string, content: string) => void;
+  onSubmit: (name: string, content: string, pdfBase64?: string) => void;
   onCancel: () => void;
   analyzing: boolean;
   analyzingStep: string;
 }) {
   const [name, setName] = useState("");
+  const [sourceType, setSourceType] = useState<"text" | "pdf">("text");
   const [content, setContent] = useState("");
+  const [pdfFile, setPdfFile] = useState<File | null>(null);
+  const [pdfBase64, setPdfBase64] = useState<string>("");
+
+  function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setPdfFile(file);
+    if (!name) setName(file.name.replace(/\.pdf$/i, ""));
+    const reader = new FileReader();
+    reader.onload = () => {
+      const result = reader.result as string;
+      // Strip the data URL prefix to get raw base64
+      const base64 = result.split(",")[1];
+      setPdfBase64(base64);
+    };
+    reader.readAsDataURL(file);
+  }
 
   return (
     <div className="border border-border rounded-md p-4 mb-6">
@@ -253,31 +289,67 @@ function AddSourceForm({
             Source type
           </label>
           <div className="flex gap-2">
-            <span className="text-xs px-2 py-1 rounded-sm border border-foreground/20 bg-foreground/5 text-foreground">
-              Text
-            </span>
-            <span
-              className="text-xs px-2 py-1 rounded-sm border border-border text-muted-foreground/50 cursor-not-allowed"
-              title="PDF upload coming soon — paste PDF content as text for now"
+            <button
+              onClick={() => { setSourceType("text"); setPdfFile(null); setPdfBase64(""); }}
+              className={cn(
+                "text-xs px-2 py-1 rounded-sm border transition-colors",
+                sourceType === "text"
+                  ? "border-foreground/20 bg-foreground/5 text-foreground"
+                  : "border-border text-muted-foreground hover:text-foreground"
+              )}
+              disabled={analyzing}
             >
-              PDF (paste as text)
-            </span>
+              Text
+            </button>
+            <button
+              onClick={() => { setSourceType("pdf"); setContent(""); }}
+              className={cn(
+                "text-xs px-2 py-1 rounded-sm border transition-colors",
+                sourceType === "pdf"
+                  ? "border-foreground/20 bg-foreground/5 text-foreground"
+                  : "border-border text-muted-foreground hover:text-foreground"
+              )}
+              disabled={analyzing}
+            >
+              PDF
+            </button>
           </div>
         </div>
 
-        <div>
-          <label className="text-xs text-muted-foreground block mb-1">
-            Content
-          </label>
-          <textarea
-            value={content}
-            onChange={(e) => setContent(e.target.value)}
-            placeholder="Paste your source content here..."
-            rows={10}
-            className="w-full bg-transparent border border-border rounded-sm px-3 py-2 text-sm focus:outline-none focus:border-foreground placeholder:text-muted-foreground/40 resize-y"
-            disabled={analyzing}
-          />
-        </div>
+        {sourceType === "text" ? (
+          <div>
+            <label className="text-xs text-muted-foreground block mb-1">
+              Content
+            </label>
+            <textarea
+              value={content}
+              onChange={(e) => setContent(e.target.value)}
+              placeholder="Paste your source content here..."
+              rows={10}
+              className="w-full bg-transparent border border-border rounded-sm px-3 py-2 text-sm focus:outline-none focus:border-foreground placeholder:text-muted-foreground/40 resize-y"
+              disabled={analyzing}
+            />
+          </div>
+        ) : (
+          <div>
+            <label className="text-xs text-muted-foreground block mb-1">
+              PDF File
+            </label>
+            <input
+              type="file"
+              accept=".pdf,application/pdf"
+              onChange={handleFileChange}
+              disabled={analyzing}
+              className="w-full text-sm text-muted-foreground file:mr-3 file:py-1.5 file:px-3 file:rounded-sm file:border file:border-border file:text-xs file:bg-background file:text-foreground file:cursor-pointer hover:file:bg-muted cursor-pointer"
+            />
+            {pdfFile && (
+              <p className="text-xs text-muted-foreground/60 mt-1.5">
+                {pdfFile.name} · {(pdfFile.size / 1024).toFixed(0)} KB
+                {pdfBase64 ? " · ready" : " · reading..."}
+              </p>
+            )}
+          </div>
+        )}
 
         {analyzing && (
           <div className="flex items-center gap-2 py-2">
@@ -290,8 +362,18 @@ function AddSourceForm({
 
         <div className="flex gap-2">
           <button
-            onClick={() => onSubmit(name.trim(), content.trim())}
-            disabled={!name.trim() || !content.trim() || analyzing}
+            onClick={() => {
+              if (sourceType === "pdf") {
+                onSubmit(name.trim(), "", pdfBase64);
+              } else {
+                onSubmit(name.trim(), content.trim());
+              }
+            }}
+            disabled={
+              !name.trim() ||
+              analyzing ||
+              (sourceType === "text" ? !content.trim() : !pdfBase64)
+            }
             className="text-xs font-semibold px-4 py-2 rounded-sm bg-foreground text-background disabled:opacity-50"
           >
             Analyze
@@ -835,7 +917,7 @@ export default function Analyze() {
 
   // ---- Handlers ----
 
-  async function handleAnalyze(name: string, content: string) {
+  async function handleAnalyze(name: string, content: string, pdfBase64?: string) {
     if (!orgId || !user) return;
     setAnalyzing(true);
     setAnalyzingStep("Saving source...");
@@ -845,8 +927,8 @@ export default function Analyze() {
       .insert({
         org_id: orgId,
         name,
-        source_type: "text",
-        content,
+        source_type: pdfBase64 ? "pdf" : "text",
+        content: pdfBase64 ? "[PDF — analyzed directly]" : content,
         processing_status: "analyzing",
         uploaded_by: user.id,
       } as any)
@@ -863,7 +945,7 @@ export default function Analyze() {
 
     let result;
     try {
-      result = await analyzeSource(content, name);
+      result = await analyzeSource(content, name, pdfBase64);
     } catch (err) {
       await supabase
         .from("intel_sources")
@@ -1081,7 +1163,7 @@ export default function Analyze() {
       {/* Add Source Form */}
       {showAddForm && (
         <AddSourceForm
-          onSubmit={handleAnalyze}
+          onSubmit={(name, content, pdfBase64) => handleAnalyze(name, content, pdfBase64)}
           onCancel={() => setShowAddForm(false)}
           analyzing={analyzing}
           analyzingStep={analyzingStep}
