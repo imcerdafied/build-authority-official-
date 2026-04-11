@@ -48,11 +48,11 @@ const SUB_NAV: Record<Altitude, { label: string; to: string }[]> = {
     { label: "Signals", to: "/signals" },
   ],
   build: [
-    { label: "Outcomes", to: "/build" },
+    { label: "Initiatives", to: "/build/initiatives" },
     { label: "Roadmap", to: "/build/roadmap" },
     { label: "Pods", to: "/pods" },
     { label: "Loops", to: "/loops" },
-    { label: "Initiatives", to: "/build/initiatives" },
+    { label: "Outcomes", to: "/build" },
   ],
 };
 
