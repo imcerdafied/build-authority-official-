@@ -197,13 +197,13 @@ export default function OKRList() {
         if (krError) throw krError;
       }
 
-      toast.success("OKR created");
+      toast.success("Goal created");
       queryClient.invalidateQueries({ queryKey: ["okrs"] });
       queryClient.invalidateQueries({ queryKey: ["key_results_all"] });
       resetForm();
       setShowCreate(false);
     } catch (err: any) {
-      toast.error(err.message ?? "Failed to create OKR");
+      toast.error(err.message ?? "Failed to create goal");
     } finally {
       setSubmitting(false);
     }
@@ -240,7 +240,7 @@ export default function OKRList() {
       <div className="space-y-3 mt-2">
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h2 className="text-lg font-semibold">OKRs — {buildQuarterOptions()[0].replace("-", " ")}</h2>
+            <h2 className="text-lg font-semibold">Goals — {buildQuarterOptions()[0].replace("-", " ")}</h2>
             <p className="text-sm text-muted-foreground mt-0.5">
               3–5 objectives · 3 key results each · reviewed weekly
             </p>
@@ -249,7 +249,7 @@ export default function OKRList() {
             onClick={() => setShowCreate(true)}
             className="text-xs uppercase tracking-wider font-semibold border border-foreground/20 rounded-sm px-3 py-1.5 hover:bg-foreground/5 transition-colors"
           >
-            + New OKR
+            + New Goal
           </button>
         </div>
 
@@ -284,7 +284,7 @@ export default function OKRList() {
         ))}
 
         <p className="text-xs text-muted-foreground/50 text-center pt-2">
-          Click any objective to start building your OKRs
+          Click any objective to set your goals for the quarter
         </p>
 
         {showCreate && <CreatePanel />}
@@ -304,7 +304,7 @@ export default function OKRList() {
         <div className="fixed top-0 right-0 h-full w-full max-w-lg bg-background border-l border-border z-50 overflow-y-auto shadow-xl animate-in slide-in-from-right duration-200">
           <div className="p-6 space-y-5">
             <div className="flex items-center justify-between">
-              <h2 className="text-sm font-bold uppercase tracking-wider">Create OKR</h2>
+              <h2 className="text-sm font-bold uppercase tracking-wider">Create Goal</h2>
               <button
                 onClick={() => setShowCreate(false)}
                 className="text-muted-foreground hover:text-foreground text-lg leading-none"
@@ -427,7 +427,7 @@ export default function OKRList() {
                     : "border-border text-muted-foreground cursor-not-allowed",
                 )}
               >
-                {submitting ? "Creating..." : "Create OKR"}
+                {submitting ? "Creating..." : "Create Goal"}
               </button>
               <button
                 onClick={() => {
@@ -453,14 +453,14 @@ export default function OKRList() {
       <div className="sticky top-0 z-10 bg-background/95 backdrop-blur-sm border-b -mx-4 sm:-mx-6 lg:-mx-8 px-4 sm:px-6 lg:px-8 py-3 mb-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <h1 className="text-lg font-bold">OKRs</h1>
-            <span className="text-xs text-muted-foreground hidden sm:inline">{okrs.length} objectives</span>
+            <h1 className="text-lg font-bold">Goals</h1>
+            <span className="text-xs text-muted-foreground hidden sm:inline">{okrs.length} goal{okrs.length !== 1 ? "s" : ""}</span>
           </div>
           <button
             onClick={() => setShowCreate(true)}
             className="text-xs uppercase tracking-wider font-semibold border border-foreground/20 rounded-sm px-3 py-1.5 hover:bg-foreground/5 transition-colors"
           >
-            + New OKR
+            + New Goal
           </button>
         </div>
       </div>

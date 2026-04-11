@@ -104,7 +104,7 @@ export default function QuarterReview() {
     if (!currentOrg) return;
     const activeIds = okrs.filter((o) => o.status === "active").map((o) => o.id);
     if (activeIds.length === 0) {
-      toast.info("No active OKRs to close");
+      toast.info("No active goals to close");
       return;
     }
     setClosing(true);
@@ -188,13 +188,13 @@ export default function QuarterReview() {
       {summary.length === 0 && (
         <div className="flex flex-col items-center justify-center py-16 gap-3 text-center">
           <p className="text-xs uppercase tracking-wider text-muted-foreground max-w-sm leading-relaxed">
-            No OKRs found for {currentQuarter}. Create objectives on the OKRs page to populate this review.
+            No goals found for {currentQuarter}. Create goals to populate this review.
           </p>
           <Link
             to="/goals"
             className="text-xs uppercase tracking-wider font-semibold text-muted-foreground hover:text-foreground"
           >
-            &larr; Go to OKRs
+            &larr; Back to Goals
           </Link>
         </div>
       )}
