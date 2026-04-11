@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useState, ReactNode, useCallback, useMemo } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "./AuthContext";
+import { useOrgFromUrl } from "@/hooks/useOrgFromUrl";
 import type { Tables } from "@/integrations/supabase/types";
 import type { Database } from "@/integrations/supabase/types";
 
@@ -248,6 +249,8 @@ export function OrgProvider({ children }: { children: ReactNode }) {
     setCurrentOrgId(orgId);
     writeLastActiveOrgId(orgId);
   };
+
+  useOrgFromUrl(handleSetCurrentOrgId);
 
   const createOrg = async (
     name: string,
