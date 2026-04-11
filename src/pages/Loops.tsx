@@ -74,7 +74,7 @@ export default function Loops() {
       <div className="sticky top-0 z-10 bg-background/95 backdrop-blur-sm border-b -mx-4 sm:-mx-6 lg:-mx-8 px-4 sm:px-6 lg:px-8 py-3 mb-4">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
           <div className="flex items-center gap-3">
-            <h1 className="text-lg font-bold">Outcome Loops</h1>
+            <h1 className="text-lg font-bold">Loops</h1>
             <span className="text-xs text-muted-foreground hidden sm:inline">
               {loops.length} total · {activeCount} active
               {staleCount > 0 && <span className="text-signal-amber"> · {staleCount} stale</span>}
@@ -148,10 +148,56 @@ export default function Loops() {
 
       {/* Loop list grouped by bet */}
       {filteredLoops.length === 0 ? (
-        <div className="border border-dashed rounded-md px-6 py-10 text-center">
-          <p className="text-sm font-medium text-muted-foreground">No loops found.</p>
-          <p className="text-xs text-muted-foreground/70 mt-1.5">
-            Create outcome loops from within a bet to start tracking execution cycles.
+        <div className="space-y-3">
+          <p className="text-sm text-muted-foreground mb-4">
+            Loops track how a bet is executing in short cycles — ship something, learn from it,
+            decide what to do next: scale, iterate, or kill. Create a loop from within any active bet.
+          </p>
+          {/* Ghost example loops */}
+          {[
+            {
+              bet: "TransitionOS — AI displacement navigation platform",
+              title: "B2B employer outreach campaign",
+              status: "Active",
+              shipped: "Scout tool live, first 20 outreach emails sent",
+              decision: "Iterate — response rate too low, refine angle",
+              note: "What's the loop for this bet's current push?"
+            },
+            {
+              bet: "Build Authority — system of record for organizational decisions",
+              title: "Conviva case study and renewal prep",
+              status: "Iterating",
+              shipped: "Q2 strategy review delivered",
+              decision: "Scale — expand scope in renewal proposal",
+              note: "What iteration is this bet on?"
+            },
+          ].map((ghost, i) => (
+            <div
+              key={i}
+              className="border border-dashed border-border/60 rounded-lg p-5 opacity-60"
+            >
+              <div className="text-[10px] uppercase tracking-widest text-muted-foreground/50 mb-1">
+                Example Loop · {ghost.bet}
+              </div>
+              <div className="font-medium text-muted-foreground/70 mb-3">{ghost.title}</div>
+              <div className="grid grid-cols-3 gap-3 text-xs">
+                <div>
+                  <div className="text-[10px] uppercase tracking-wider text-muted-foreground/40 mb-1">What shipped</div>
+                  <div className="text-muted-foreground/50">{ghost.shipped}</div>
+                </div>
+                <div>
+                  <div className="text-[10px] uppercase tracking-wider text-muted-foreground/40 mb-1">Decision</div>
+                  <div className="text-muted-foreground/50">{ghost.decision}</div>
+                </div>
+                <div>
+                  <div className="text-[10px] uppercase tracking-wider text-muted-foreground/40 mb-1">Start here</div>
+                  <div className="text-muted-foreground/40 italic">{ghost.note}</div>
+                </div>
+              </div>
+            </div>
+          ))}
+          <p className="text-xs text-muted-foreground/40 text-center pt-1">
+            Open a bet → scroll to Outcome Loops → + New Loop
           </p>
         </div>
       ) : (

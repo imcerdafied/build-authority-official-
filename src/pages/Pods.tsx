@@ -51,10 +51,10 @@ export default function Pods() {
     <div>
       <div className="mb-6 flex items-center justify-between">
         <div>
-          <h1 className="text-xl font-bold">Bet Units</h1>
+          <h1 className="text-xl font-bold">Pods</h1>
           <p className="text-sm text-muted-foreground mt-1">
             {authorityActive
-              ? "Authority allocates. Cross-functional units execute."
+              ? "Cross-functional teams executing your active bets."
               : `${pods.length} units · ${pods.reduce((sum: number, p: any) => sum + (p.pod_initiatives?.length || 0), 0)} initiatives`}
           </p>
         </div>
@@ -84,12 +84,36 @@ export default function Pods() {
       {showCreate && <CreatePodForm onClose={() => setShowCreate(false)} />}
 
       {isEmpty && !showCreate ? (
-        <div className="border border-dashed rounded-md px-6 py-10 text-center">
-          <p className="text-sm font-medium text-muted-foreground">No Bet Units Active.</p>
-          <p className="text-xs text-muted-foreground/70 mt-1.5">Activate a unit to begin execution compression.</p>
-          <div className="flex justify-center gap-6 mt-4 text-xs text-muted-foreground/50">
-            <span>Unit Name</span><span>Active Bets</span><span>Slice Status</span><span>Velocity</span>
-          </div>
+        <div className="space-y-3">
+          <p className="text-sm text-muted-foreground mb-4">
+            Pods are cross-functional teams executing your bets. Each pod owns one or more active bets
+            and ships in short slices. Create a pod when a bet needs a dedicated team behind it.
+          </p>
+          {/* Ghost example pod */}
+          {[
+            { name: "Growth Pod", bets: "TransitionOS B2B launch", status: "In Slice", note: "Who owns the B2B push?" },
+            { name: "Platform Pod", bets: "Build Authority product", status: "Building", note: "Who owns the product?" },
+          ].map((ghost, i) => (
+            <div
+              key={i}
+              onClick={() => setShowCreate(true)}
+              className="border border-dashed border-border/60 rounded-lg p-5 cursor-pointer
+                hover:border-foreground/30 hover:bg-muted/20 transition-all group"
+            >
+              <div className="flex items-center justify-between">
+                <div>
+                  <div className="text-[10px] uppercase tracking-widest text-muted-foreground/50 mb-1">Example Pod</div>
+                  <div className="font-medium text-muted-foreground/60">{ghost.name}</div>
+                  <div className="text-xs text-muted-foreground/40 mt-1">Executing: {ghost.bets}</div>
+                </div>
+                <div className="text-right">
+                  <div className="text-[10px] px-2 py-0.5 rounded border border-dashed border-border/40 text-muted-foreground/40 mb-1">{ghost.status}</div>
+                  <div className="text-[10px] text-muted-foreground/30 italic">{ghost.note}</div>
+                </div>
+              </div>
+            </div>
+          ))}
+          <p className="text-xs text-muted-foreground/40 text-center pt-1">Click to create your first pod</p>
         </div>
       ) : (
         <div className="space-y-6">
