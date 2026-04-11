@@ -1065,6 +1065,21 @@ function BetCard({
   handleStatusConfirm: () => void;
 }) {
   const [logFormExpanded, setLogFormExpanded] = useState(false);
+  const { currentOrg } = useOrg();
+
+  const { data: betOutcomes } = useQuery({
+    queryKey: ['bet-outcomes', d.id],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from('outcomes')
+        .select('id, title, status')
+        .eq('bet_id', d.id)
+        .eq('org_id', currentOrg!.id);
+      return data ?? [];
+    },
+    enabled: !!currentOrg && !!d.id,
+    staleTime: 60_000,
+  });
 
   const capacityDiverted = (d.capacity_diverted ?? 0) as number;
   const unplannedInterrupts = (d.unplanned_interrupts ?? 0) as number;
@@ -1080,6 +1095,12 @@ function BetCard({
       <div className="px-4 md:px-5 py-3 border-b bg-black/90 text-white">
         <div className="flex flex-col xl:flex-row xl:items-center xl:justify-between gap-4">
           <div className="min-w-0 w-full xl:flex-[1.2]">
+            {d.linked_okr_title && (
+              <div className="text-[10px] uppercase tracking-widest text-white/50 mb-1 flex items-center gap-1">
+                <span className="w-1.5 h-1.5 rounded-full bg-teal-400 inline-block" />
+                GOAL: {d.linked_okr_title}
+              </div>
+            )}
             <div className="flex items-start gap-2 min-h-[44px]">
               <span className="text-lg font-semibold leading-snug !text-white/70">{index}.</span>
               <InlineEdit
@@ -1286,6 +1307,30 @@ function BetCard({
           logInterruptionOnClick={() => setLogFormExpanded(true)}
           canWrite={canWrite}
         />
+
+      {betOutcomes && betOutcomes.length > 0 && (
+        <div className="px-4 md:px-5 py-3 border-t border-border/40">
+          <div className="text-[10px] uppercase tracking-widest text-muted-foreground mb-1.5 flex items-center gap-1">
+            <span className="w-1.5 h-1.5 rounded-full bg-purple-400 inline-block" />
+            BUILD: {betOutcomes.length} outcome{betOutcomes.length !== 1 ? 's' : ''}
+          </div>
+          <div className="flex flex-wrap gap-1">
+            {betOutcomes.slice(0, 3).map((o: any) => (
+              <span key={o.id} className={cn(
+                "text-[10px] px-1.5 py-0.5 rounded border",
+                o.status === 'shipped' ? 'border-green-200 text-green-700 bg-green-50' :
+                o.status === 'in_progress' ? 'border-blue-200 text-blue-700 bg-blue-50' :
+                'border-border/40 text-muted-foreground'
+              )}>
+                {o.title.length > 30 ? o.title.slice(0, 30) + '\u2026' : o.title}
+              </span>
+            ))}
+            {betOutcomes.length > 3 && (
+              <span className="text-[10px] text-muted-foreground">+{betOutcomes.length - 3} more</span>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
