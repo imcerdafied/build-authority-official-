@@ -222,21 +222,63 @@ export default function OKRList() {
     return <p className="text-xs text-muted-foreground uppercase tracking-widest py-12 text-center">Loading...</p>;
   }
 
-  if (okrs.length === 0 && !showCreate) {
+  if (okrs.length === 0) {
+    const ghosts = [
+      { label: "Objective 1", hint: "What does your team most need to achieve this quarter?" },
+      { label: "Objective 2", hint: "What capability or market position needs to be built?" },
+      { label: "Objective 3", hint: "What risk or debt needs to be addressed?" },
+    ];
     return (
-      <div className="flex flex-col items-center justify-center py-24 gap-4 text-center">
-        <p className="text-xs uppercase tracking-wider text-muted-foreground max-w-md leading-relaxed">
-          The Goals altitude is where you define what matters most. OKRs connect your strategic objectives to measurable key results
-          so the entire organization stays aligned.
-        </p>
-        <button
-          onClick={() => setShowCreate(true)}
-          className="text-xs uppercase tracking-wider font-semibold border border-foreground/20 rounded-sm px-4 py-2 hover:bg-foreground/5 transition-colors"
-        >
-          + Create Your First OKR
-        </button>
+      <div className="space-y-3 mt-2">
+        <div className="flex items-center justify-between mb-6">
+          <div>
+            <h2 className="text-lg font-semibold">OKRs — {buildQuarterOptions()[0].replace("-", " ")}</h2>
+            <p className="text-sm text-muted-foreground mt-0.5">
+              3–5 objectives · 3 key results each · reviewed weekly
+            </p>
+          </div>
+          <button
+            onClick={() => setShowCreate(true)}
+            className="text-xs uppercase tracking-wider font-semibold border border-foreground/20 rounded-sm px-3 py-1.5 hover:bg-foreground/5 transition-colors"
+          >
+            + New OKR
+          </button>
+        </div>
 
-        {/* slide-over rendered even in empty state */}
+        {ghosts.map((ghost, i) => (
+          <div
+            key={i}
+            onClick={() => setShowCreate(true)}
+            className="border border-dashed border-border/60 rounded-lg p-5 cursor-pointer hover:border-foreground/30 hover:bg-muted/30 transition-all group"
+          >
+            <div className="flex items-start justify-between">
+              <div className="flex-1">
+                <div className="text-[10px] uppercase tracking-widest text-muted-foreground/60 mb-1">
+                  {ghost.label}
+                </div>
+                <div className="text-sm text-muted-foreground/50 italic">
+                  {ghost.hint}
+                </div>
+                <div className="mt-3 space-y-1.5">
+                  {['Key Result 1', 'Key Result 2', 'Key Result 3'].map((kr, j) => (
+                    <div key={j} className="flex items-center gap-2">
+                      <div className="w-1.5 h-1.5 rounded-full bg-muted-foreground/20" />
+                      <div className="text-[11px] text-muted-foreground/40">{kr}: measure what matters</div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+              <span className="text-[10px] text-muted-foreground/40 group-hover:text-foreground/40 ml-4 mt-1">
+                + Add →
+              </span>
+            </div>
+          </div>
+        ))}
+
+        <p className="text-xs text-muted-foreground/50 text-center pt-2">
+          Click any objective to start building your OKRs
+        </p>
+
         {showCreate && <CreatePanel />}
       </div>
     );
