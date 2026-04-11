@@ -197,7 +197,7 @@ export default function Loops() {
             </div>
           ))}
           <p className="text-xs text-muted-foreground/40 text-center pt-1">
-            Open a bet → scroll to Outcome Loops → + New Loop
+            Open any bet in the Bets altitude to create a loop for it.
           </p>
         </div>
       ) : (
