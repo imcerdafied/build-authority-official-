@@ -1,26 +1,25 @@
 import { useState } from "react";
-import { useCreateSignal } from "@/hooks/useOrgData";
+import { useCreateSignal, useOrgDomains } from "@/hooks/useOrgData";
 import { useOrg } from "@/contexts/OrgContext";
 import type { Database } from "@/integrations/supabase/types";
 
 type SignalType = Database["public"]["Enums"]["signal_type"];
-type SolutionDomain = Database["public"]["Enums"]["solution_domain"];
 
 const signalTypes: SignalType[] = [
   "KPI Deviation", "Segment Variance", "Agent Drift", "Exec Escalation",
   "Launch Milestone", "Renewal Risk", "Cross-Solution Conflict",
 ];
-const solutionDomains: SolutionDomain[] = ["S1", "S2", "S3", "Cross"];
 
 export default function CreateSignalForm({ onClose }: { onClose: () => void }) {
   const createSignal = useCreateSignal();
   const { currentRole } = useOrg();
   const canCreate = currentRole === "admin" || currentRole === "pod_lead";
+  const { data: orgDomains = [], isLoading: domainsLoading } = useOrgDomains();
 
   const [type, setType] = useState<SignalType>("KPI Deviation");
   const [description, setDescription] = useState("");
   const [source, setSource] = useState("");
-  const [solutionDomain, setSolutionDomain] = useState<SolutionDomain | "">("");
+  const [solutionDomain, setSolutionDomain] = useState<string>("");
 
   if (!canCreate) return null;
 
@@ -32,8 +31,8 @@ export default function CreateSignalForm({ onClose }: { onClose: () => void }) {
       type,
       description,
       source,
-      solution_domain: solutionDomain || null,
-    });
+      solution_domain_key: solutionDomain || null,
+    } as any);
     onClose();
   };
 
@@ -54,10 +53,16 @@ export default function CreateSignalForm({ onClose }: { onClose: () => void }) {
           </div>
           <div>
             <label className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground block mb-1">Domain</label>
-            <select value={solutionDomain} onChange={(e) => setSolutionDomain(e.target.value as SolutionDomain)}
-              className="w-full border rounded-sm px-3 py-2 text-sm bg-background focus:outline-none focus:ring-1 focus:ring-foreground">
-              <option value="">—</option>
-              {solutionDomains.map((s) => <option key={s} value={s}>{s}</option>)}
+            <select
+              value={solutionDomain}
+              onChange={(e) => setSolutionDomain(e.target.value)}
+              disabled={domainsLoading}
+              className="w-full border rounded-sm px-3 py-2 text-sm bg-background focus:outline-none focus:ring-1 focus:ring-foreground disabled:opacity-50">
+              <option value="">{domainsLoading ? "Loading domains..." : "—"}</option>
+              {!domainsLoading && orgDomains.length === 0 && (
+                <option value="" disabled>No domains configured</option>
+              )}
+              {orgDomains.map((d) => <option key={d.id} value={d.name}>{d.label}</option>)}
             </select>
           </div>
         </div>
