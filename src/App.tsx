@@ -12,7 +12,6 @@ import Review from "@/pages/Review";
 import HowItWorks from "@/pages/HowItWorks";
 import Signals from "@/pages/Signals";
 import Pods from "@/pages/Pods";
-import Memory from "@/pages/Memory";
 import Ask from "@/pages/Ask";
 import Team from "@/pages/Team";
 import FeedbackAdmin from "@/pages/FeedbackAdmin";
@@ -86,7 +85,6 @@ function AppContent() {
               <Route path="/pods" element={<Pods />} />
               <Route path="/capability-map" element={<CapabilityMap />} />
               <Route path="/ask" element={<Ask />} />
-              <Route path="/memory" element={<Memory />} />
               <Route path="/how-it-works" element={<HowItWorks />} />
 
               {/* Build altitude */}
