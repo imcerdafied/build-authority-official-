@@ -95,7 +95,7 @@ export default function ProjectionPanel({
   return (
     <div className="mt-4 pt-4 border-t">
       <div className="mt-2 border rounded-md p-3 bg-muted/20">
-        <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground mb-2">
+        <p className="text-xs font-semibold text-muted-foreground mb-2">
           Authority vs Monitoring: {horizonMonths}-Month Exposure
         </p>
         <p className="text-xs text-muted-foreground">
@@ -103,19 +103,19 @@ export default function ProjectionPanel({
         </p>
 
         <div className="mt-3 rounded-lg border bg-background/70 p-4">
-          <p className="text-[10px] uppercase tracking-wider text-muted-foreground">Renewal Exposure at Risk</p>
+          <p className="text-xs text-muted-foreground">Renewal Exposure at Risk</p>
           <p className="text-4xl md:text-5xl font-semibold leading-none mt-1 text-signal-red">
             {downsideValue === null ? "—" : `−${formatMillions(Math.abs(downsideValue))}`}
           </p>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mt-4 text-sm">
             <div>
-              <p className="text-[10px] uppercase tracking-wider text-muted-foreground">Installed Base Influenced</p>
+              <p className="text-xs text-muted-foreground">Installed Base Influenced</p>
               <p className="text-xl font-semibold">
                 {installedBaseInfluenced === null ? "—" : formatMillions(installedBaseInfluenced)}
               </p>
             </div>
             <div>
-              <p className="text-[10px] uppercase tracking-wider text-muted-foreground">Expansion Opportunity</p>
+              <p className="text-xs text-muted-foreground">Expansion Opportunity</p>
               <p className="text-xl font-semibold text-signal-green">
                 {upsideValue === null ? "—" : `+${formatMillions(Math.abs(upsideValue))}`}
               </p>
@@ -125,7 +125,7 @@ export default function ProjectionPanel({
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mt-4">
           <div className="border rounded-sm bg-background/70 p-3">
-            <p className="text-[10px] uppercase tracking-wider text-muted-foreground">Defensive Value (Renewal Protection)</p>
+            <p className="text-xs text-muted-foreground">Defensive Value (Renewal Protection)</p>
             <p className="text-sm font-medium mt-1">
               Protects renewal gravity by embedding Conviva in AI evaluation and governance workflows.
             </p>
@@ -134,7 +134,7 @@ export default function ProjectionPanel({
             </p>
           </div>
           <div className="border rounded-sm bg-background/70 p-3">
-            <p className="text-[10px] uppercase tracking-wider text-muted-foreground">Offensive Value (Expansion & Positioning)</p>
+            <p className="text-xs text-muted-foreground">Offensive Value (Expansion & Positioning)</p>
             <p className="text-sm font-medium mt-1">
               Converts Conviva into the system of record for scale/change/stop decisions on enterprise AI agents.
             </p>
@@ -149,18 +149,18 @@ export default function ProjectionPanel({
         </p>
 
         <div className="mt-3 border rounded-sm bg-background/70 p-3">
-          <p className="text-[10px] uppercase tracking-wider text-muted-foreground">Risk Weighting Model</p>
+          <p className="text-xs text-muted-foreground">Risk Weighting Model</p>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mt-2 text-sm">
             <div>
-              <p className="text-[10px] uppercase tracking-wider text-muted-foreground">Probability of Success</p>
+              <p className="text-xs text-muted-foreground">Probability of Success</p>
               <p className="font-semibold">{probabilitySuccess}% ({inferredConfidence})</p>
             </div>
             <div>
-              <p className="text-[10px] uppercase tracking-wider text-muted-foreground">Break-even Probability</p>
+              <p className="text-xs text-muted-foreground">Break-even Probability</p>
               <p className="font-semibold">{breakEvenProbability === null ? "—" : `${breakEvenProbability}%`}</p>
             </div>
             <div>
-              <p className="text-[10px] uppercase tracking-wider text-muted-foreground">Expected Value ({horizonMonths} mo)</p>
+              <p className="text-xs text-muted-foreground">Expected Value ({horizonMonths} mo)</p>
               <p className={cn("font-semibold", expectedNet !== null && expectedNet < 0 ? "text-signal-red" : "")}>{expectedValueLabel}</p>
             </div>
           </div>
@@ -175,7 +175,7 @@ export default function ProjectionPanel({
             </p>
           </div>
           <div className="mt-3">
-            <p className="text-[10px] uppercase tracking-wider text-muted-foreground mb-1">Risk-Reward Imbalance (Raw)</p>
+            <p className="text-xs text-muted-foreground mb-1">Risk-Reward Imbalance (Raw)</p>
             <div className="border rounded-sm px-2 py-1.5 bg-background/70">
               <div className="flex items-center h-4">
                 <div className="w-1/2 flex justify-end pr-1">
@@ -190,7 +190,7 @@ export default function ProjectionPanel({
                   )}
                 </div>
               </div>
-              <div className="mt-1 flex items-center justify-between text-[10px] text-muted-foreground">
+              <div className="mt-1 flex items-center justify-between text-xs text-muted-foreground">
                 <span>Risk: {downsideValue === null ? "—" : `−${formatMillions(Math.abs(downsideValue))}`}</span>
                 <span>0</span>
                 <span>Opportunity: {upsideValue === null ? "—" : `+${formatMillions(Math.abs(upsideValue))}`}</span>
@@ -203,7 +203,7 @@ export default function ProjectionPanel({
         </div>
 
         <div className="mt-3 border rounded-sm bg-background/70 p-3">
-          <p className="text-[10px] uppercase tracking-wider text-muted-foreground">Interpretation</p>
+          <p className="text-xs text-muted-foreground">Interpretation</p>
           <p className="text-sm mt-1">
             This bet carries high strategic leverage with asymmetrical exposure. The decision is whether to accept current risk shape
             or deliberately change it.
@@ -214,7 +214,7 @@ export default function ProjectionPanel({
             <li>Reduce renewal exposure by lowering dependency on miss scenarios.</li>
           </ul>
         </div>
-        <p className="text-[10px] text-muted-foreground mt-3">
+        <p className="text-xs text-muted-foreground mt-3">
           Last updated {new Date(decision.updated_at).toLocaleString("en-US", {
             month: "short",
             day: "numeric",

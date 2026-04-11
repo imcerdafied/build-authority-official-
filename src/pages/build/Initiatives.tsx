@@ -66,13 +66,13 @@ export default function Initiatives() {
   }, [filtered]);
 
   if (isLoading) {
-    return <p className="text-xs text-muted-foreground uppercase tracking-widest py-12 text-center">Loading...</p>;
+    return <p className="text-sm text-muted-foreground py-12 text-center">Loading...</p>;
   }
 
   if (initiatives.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-24 gap-4 text-center">
-        <p className="text-xs uppercase tracking-wider text-muted-foreground max-w-md leading-relaxed">
+        <p className="text-xs text-muted-foreground max-w-md leading-relaxed">
           Initiatives are the specific actions your team is committing to for each bet.
           They feed the scoring engine — higher value × confidence ÷ effort = better score.
         </p>
@@ -81,7 +81,7 @@ export default function Initiatives() {
         </p>
         <Link
           to="/decisions"
-          className="text-xs uppercase tracking-wider font-semibold border border-foreground/20 rounded-sm px-4 py-2 hover:bg-foreground/5 transition-colors"
+          className="text-xs font-semibold border border-foreground/20 rounded-sm px-4 py-2 hover:bg-foreground/5 transition-colors"
         >
           Go to Bets →
         </Link>
@@ -131,13 +131,13 @@ export default function Initiatives() {
               {/* Bet header */}
               <div className="px-4 py-2.5 border-b bg-muted/30 flex items-center justify-between">
                 <div className="flex items-center gap-2 min-w-0">
-                  <span className="text-[10px] text-muted-foreground/60">⚡</span>
-                  <span className="text-[11px] font-semibold uppercase tracking-wider truncate">
+                  <span className="text-xs text-muted-foreground/60">⚡</span>
+                  <span className="text-sm font-semibold truncate">
                     {bet?.title || "Unknown Bet"}
                   </span>
                 </div>
                 {bet?.status && (
-                  <span className="text-[10px] uppercase tracking-wider text-muted-foreground border border-border rounded-sm px-1.5 py-0.5 shrink-0">
+                  <span className="text-xs text-muted-foreground border border-border rounded-sm px-1.5 py-0.5 shrink-0">
                     {String(bet.status).replace(/_/g, " ")}
                   </span>
                 )}
@@ -156,7 +156,7 @@ export default function Initiatives() {
                     {/* Score badge */}
                     <span
                       className={cn(
-                        "text-[10px] font-semibold uppercase tracking-wider px-1.5 py-0.5 rounded-sm shrink-0 tabular-nums",
+                        "text-xs font-semibold px-1.5 py-0.5 rounded-sm shrink-0 tabular-nums",
                         scoreColor(init.score_v3),
                       )}
                     >
@@ -164,7 +164,7 @@ export default function Initiatives() {
                     </span>
 
                     {/* Confidence */}
-                    <span className="text-[10px] text-muted-foreground tabular-nums shrink-0 w-12 text-right">
+                    <span className="text-xs text-muted-foreground tabular-nums shrink-0 w-12 text-right">
                       {Math.round(init.confidence * 100)}%
                     </span>
 
@@ -176,7 +176,7 @@ export default function Initiatives() {
                           style={{ width: `${Math.min(100, (init.effort / 10) * 100)}%` }}
                         />
                       </div>
-                      <span className="text-[10px] text-muted-foreground tabular-nums">{init.effort}</span>
+                      <span className="text-xs text-muted-foreground tabular-nums">{init.effort}</span>
                     </div>
                   </div>
                 ))}

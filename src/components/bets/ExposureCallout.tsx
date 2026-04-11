@@ -25,7 +25,7 @@ export default function ExposureCallout({ label, variant, children, className }:
 
   return (
     <div className={cn("border rounded-md p-3", styles.wrapper, className)}>
-      <span className={cn("text-[11px] uppercase tracking-[0.16em] block mb-1", styles.label)}>
+      <span className={cn("text-xs block mb-1", styles.label)}>
         {label}
       </span>
       <div className={cn("text-sm", styles.content)}>{children}</div>

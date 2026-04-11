@@ -146,7 +146,7 @@ export default function Team() {
   };
 
   if (membersLoading || invitesLoading) {
-    return <p className="text-xs text-muted-foreground uppercase tracking-widest">Loading...</p>;
+    return <p className="text-sm text-muted-foreground">Loading...</p>;
   }
 
   if (!canManageMembers) {
@@ -172,13 +172,13 @@ export default function Team() {
       </div>
 
       <section className="mb-8">
-        <h2 className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground mb-3">
+        <h2 className="text-xs font-semibold text-muted-foreground mb-3">
           Invite Member
         </h2>
         <div className="border rounded-md p-4 space-y-4">
           <form onSubmit={handleInvite} className="grid grid-cols-1 lg:grid-cols-[1.2fr_0.6fr_0.8fr_auto] gap-2 items-end">
             <div>
-              <label className="text-[11px] uppercase tracking-widest font-semibold text-muted-foreground block mb-1">
+              <label className="text-xs font-semibold text-muted-foreground block mb-1">
                 Email
               </label>
               <input
@@ -191,7 +191,7 @@ export default function Team() {
             </div>
 
             <div>
-              <label className="text-[11px] uppercase tracking-widest font-semibold text-muted-foreground block mb-1">
+              <label className="text-xs font-semibold text-muted-foreground block mb-1">
                 Role
               </label>
               <select
@@ -206,7 +206,7 @@ export default function Team() {
             </div>
 
             <div>
-              <label className="text-[11px] uppercase tracking-widest font-semibold text-muted-foreground block mb-1">
+              <label className="text-xs font-semibold text-muted-foreground block mb-1">
                 Role Label (Optional)
               </label>
               <input
@@ -221,7 +221,7 @@ export default function Team() {
             <button
               type="submit"
               disabled={inviteMember.isPending}
-              className="text-[11px] font-semibold uppercase tracking-wider text-background bg-foreground px-4 py-2 rounded-sm hover:bg-foreground/90 transition-colors disabled:opacity-50"
+              className="text-sm font-semibold text-background bg-foreground px-4 py-2 rounded-sm hover:bg-foreground/90 transition-colors disabled:opacity-50"
             >
               {inviteMember.isPending ? "Sending..." : "Invite"}
             </button>
@@ -236,19 +236,19 @@ export default function Team() {
             />
             <button
               onClick={handleCopy}
-              className="text-[11px] font-semibold uppercase tracking-wider border border-foreground px-4 py-2 rounded-sm hover:bg-foreground hover:text-background transition-colors"
+              className="text-sm font-semibold border border-foreground px-4 py-2 rounded-sm hover:bg-foreground hover:text-background transition-colors"
             >
               {copied ? "Copied ✓" : "Copy Invite Link"}
             </button>
           </div>
-          <p className="text-[11px] text-muted-foreground">
+          <p className="text-xs text-muted-foreground">
             Invite links use the active workspace id and keep data isolated per workspace.
           </p>
 
           <div className="pt-2 border-t">
             <div className="grid grid-cols-1 md:grid-cols-[1fr_auto] gap-2 items-end">
               <div>
-                <label className="text-[11px] uppercase tracking-widest font-semibold text-muted-foreground block mb-1">
+                <label className="text-xs font-semibold text-muted-foreground block mb-1">
                   Allowed Email Domain
                 </label>
                 <input
@@ -262,18 +262,18 @@ export default function Team() {
               <button
                 onClick={handleSaveDomain}
                 disabled={domainSaving}
-                className="text-[11px] font-semibold uppercase tracking-wider border border-foreground px-4 py-2 rounded-sm hover:bg-foreground hover:text-background transition-colors disabled:opacity-50"
+                className="text-sm font-semibold border border-foreground px-4 py-2 rounded-sm hover:bg-foreground hover:text-background transition-colors disabled:opacity-50"
               >
                 {domainSaving ? "Saving..." : "Save Domain Rule"}
               </button>
             </div>
-            {domainMsg && <p className="text-[11px] text-muted-foreground mt-2">{domainMsg}</p>}
+            {domainMsg && <p className="text-xs text-muted-foreground mt-2">{domainMsg}</p>}
           </div>
         </div>
       </section>
 
       <section className="mb-8">
-        <h2 className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground mb-3">
+        <h2 className="text-xs font-semibold text-muted-foreground mb-3">
           Pending Invitations ({pendingInvitations.length})
         </h2>
         {pendingInvitations.length === 0 ? (
@@ -286,7 +286,7 @@ export default function Team() {
               <div key={invite.id} className="px-4 py-3 flex items-center justify-between gap-3">
                 <div className="min-w-0">
                   <p className="text-sm font-medium truncate">{invite.email}</p>
-                  <p className="text-[11px] text-muted-foreground">
+                  <p className="text-xs text-muted-foreground">
                     {roleLabels[invite.role] || invite.role}
                     {invite.role_label ? ` · ${invite.role_label}` : ""}
                     {" · "}
@@ -296,7 +296,7 @@ export default function Team() {
                 <button
                   onClick={() => void handleRevokeInvite(invite.id)}
                   disabled={revokeInvitation.isPending}
-                  className="text-[11px] font-semibold uppercase tracking-wider border border-foreground px-3 py-1.5 rounded-sm hover:bg-foreground hover:text-background transition-colors disabled:opacity-50"
+                  className="text-sm font-semibold border border-foreground px-3 py-1.5 rounded-sm hover:bg-foreground hover:text-background transition-colors disabled:opacity-50"
                 >
                   Revoke
                 </button>
@@ -307,7 +307,7 @@ export default function Team() {
       </section>
 
       <section>
-        <h2 className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground mb-3">
+        <h2 className="text-xs font-semibold text-muted-foreground mb-3">
           Members ({orderedMembers.length})
         </h2>
         {orderedMembers.length === 0 ? (
@@ -332,9 +332,9 @@ export default function Team() {
                       {isYou && <span className="text-muted-foreground ml-1">(You)</span>}
                     </p>
                     {hasName && member.email && (
-                      <p className="text-[11px] text-muted-foreground truncate">{member.email}</p>
+                      <p className="text-xs text-muted-foreground truncate">{member.email}</p>
                     )}
-                    <p className="text-[11px] text-muted-foreground">
+                    <p className="text-xs text-muted-foreground">
                       Joined {formatDate(member.joined_at)}
                       {member.role_label ? ` · ${member.role_label}` : ""}
                     </p>
@@ -365,7 +365,7 @@ export default function Team() {
                           )
                         }
                         disabled={updateMemberRole.isPending}
-                        className="text-[11px] font-semibold uppercase tracking-wider border rounded-sm px-2 py-1 bg-background"
+                        className="text-sm font-semibold border rounded-sm px-2 py-1 bg-background"
                       >
                         <option value="viewer">Viewer</option>
                         <option value="pod_lead">Editor</option>
@@ -374,7 +374,7 @@ export default function Team() {
                     ) : (
                       <span
                         className={cn(
-                          "text-[11px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-sm",
+                          "text-sm font-semibold px-2 py-0.5 rounded-sm",
                           roleBadgeClass(semanticRole),
                         )}
                       >

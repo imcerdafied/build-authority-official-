@@ -26,7 +26,7 @@ export default function Signals() {
   const canWrite = currentRole === "admin" || currentRole === "pod_lead";
   const canDelete = currentRole === "admin";
 
-  if (isLoading) return <p className="text-xs text-muted-foreground uppercase tracking-widest">Loading...</p>;
+  if (isLoading) return <p className="text-sm text-muted-foreground">Loading...</p>;
 
   const unlinked = signals.filter((s) => !s.decision_id);
   const severe = unlinked.length > 3;
@@ -41,7 +41,7 @@ export default function Signals() {
         </div>
         {canWrite && !showCreate && (
           <button onClick={() => setShowCreate(true)}
-            className="text-[11px] font-semibold uppercase tracking-wider text-foreground border border-foreground px-3 py-1.5 rounded-sm hover:bg-foreground hover:text-background transition-colors">
+            className="text-sm font-semibold text-foreground border border-foreground px-3 py-1.5 rounded-sm hover:bg-foreground hover:text-background transition-colors">
             + Register Signal
           </button>
         )}
@@ -58,7 +58,7 @@ export default function Signals() {
 
       <div className="flex gap-2 mb-6 flex-wrap">
         {signalTypeLabels.map((type) => (
-          <span key={type} className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground border rounded-sm px-2 py-1">{type}</span>
+          <span key={type} className="text-xs font-semibold text-muted-foreground border rounded-sm px-2 py-1">{type}</span>
         ))}
       </div>
 
@@ -73,21 +73,21 @@ export default function Signals() {
             <div key={s.id} className="p-4">
               <div className="flex items-center gap-3 mb-2">
                 {s.solution_domain && <StatusBadge status={s.solution_domain} />}
-                <span className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground bg-muted px-2 py-0.5 rounded-sm">{s.type}</span>
-                <span className="text-[11px] text-muted-foreground">{daysSince(s.created_at)}d ago · {s.source}</span>
-                {!s.decision_id && <span className="text-[11px] font-semibold text-signal-amber uppercase tracking-wider ml-auto">Needs Bet</span>}
-                {s.decision_id && <span className="text-[11px] text-signal-green font-semibold uppercase tracking-wider ml-auto">Linked</span>}
+                <span className="text-xs font-semibold text-muted-foreground bg-muted px-2 py-0.5 rounded-sm">{s.type}</span>
+                <span className="text-xs text-muted-foreground">{daysSince(s.created_at)}d ago · {s.source}</span>
+                {!s.decision_id && <span className="text-xs font-semibold text-signal-amber ml-auto">Needs Bet</span>}
+                {s.decision_id && <span className="text-xs text-signal-green font-semibold ml-auto">Linked</span>}
               </div>
               <p className="text-sm">{s.description}</p>
               <div className="flex items-center gap-3 mt-2">
                 {!s.decision_id && (
-                  <button className="text-[11px] font-semibold uppercase tracking-wider text-foreground border border-foreground px-2 py-1 rounded-sm hover:bg-foreground hover:text-background transition-colors">
+                  <button className="text-sm font-semibold text-foreground border border-foreground px-2 py-1 rounded-sm hover:bg-foreground hover:text-background transition-colors">
                     Spawn Bet →
                   </button>
                 )}
                 {canDelete && (
                   <button onClick={() => { if (confirm("Delete this signal?")) deleteSignal.mutate(s.id); }}
-                    className="text-[11px] font-semibold uppercase tracking-wider text-signal-red hover:underline">Delete</button>
+                    className="text-sm font-semibold text-signal-red hover:underline">Delete</button>
                 )}
               </div>
             </div>

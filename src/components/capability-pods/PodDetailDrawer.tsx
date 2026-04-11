@@ -125,7 +125,7 @@ export default function PodDetailDrawer({ podId, onClose, canWrite }: PodDetailD
     await updatePod.mutateAsync({ id: pod.id, dependencies: deps });
   };
 
-  const labelClass = "text-[11px] font-semibold uppercase tracking-[0.16em] text-muted-foreground block mb-1";
+  const labelClass = "text-xs font-semibold text-muted-foreground block mb-1";
   const inputClass = "w-full border rounded-sm px-3 py-2 text-sm bg-background focus:outline-none focus:ring-1 focus:ring-foreground";
 
   const EditableField = ({ field, label, value, multiline }: { field: string; label: string; value: string; multiline?: boolean }) => (
@@ -312,9 +312,9 @@ export default function PodDetailDrawer({ podId, onClose, canWrite }: PodDetailD
               {canWrite && (
                 <div className="flex gap-2">
                   {kpiTargets.length > 0 && (
-                    <button onClick={saveKpis} className="text-[11px] font-semibold uppercase tracking-wider text-signal-green hover:underline">Save</button>
+                    <button onClick={saveKpis} className="text-sm font-semibold text-signal-green hover:underline">Save</button>
                   )}
-                  <button onClick={addKpi} className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground hover:text-foreground">+ Add</button>
+                  <button onClick={addKpi} className="text-xs font-semibold text-muted-foreground hover:text-foreground">+ Add</button>
                 </div>
               )}
             </div>
@@ -325,23 +325,23 @@ export default function PodDetailDrawer({ podId, onClose, canWrite }: PodDetailD
                 {kpiTargets.map((kpi, idx) => (
                   <div key={idx} className="grid grid-cols-1 md:grid-cols-5 gap-2 items-end">
                     <div>
-                      <label className="text-[10px] text-muted-foreground">KPI Name</label>
+                      <label className="text-xs text-muted-foreground">KPI Name</label>
                       <input value={kpi.kpi_name} onChange={(e) => updateKpi(idx, "kpi_name", e.target.value)} className="w-full border rounded-sm px-2 py-1 text-xs bg-background" disabled={!canWrite} />
                     </div>
                     <div>
-                      <label className="text-[10px] text-muted-foreground">Baseline</label>
+                      <label className="text-xs text-muted-foreground">Baseline</label>
                       <input value={kpi.baseline} onChange={(e) => updateKpi(idx, "baseline", e.target.value)} className="w-full border rounded-sm px-2 py-1 text-xs bg-background" disabled={!canWrite} />
                     </div>
                     <div>
-                      <label className="text-[10px] text-muted-foreground">Target</label>
+                      <label className="text-xs text-muted-foreground">Target</label>
                       <input value={kpi.target} onChange={(e) => updateKpi(idx, "target", e.target.value)} className="w-full border rounded-sm px-2 py-1 text-xs bg-background" disabled={!canWrite} />
                     </div>
                     <div>
-                      <label className="text-[10px] text-muted-foreground">Unit</label>
+                      <label className="text-xs text-muted-foreground">Unit</label>
                       <input value={kpi.unit} onChange={(e) => updateKpi(idx, "unit", e.target.value)} className="w-full border rounded-sm px-2 py-1 text-xs bg-background" disabled={!canWrite} />
                     </div>
                     {canWrite && (
-                      <button onClick={() => removeKpi(idx)} className="text-[11px] text-signal-red hover:underline pb-1">Remove</button>
+                      <button onClick={() => removeKpi(idx)} className="text-xs text-signal-red hover:underline pb-1">Remove</button>
                     )}
                   </div>
                 ))}
@@ -410,7 +410,7 @@ export default function PodDetailDrawer({ podId, onClose, canWrite }: PodDetailD
             <div className="pt-3 border-t">
               <button
                 onClick={handleDeletePod}
-                className="text-[11px] font-semibold uppercase tracking-wider text-signal-red hover:underline"
+                className="text-sm font-semibold text-signal-red hover:underline"
               >
                 Delete Pod
               </button>

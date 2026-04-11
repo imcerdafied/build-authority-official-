@@ -4,7 +4,7 @@ export default function HowItWorks() {
       <h1 className="text-xl font-bold">How Build Authority Works</h1>
 
       <section>
-        <h2 className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground mb-2">The Model</h2>
+        <h2 className="text-xs font-semibold text-muted-foreground mb-2">The Model</h2>
         <p className="text-sm leading-relaxed text-muted-foreground">
           You can only have 5 active high-impact bets at a time. Want to start something new? Close one first.
           This single constraint changes behavior: it forces prioritization, closure, ownership, and exposure clarity.
@@ -15,7 +15,7 @@ export default function HowItWorks() {
       </section>
 
       <section>
-        <h2 className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground mb-2">The Rhythm</h2>
+        <h2 className="text-xs font-semibold text-muted-foreground mb-2">The Rhythm</h2>
         <div className="space-y-4 text-sm text-muted-foreground">
           <p>
             <strong className="text-foreground">Monday — Bet Health Review (10 min):</strong> the system shows what moved, what didn&apos;t, what risk increased.
@@ -30,7 +30,7 @@ export default function HowItWorks() {
       </section>
 
       <section>
-        <h2 className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground mb-2">Who Uses It</h2>
+        <h2 className="text-xs font-semibold text-muted-foreground mb-2">Who Uses It</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-sm">
           <div className="border rounded-md p-3">
             <p className="font-medium">Executive Sponsor</p>
@@ -48,7 +48,7 @@ export default function HowItWorks() {
       </section>
 
       <section>
-        <h2 className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground mb-2">Measure What Matters</h2>
+        <h2 className="text-xs font-semibold text-muted-foreground mb-2">Measure What Matters</h2>
         <p className="text-sm leading-relaxed text-muted-foreground">
           Every bet declares what success looks like. Outcome Metrics let you define the measurable targets behind each bet — retention rates, revenue milestones, activation goals.
         </p>
@@ -58,7 +58,7 @@ export default function HowItWorks() {
       </section>
 
       <section>
-        <h2 className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground mb-2">Always Know What to Build Next</h2>
+        <h2 className="text-xs font-semibold text-muted-foreground mb-2">Always Know What to Build Next</h2>
         <p className="text-sm leading-relaxed text-muted-foreground">
           Initiatives are the things your team is building or considering. Each initiative is scored and ranked based on its expected value, your confidence in its success, the effort required, and how well it aligns to your declared outcomes.
         </p>
@@ -68,7 +68,7 @@ export default function HowItWorks() {
       </section>
 
       <section>
-        <h2 className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground mb-2">Know When Execution Drifts from Strategy</h2>
+        <h2 className="text-xs font-semibold text-muted-foreground mb-2">Know When Execution Drifts from Strategy</h2>
         <p className="text-sm leading-relaxed text-muted-foreground">
           Build Authority watches for misalignment between what you said matters and what&apos;s actually getting built.
         </p>
@@ -88,7 +88,7 @@ export default function HowItWorks() {
       </section>
 
       <section>
-        <h2 className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground mb-2">The Closed Loop</h2>
+        <h2 className="text-xs font-semibold text-muted-foreground mb-2">The Closed Loop</h2>
         <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-sm font-medium my-3">
           <span>Capital</span>
           <span className="text-muted-foreground/40">→</span>

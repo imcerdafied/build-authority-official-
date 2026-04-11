@@ -39,7 +39,7 @@ export default function Loops() {
   const betsWithLoops = Array.from(new Set(loops.map((l) => l.bet_id)));
 
   if (isLoading) {
-    return <p className="text-xs text-muted-foreground uppercase tracking-widest">Loading...</p>;
+    return <p className="text-sm text-muted-foreground">Loading...</p>;
   }
 
   if (selectedLoop) {
@@ -48,12 +48,12 @@ export default function Loops() {
       <div>
         <button
           onClick={() => setSelectedLoop(null)}
-          className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground hover:text-foreground mb-3 flex items-center gap-1"
+          className="text-xs font-semibold text-muted-foreground hover:text-foreground mb-3 flex items-center gap-1"
         >
           <span>&larr;</span> Back to all loops
         </button>
         <div className="mb-2">
-          <span className="text-[10px] text-muted-foreground uppercase tracking-wider">
+          <span className="text-xs text-muted-foreground">
             Bet: {betMap.get(selectedLoop.bet_id) || "Unknown"}
           </span>
         </div>
@@ -108,7 +108,7 @@ export default function Loops() {
             {(statusFilter || betFilter) && (
               <button
                 onClick={() => { setStatusFilter(""); setBetFilter(""); }}
-                className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground hover:text-foreground"
+                className="text-xs font-semibold text-muted-foreground hover:text-foreground"
               >
                 Clear
               </button>
@@ -120,14 +120,14 @@ export default function Loops() {
       {/* Summary cards */}
       <div className="grid grid-cols-3 gap-3 mb-6">
         <div className="border rounded-sm px-3 py-2">
-          <span className="text-[10px] uppercase tracking-wider text-muted-foreground block">
+          <span className="text-xs text-muted-foreground block">
             What are we working on?
           </span>
           <span className="text-lg font-bold tabular-nums">{activeCount}</span>
           <span className="text-xs text-muted-foreground ml-1">active loops</span>
         </div>
         <div className="border rounded-sm px-3 py-2">
-          <span className="text-[10px] uppercase tracking-wider text-muted-foreground block">
+          <span className="text-xs text-muted-foreground block">
             What happened?
           </span>
           <span className="text-lg font-bold tabular-nums">
@@ -136,7 +136,7 @@ export default function Loops() {
           <span className="text-xs text-muted-foreground ml-1">have shipped</span>
         </div>
         <div className="border rounded-sm px-3 py-2">
-          <span className="text-[10px] uppercase tracking-wider text-muted-foreground block">
+          <span className="text-xs text-muted-foreground block">
             What&apos;s next?
           </span>
           <span className="text-lg font-bold tabular-nums">
@@ -176,21 +176,21 @@ export default function Loops() {
               key={i}
               className="border border-dashed border-border/60 rounded-lg p-5 opacity-60"
             >
-              <div className="text-[10px] uppercase tracking-widest text-muted-foreground/50 mb-1">
+              <div className="text-xs text-muted-foreground/50 mb-1">
                 Example Loop · {ghost.bet}
               </div>
               <div className="font-medium text-muted-foreground/70 mb-3">{ghost.title}</div>
               <div className="grid grid-cols-3 gap-3 text-xs">
                 <div>
-                  <div className="text-[10px] uppercase tracking-wider text-muted-foreground/40 mb-1">What shipped</div>
+                  <div className="text-xs text-muted-foreground/40 mb-1">What shipped</div>
                   <div className="text-muted-foreground/50">{ghost.shipped}</div>
                 </div>
                 <div>
-                  <div className="text-[10px] uppercase tracking-wider text-muted-foreground/40 mb-1">Decision</div>
+                  <div className="text-xs text-muted-foreground/40 mb-1">Decision</div>
                   <div className="text-muted-foreground/50">{ghost.decision}</div>
                 </div>
                 <div>
-                  <div className="text-[10px] uppercase tracking-wider text-muted-foreground/40 mb-1">Start here</div>
+                  <div className="text-xs text-muted-foreground/40 mb-1">Start here</div>
                   <div className="text-muted-foreground/40 italic">{ghost.note}</div>
                 </div>
               </div>
@@ -209,7 +209,7 @@ export default function Loops() {
               if (betLoops.length === 0) return null;
               return (
                 <div key={betId}>
-                  <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground mb-2">
+                  <p className="text-xs font-semibold text-muted-foreground mb-2">
                     {betMap.get(betId) || "Unknown Bet"}
                   </p>
                   <div className="space-y-2">

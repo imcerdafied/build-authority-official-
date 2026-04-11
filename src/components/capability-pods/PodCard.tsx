@@ -27,7 +27,7 @@ export default function PodCard({ pod, betId, canWrite, onToggle, onClick }: Pod
         <div className="flex items-center gap-2 min-w-0">
           <span
             className={cn(
-              "text-[10px] font-semibold uppercase tracking-wider px-1.5 py-0.5 rounded-sm shrink-0",
+              "text-xs font-semibold px-1.5 py-0.5 rounded-sm shrink-0",
               isPrimary
                 ? "bg-foreground text-background"
                 : "border border-foreground text-foreground",
@@ -48,7 +48,7 @@ export default function PodCard({ pod, betId, canWrite, onToggle, onClick }: Pod
       </div>
 
       <div className="flex items-center gap-4" onClick={(e) => e.stopPropagation()}>
-        <label className="flex items-center gap-1.5 text-[11px] text-muted-foreground">
+        <label className="flex items-center gap-1.5 text-xs text-muted-foreground">
           <input
             type="checkbox"
             checked={pod.prototype_built}
@@ -58,7 +58,7 @@ export default function PodCard({ pod, betId, canWrite, onToggle, onClick }: Pod
           />
           Prototype
         </label>
-        <label className="flex items-center gap-1.5 text-[11px] text-muted-foreground">
+        <label className="flex items-center gap-1.5 text-xs text-muted-foreground">
           <input
             type="checkbox"
             checked={pod.customer_validated}
@@ -68,7 +68,7 @@ export default function PodCard({ pod, betId, canWrite, onToggle, onClick }: Pod
           />
           Validated
         </label>
-        <label className="flex items-center gap-1.5 text-[11px] text-muted-foreground">
+        <label className="flex items-center gap-1.5 text-xs text-muted-foreground">
           <input
             type="checkbox"
             checked={pod.production_shipped}
@@ -83,7 +83,7 @@ export default function PodCard({ pod, betId, canWrite, onToggle, onClick }: Pod
       {warnings.length > 0 && (
         <div className="mt-2 flex flex-wrap gap-2">
           {warnings.map((w, i) => (
-            <span key={i} className="text-[10px] font-semibold uppercase tracking-wider text-signal-amber">
+            <span key={i} className="text-xs font-semibold text-signal-amber">
               {w}
             </span>
           ))}

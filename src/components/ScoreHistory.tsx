@@ -129,7 +129,7 @@ export default function ScoreHistory({ betId }: ScoreHistoryProps) {
   if (isLoading) {
     return (
       <div className="px-4 md:px-6 py-3 border-t">
-        <span className="text-[11px] uppercase tracking-[0.16em] text-muted-foreground">
+        <span className="text-xs text-muted-foreground">
           What Moved
         </span>
         <HistorySkeleton />
@@ -141,7 +141,7 @@ export default function ScoreHistory({ betId }: ScoreHistoryProps) {
   if (history.length === 0) {
     return (
       <div className="px-4 md:px-6 py-3 border-t">
-        <span className="text-[11px] uppercase tracking-[0.16em] text-muted-foreground">
+        <span className="text-xs text-muted-foreground">
           What Moved
         </span>
         <p className="text-xs text-muted-foreground/60 mt-1.5">
@@ -156,10 +156,10 @@ export default function ScoreHistory({ betId }: ScoreHistoryProps) {
     <div className="px-4 md:px-6 py-3 border-t">
       <button
         onClick={() => setOpen(!open)}
-        className="flex items-center gap-1.5 text-[11px] uppercase tracking-[0.16em] text-muted-foreground hover:text-foreground transition-colors"
+        className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors"
         aria-expanded={open}
       >
-        <span className="text-[10px]" aria-hidden="true">{open ? "▼" : "▶"}</span>
+        <span className="text-xs" aria-hidden="true">{open ? "▼" : "▶"}</span>
         What Moved ({history.length})
       </button>
 
@@ -173,7 +173,7 @@ export default function ScoreHistory({ betId }: ScoreHistoryProps) {
                 onClick={() => setFilter(f.key)}
                 aria-pressed={filter === f.key}
                 className={cn(
-                  "text-[10px] px-2 py-0.5 rounded-sm border transition-colors",
+                  "text-xs px-2 py-0.5 rounded-sm border transition-colors",
                   filter === f.key
                     ? "bg-foreground text-background border-foreground"
                     : "bg-background text-muted-foreground border-border hover:border-foreground",
@@ -193,7 +193,7 @@ export default function ScoreHistory({ betId }: ScoreHistoryProps) {
               />
             ))}
             {groups.length === 0 && (
-              <p className="text-[11px] text-muted-foreground/50">
+              <p className="text-xs text-muted-foreground/50">
                 No entries match this filter.
               </p>
             )}
@@ -216,7 +216,7 @@ function RecalcGroupView({
   const count = group.entries.length;
 
   return (
-    <div className="text-[11px]">
+    <div className="text-xs">
       {/* Group header */}
       <div className="flex items-center gap-1.5 text-muted-foreground">
         <span className="tabular-nums whitespace-nowrap">
@@ -275,7 +275,7 @@ function EntryLine({
   const truncDesc = desc.length > 40 ? desc.slice(0, 40) + "…" : desc;
 
   return (
-    <div className="flex items-start gap-2 text-[11px]">
+    <div className="flex items-start gap-2 text-xs">
       <span className="text-muted-foreground/30 shrink-0 leading-tight" aria-hidden="true">
         {isLast ? "└" : "├"}
       </span>

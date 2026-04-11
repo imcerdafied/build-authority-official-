@@ -43,7 +43,7 @@ export default function CreateLoopForm({ betId, onClose }: CreateLoopFormProps) 
   return (
     <div className="border rounded-md p-4 bg-surface-elevated">
       <div className="flex items-center justify-between mb-3">
-        <h3 className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+        <h3 className="text-xs font-semibold text-muted-foreground">
           New Outcome Loop
         </h3>
         <button
@@ -55,7 +55,7 @@ export default function CreateLoopForm({ betId, onClose }: CreateLoopFormProps) 
       </div>
       <form onSubmit={handleSubmit} className="space-y-3">
         <div>
-          <label className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground block mb-1">
+          <label className="text-xs font-semibold text-muted-foreground block mb-1">
             Title *
           </label>
           <input
@@ -67,7 +67,7 @@ export default function CreateLoopForm({ betId, onClose }: CreateLoopFormProps) 
           />
         </div>
         <div>
-          <label className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground block mb-1">
+          <label className="text-xs font-semibold text-muted-foreground block mb-1">
             Use Case *
           </label>
           <textarea
@@ -80,7 +80,7 @@ export default function CreateLoopForm({ betId, onClose }: CreateLoopFormProps) 
           />
         </div>
         <div>
-          <label className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground block mb-1">
+          <label className="text-xs font-semibold text-muted-foreground block mb-1">
             Hypothesis
           </label>
           <textarea
@@ -92,7 +92,7 @@ export default function CreateLoopForm({ betId, onClose }: CreateLoopFormProps) 
           />
         </div>
         <div>
-          <label className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground block mb-1">
+          <label className="text-xs font-semibold text-muted-foreground block mb-1">
             Owner *
           </label>
           <select
@@ -115,7 +115,7 @@ export default function CreateLoopForm({ betId, onClose }: CreateLoopFormProps) 
           <button
             type="submit"
             disabled={createLoop.isPending || !title.trim() || !useCase.trim() || !ownerUserId}
-            className="text-[11px] font-semibold uppercase tracking-wider text-background bg-foreground px-4 py-2 rounded-sm hover:bg-foreground/90 transition-colors disabled:opacity-50"
+            className="text-sm font-semibold text-background bg-foreground px-4 py-2 rounded-sm hover:bg-foreground/90 transition-colors disabled:opacity-50"
           >
             {createLoop.isPending ? "Creating..." : "Create Loop"}
           </button>

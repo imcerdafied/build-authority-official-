@@ -140,7 +140,7 @@ export default function Ask() {
 
       {answer && (
         <div>
-          <h2 className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground mb-3">
+          <h2 className="text-xs font-semibold text-muted-foreground mb-3">
             {answer.question}
           </h2>
           {answer.items.length === 0 ? (

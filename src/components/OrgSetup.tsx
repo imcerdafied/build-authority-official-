@@ -144,7 +144,7 @@ export default function OrgSetup() {
           <h1 className="text-sm font-bold tracking-widest uppercase text-foreground">
             Build Authority
           </h1>
-          <p className="text-[10px] uppercase tracking-widest text-muted-foreground mt-1">
+          <p className="text-xs text-muted-foreground mt-1">
             {step === 1 && "Create Your Organization"}
             {step === 2 && "Define Product Areas"}
             {step === 3 && "Outcome Categories"}
@@ -174,7 +174,7 @@ export default function OrgSetup() {
               </p>
               <div className="space-y-4">
                 <div>
-                  <label className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground block mb-1">
+                  <label className="text-xs font-semibold text-muted-foreground block mb-1">
                     Organization Name
                   </label>
                   <input
@@ -190,7 +190,7 @@ export default function OrgSetup() {
                 <button
                   onClick={handleNext}
                   disabled={!name.trim()}
-                  className="w-full text-[11px] font-semibold uppercase tracking-wider text-background bg-foreground px-4 py-2.5 rounded-sm hover:bg-foreground/90 transition-colors disabled:opacity-50"
+                  className="w-full text-sm font-semibold text-background bg-foreground px-4 py-2.5 rounded-sm hover:bg-foreground/90 transition-colors disabled:opacity-50"
                 >
                   Next
                 </button>
@@ -207,7 +207,7 @@ export default function OrgSetup() {
               <div className="space-y-3">
                 {productAreas.map((area, i) => (
                   <div key={i} className="flex items-center gap-2">
-                    <span className="text-[10px] font-semibold text-muted-foreground w-5 shrink-0">
+                    <span className="text-xs font-semibold text-muted-foreground w-5 shrink-0">
                       {i + 1}.
                     </span>
                     <input
@@ -230,7 +230,7 @@ export default function OrgSetup() {
                 {productAreas.length < 7 && (
                   <button
                     onClick={addProductArea}
-                    className="text-[11px] uppercase tracking-wider text-muted-foreground hover:text-foreground transition-colors"
+                    className="text-xs text-muted-foreground hover:text-foreground transition-colors"
                   >
                     + Add product area
                   </button>
@@ -239,14 +239,14 @@ export default function OrgSetup() {
               <div className="flex flex-col sm:flex-row gap-3 mt-6">
                 <button
                   onClick={handleBack}
-                  className="flex-1 text-[11px] font-semibold uppercase tracking-wider text-foreground border border-foreground px-4 py-2.5 rounded-sm hover:bg-foreground hover:text-background transition-colors"
+                  className="flex-1 text-sm font-semibold text-foreground border border-foreground px-4 py-2.5 rounded-sm hover:bg-foreground hover:text-background transition-colors"
                 >
                   Back
                 </button>
                 <button
                   onClick={handleNext}
                   disabled={filledAreas === 0}
-                  className="flex-1 text-[11px] font-semibold uppercase tracking-wider text-background bg-foreground px-4 py-2.5 rounded-sm hover:bg-foreground/90 transition-colors disabled:opacity-50"
+                  className="flex-1 text-sm font-semibold text-background bg-foreground px-4 py-2.5 rounded-sm hover:bg-foreground/90 transition-colors disabled:opacity-50"
                 >
                   Next
                 </button>
@@ -264,7 +264,7 @@ export default function OrgSetup() {
                 <button
                   onClick={() => setCategoryMode("defaults")}
                   className={cn(
-                    "text-[11px] font-semibold uppercase tracking-wider px-3 py-1.5 rounded-sm border transition-colors",
+                    "text-sm font-semibold px-3 py-1.5 rounded-sm border transition-colors",
                     categoryMode === "defaults"
                       ? "bg-foreground text-background border-foreground"
                       : "border-foreground text-foreground hover:bg-foreground hover:text-background",
@@ -275,7 +275,7 @@ export default function OrgSetup() {
                 <button
                   onClick={() => setCategoryMode("custom")}
                   className={cn(
-                    "text-[11px] font-semibold uppercase tracking-wider px-3 py-1.5 rounded-sm border transition-colors",
+                    "text-sm font-semibold px-3 py-1.5 rounded-sm border transition-colors",
                     categoryMode === "custom"
                       ? "bg-foreground text-background border-foreground"
                       : "border-foreground text-foreground hover:bg-foreground hover:text-background",
@@ -285,7 +285,7 @@ export default function OrgSetup() {
                 </button>
               </div>
               {categoryMode === null && (
-                <p className="text-[11px] text-muted-foreground mb-3">
+                <p className="text-xs text-muted-foreground mb-3">
                   Choose <span className="font-semibold">Use Defaults</span> or <span className="font-semibold">Customize</span> to continue.
                 </p>
               )}
@@ -312,7 +312,7 @@ export default function OrgSetup() {
                   ))}
                   <button
                     onClick={addCategory}
-                    className="text-[11px] uppercase tracking-wider text-muted-foreground hover:text-foreground transition-colors"
+                    className="text-xs text-muted-foreground hover:text-foreground transition-colors"
                   >
                     + Add category
                   </button>
@@ -327,7 +327,7 @@ export default function OrgSetup() {
                       {c.label}
                     </p>
                   ))}
-                  <p className="text-[10px] text-muted-foreground mt-2">
+                  <p className="text-xs text-muted-foreground mt-2">
                     These can be changed later in settings.
                   </p>
                 </div>
@@ -335,7 +335,7 @@ export default function OrgSetup() {
               <div className="flex flex-col sm:flex-row gap-3 mt-6">
                 <button
                   onClick={handleBack}
-                  className="flex-1 text-[11px] font-semibold uppercase tracking-wider text-foreground border border-foreground px-4 py-2.5 rounded-sm hover:bg-foreground hover:text-background transition-colors"
+                  className="flex-1 text-sm font-semibold text-foreground border border-foreground px-4 py-2.5 rounded-sm hover:bg-foreground hover:text-background transition-colors"
                 >
                   Back
                 </button>
@@ -343,7 +343,7 @@ export default function OrgSetup() {
                   onClick={handleCreateOrg}
                   disabled={loading || !canCreateOrg}
                   className={cn(
-                    "flex-1 text-[11px] font-semibold uppercase tracking-wider px-4 py-2.5 rounded-sm transition-colors",
+                    "flex-1 text-sm font-semibold px-4 py-2.5 rounded-sm transition-colors",
                     canCreateOrg && !loading
                       ? "text-background bg-foreground hover:bg-foreground/90"
                       : "text-muted-foreground bg-muted cursor-not-allowed",
@@ -352,7 +352,7 @@ export default function OrgSetup() {
                   {loading ? "Creating..." : "Create Organization"}
                 </button>
               </div>
-              {createError && <p className="text-[11px] text-signal-red mt-3">{createError}</p>}
+              {createError && <p className="text-xs text-signal-red mt-3">{createError}</p>}
             </>
           )}
 
@@ -367,7 +367,7 @@ export default function OrgSetup() {
               </p>
               <div className="space-y-4">
                 <div>
-                  <label className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground block mb-1">
+                  <label className="text-xs font-semibold text-muted-foreground block mb-1">
                     Invite Link
                   </label>
                   <div className="flex flex-col sm:flex-row gap-2">
@@ -380,7 +380,7 @@ export default function OrgSetup() {
                     <button
                       onClick={copyInviteLink}
                       disabled={!inviteUrl}
-                      className="text-[11px] font-semibold uppercase tracking-wider text-foreground border border-foreground px-3 py-2 rounded-sm hover:bg-foreground hover:text-background transition-colors shrink-0 w-full sm:w-auto"
+                      className="text-sm font-semibold text-foreground border border-foreground px-3 py-2 rounded-sm hover:bg-foreground hover:text-background transition-colors shrink-0 w-full sm:w-auto"
                     >
                       {copied ? "Copied" : "Copy"}
                     </button>
@@ -388,7 +388,7 @@ export default function OrgSetup() {
                 </div>
                 <button
                   onClick={() => window.location.replace("/")}
-                  className="w-full text-[11px] font-semibold uppercase tracking-wider text-background bg-foreground px-4 py-2.5 rounded-sm hover:bg-foreground/90 transition-colors"
+                  className="w-full text-sm font-semibold text-background bg-foreground px-4 py-2.5 rounded-sm hover:bg-foreground/90 transition-colors"
                 >
                   Go to Dashboard
                 </button>
@@ -400,7 +400,7 @@ export default function OrgSetup() {
         {step < 4 && (
           <button
             onClick={signOut}
-            className="mt-4 w-full text-[10px] text-muted-foreground hover:text-foreground uppercase tracking-wider transition-colors py-2"
+            className="mt-4 w-full text-xs text-muted-foreground hover:text-foreground transition-colors py-2"
           >
             Sign Out
           </button>

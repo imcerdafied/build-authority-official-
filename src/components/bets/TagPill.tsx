@@ -17,7 +17,7 @@ export default function TagPill({ children, variant = "default", className }: Ta
   return (
     <span
       className={cn(
-        "inline-flex items-center text-[11px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-sm",
+        "inline-flex items-center text-xs font-semibold px-2 py-0.5 rounded-sm",
         variantStyles[variant],
         className
       )}

@@ -31,7 +31,7 @@ export default function Pods() {
   const isAdmin = currentRole === "admin";
   const canWrite = currentRole === "admin" || currentRole === "pod_lead";
 
-  if (pLoading || dLoading) return <p className="text-xs text-muted-foreground uppercase tracking-widest">Loading...</p>;
+  if (pLoading || dLoading) return <p className="text-sm text-muted-foreground">Loading...</p>;
 
   const isEmpty = pods.length === 0;
 
@@ -60,7 +60,7 @@ export default function Pods() {
         </div>
         {isAdmin && !showCreate && (
           <button onClick={() => setShowCreate(true)}
-            className="text-[11px] font-semibold uppercase tracking-wider text-foreground border border-foreground px-3 py-1.5 rounded-sm hover:bg-foreground hover:text-background transition-colors">
+            className="text-sm font-semibold text-foreground border border-foreground px-3 py-1.5 rounded-sm hover:bg-foreground hover:text-background transition-colors">
             + Create Unit
           </button>
         )}
@@ -102,13 +102,13 @@ export default function Pods() {
             >
               <div className="flex items-center justify-between">
                 <div>
-                  <div className="text-[10px] uppercase tracking-widest text-muted-foreground/50 mb-1">Example Pod</div>
+                  <div className="text-xs text-muted-foreground/50 mb-1">Example Pod</div>
                   <div className="font-medium text-muted-foreground/60">{ghost.name}</div>
                   <div className="text-xs text-muted-foreground/40 mt-1">Executing: {ghost.bets}</div>
                 </div>
                 <div className="text-right">
-                  <div className="text-[10px] px-2 py-0.5 rounded border border-dashed border-border/40 text-muted-foreground/40 mb-1">{ghost.status}</div>
-                  <div className="text-[10px] text-muted-foreground/30 italic">{ghost.note}</div>
+                  <div className="text-xs px-2 py-0.5 rounded border border-dashed border-border/40 text-muted-foreground/40 mb-1">{ghost.status}</div>
+                  <div className="text-xs text-muted-foreground/30 italic">{ghost.note}</div>
                 </div>
               </div>
             </div>
@@ -158,10 +158,10 @@ export default function Pods() {
                       </div>
                     </div>
                     <div className="flex items-center gap-4 text-xs text-muted-foreground">
-                      {zeroVelocity && <span className="text-[11px] font-semibold text-signal-amber uppercase tracking-wider">Zero velocity</span>}
+                      {zeroVelocity && <span className="text-xs font-semibold text-signal-amber">Zero velocity</span>}
                       {isAdmin && (
                         <button onClick={() => { if (confirm(`Delete unit "${pod.name}"?`)) deletePod.mutate(pod.id); }}
-                          className="text-[11px] font-semibold uppercase tracking-wider text-signal-red hover:underline ml-2">Delete</button>
+                          className="text-sm font-semibold text-signal-red hover:underline ml-2">Delete</button>
                       )}
                     </div>
                   </div>
@@ -182,7 +182,7 @@ export default function Pods() {
                 {podDecisions.length > 0 ? (
                   <div className="border-b">
                     <div className="px-4 py-2 bg-accent/20">
-                      <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+                      <p className="text-xs font-semibold text-muted-foreground">
                         Active Bets · {podDecisions.length}
                       </p>
                     </div>
@@ -245,9 +245,9 @@ export default function Pods() {
                         <div key={init.id} className={cn("px-4 py-3", sliceOverdue && !init.shipped && "bg-signal-red/5")}>
                           <div className="flex items-center gap-3 mb-1">
                             <p className="text-sm font-medium flex-1">{init.name}</p>
-                            {init.shipped && <span className="text-[11px] font-semibold text-signal-green uppercase tracking-wider">Shipped</span>}
-                            {!init.outcome_linked && <span className="text-[11px] font-semibold text-signal-amber uppercase tracking-wider">Unbound — No Outcome</span>}
-                            {init.renewal_aligned && <span className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">Renewal-Aligned</span>}
+                            {init.shipped && <span className="text-xs font-semibold text-signal-green">Shipped</span>}
+                            {!init.outcome_linked && <span className="text-xs font-semibold text-signal-amber">Unbound — No Outcome</span>}
+                            {init.renewal_aligned && <span className="text-xs font-semibold text-muted-foreground">Renewal-Aligned</span>}
                           </div>
                           <div className="flex gap-6 text-xs text-muted-foreground">
                             <span>Owner: {init.owner}</span>

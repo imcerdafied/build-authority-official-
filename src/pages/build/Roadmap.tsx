@@ -127,13 +127,13 @@ function AddItemForm({
         <button
           onClick={() => createMutation.mutate()}
           disabled={!title.trim() || createMutation.isPending}
-          className="text-[10px] font-semibold uppercase tracking-wider px-2 py-1 rounded-sm bg-foreground text-background disabled:opacity-50"
+          className="text-xs font-semibold px-2 py-1 rounded-sm bg-foreground text-background disabled:opacity-50"
         >
           Add
         </button>
         <button
           onClick={onDone}
-          className="text-[10px] uppercase tracking-wider text-muted-foreground hover:text-foreground transition-colors"
+          className="text-xs text-muted-foreground hover:text-foreground transition-colors"
         >
           Cancel
         </button>
@@ -199,7 +199,7 @@ function ItemCard({
       <div className="flex items-center gap-2 mb-1.5">
         <span
           className={cn(
-            "text-[10px] font-semibold uppercase tracking-wider px-1.5 py-0.5 rounded-sm border",
+            "text-xs font-semibold px-1.5 py-0.5 rounded-sm border",
             item.type === "outcome"
               ? "bg-blue-500/10 text-blue-400 border-blue-500/20"
               : "bg-muted text-muted-foreground border-border",
@@ -209,7 +209,7 @@ function ItemCard({
         </span>
         <span
           className={cn(
-            "text-[10px] font-semibold uppercase tracking-wider px-1.5 py-0.5 rounded-sm border",
+            "text-xs font-semibold px-1.5 py-0.5 rounded-sm border",
             STATUS_COLORS[item.status] ?? "bg-muted text-muted-foreground border-border",
           )}
         >
@@ -220,7 +220,7 @@ function ItemCard({
       <select
         value={item.quarter}
         onChange={(e) => moveItem.mutate(e.target.value)}
-        className="text-[10px] uppercase tracking-wider bg-transparent border border-border rounded-sm px-1.5 py-0.5 text-muted-foreground focus:outline-none focus:border-foreground cursor-pointer transition-colors"
+        className="text-xs bg-transparent border border-border rounded-sm px-1.5 py-0.5 text-muted-foreground focus:outline-none focus:border-foreground cursor-pointer transition-colors"
       >
         {quarters.map((qk) => (
           <option key={qk} value={qk}>
@@ -317,7 +317,7 @@ export default function Roadmap() {
 
   if (isLoading) {
     return (
-      <p className="text-xs text-muted-foreground uppercase tracking-widest">
+      <p className="text-sm text-muted-foreground">
         Loading...
       </p>
     );
@@ -347,10 +347,10 @@ export default function Roadmap() {
             <div key={qk} className="border border-border rounded-md">
               {/* Column header */}
               <div className="px-4 py-3 border-b border-border flex items-center justify-between">
-                <h2 className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+                <h2 className="text-xs font-semibold text-muted-foreground">
                   {quarterLabel(qk)}
                 </h2>
-                <span className="text-[10px] text-muted-foreground/60 tabular-nums">
+                <span className="text-xs text-muted-foreground/60 tabular-nums">
                   {items.length}
                 </span>
               </div>
@@ -358,7 +358,7 @@ export default function Roadmap() {
               {/* Items */}
               <div className="p-3 space-y-2 min-h-[120px]">
                 {items.length === 0 && addingToQuarter !== qk && (
-                  <p className="text-[11px] text-muted-foreground/40 text-center py-4">
+                  <p className="text-xs text-muted-foreground/40 text-center py-4">
                     No items
                   </p>
                 )}
@@ -381,7 +381,7 @@ export default function Roadmap() {
                 ) : (
                   <button
                     onClick={() => setAddingToQuarter(qk)}
-                    className="w-full text-[11px] uppercase tracking-wider text-muted-foreground/60 hover:text-foreground border border-dashed border-border rounded-sm py-2 transition-colors"
+                    className="w-full text-xs text-muted-foreground/60 hover:text-foreground border border-dashed border-border rounded-sm py-2 transition-colors"
                   >
                     + Add Item
                   </button>

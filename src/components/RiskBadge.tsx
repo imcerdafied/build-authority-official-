@@ -24,14 +24,14 @@ export default function RiskBadge({ indicator, showSubtext = true, className }: 
     <div className={cn("inline-flex flex-col gap-0.5", className)}>
       <span
         className={cn(
-          "inline-flex items-center px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wider rounded-sm w-fit",
+          "inline-flex items-center px-2 py-0.5 text-xs font-semibold rounded-sm w-fit",
           riskStyles[indicator] || "bg-muted text-muted-foreground"
         )}
       >
         {indicator}
       </span>
       {showSubtext && subtext && (
-        <span className="text-[10px] text-muted-foreground leading-tight">{subtext}</span>
+        <span className="text-xs text-muted-foreground leading-tight">{subtext}</span>
       )}
     </div>
   );

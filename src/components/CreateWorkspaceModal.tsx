@@ -79,7 +79,7 @@ export default function CreateWorkspaceModal({ open, onOpenChange }: CreateWorks
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-md">
         <DialogHeader>
-          <DialogTitle className="text-base uppercase tracking-wider">Create Workspace</DialogTitle>
+          <DialogTitle className="text-base">Create Workspace</DialogTitle>
           <DialogDescription>
             Create an isolated client workspace. You will be added as admin for this workspace only.
           </DialogDescription>
@@ -87,7 +87,7 @@ export default function CreateWorkspaceModal({ open, onOpenChange }: CreateWorks
 
         <div className="space-y-4">
           <div>
-            <label className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground block mb-1">
+            <label className="text-xs font-semibold text-muted-foreground block mb-1">
               Workspace Name
             </label>
             <input
@@ -106,7 +106,7 @@ export default function CreateWorkspaceModal({ open, onOpenChange }: CreateWorks
           </div>
 
           <div>
-            <label className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground block mb-1">
+            <label className="text-xs font-semibold text-muted-foreground block mb-1">
               Your Role Label (Optional)
             </label>
             <input
@@ -123,7 +123,7 @@ export default function CreateWorkspaceModal({ open, onOpenChange }: CreateWorks
           <button
             type="button"
             onClick={() => onOpenChange(false)}
-            className="text-[11px] font-semibold uppercase tracking-wider border border-foreground px-4 py-2 rounded-sm hover:bg-foreground hover:text-background transition-colors"
+            className="text-sm font-semibold border border-foreground px-4 py-2 rounded-sm hover:bg-foreground hover:text-background transition-colors"
           >
             Cancel
           </button>
@@ -131,7 +131,7 @@ export default function CreateWorkspaceModal({ open, onOpenChange }: CreateWorks
             type="button"
             onClick={() => void handleCreate()}
             disabled={submitting || !name.trim()}
-            className="text-[11px] font-semibold uppercase tracking-wider text-background bg-foreground px-4 py-2 rounded-sm hover:bg-foreground/90 transition-colors disabled:opacity-50"
+            className="text-sm font-semibold text-background bg-foreground px-4 py-2 rounded-sm hover:bg-foreground/90 transition-colors disabled:opacity-50"
           >
             {submitting ? "Creating..." : "Create Workspace"}
           </button>

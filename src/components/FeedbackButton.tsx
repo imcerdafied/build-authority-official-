@@ -74,7 +74,7 @@ export default function FeedbackButton() {
                 type="button"
                 onClick={() => setType(t)}
                 className={cn(
-                  "text-[10px] uppercase tracking-wider rounded-full px-2.5 py-1 transition-colors",
+                  "text-xs rounded-full px-2.5 py-1 transition-colors",
                   type === t
                     ? "bg-foreground text-background"
                     : "border text-muted-foreground hover:border-foreground/50"
@@ -95,7 +95,7 @@ export default function FeedbackButton() {
           <button
             type="submit"
             disabled={submitting || !message.trim()}
-            className="text-[11px] uppercase tracking-wider bg-foreground text-background rounded px-3 py-1.5 w-full disabled:opacity-50"
+            className="text-xs bg-foreground text-background rounded px-3 py-1.5 w-full disabled:opacity-50"
           >
             {submitting ? "Sending…" : "Send"}
           </button>
@@ -105,7 +105,7 @@ export default function FeedbackButton() {
         type="button"
         onClick={() => setOpen(!open)}
         className={cn(
-          "text-[10px] uppercase tracking-wider text-muted-foreground border rounded-full px-3 py-1.5 bg-background hover:bg-muted transition-colors shadow-sm",
+          "text-xs text-muted-foreground border rounded-full px-3 py-1.5 bg-background hover:bg-muted transition-colors shadow-sm",
           thanks && "text-signal-green"
         )}
       >

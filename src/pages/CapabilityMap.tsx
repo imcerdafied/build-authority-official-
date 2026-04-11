@@ -21,7 +21,7 @@ export default function CapabilityMap() {
   );
 
   if (podsLoading || decisionsLoading) {
-    return <p className="text-xs text-muted-foreground uppercase tracking-widest">Loading...</p>;
+    return <p className="text-sm text-muted-foreground">Loading...</p>;
   }
 
   const totalPods = pods.length;
@@ -33,7 +33,7 @@ export default function CapabilityMap() {
       <div className="border rounded-md p-4 md:p-5 bg-background">
         <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-3">
           <div>
-            <p className="text-[11px] uppercase tracking-widest text-muted-foreground mb-1">
+            <p className="text-xs text-muted-foreground mb-1">
               Capability Map
             </p>
             <h1 className="text-xl md:text-2xl font-semibold tracking-tight text-foreground">
@@ -46,7 +46,7 @@ export default function CapabilityMap() {
           {canWrite && !showCreate && (
             <button
               onClick={() => setShowCreate(true)}
-              className="text-[11px] font-semibold uppercase tracking-wider text-foreground border border-foreground px-3 py-2 rounded-sm hover:bg-foreground hover:text-background transition-colors min-h-[44px]"
+              className="text-sm font-semibold text-foreground border border-foreground px-3 py-2 rounded-sm hover:bg-foreground hover:text-background transition-colors min-h-[44px]"
             >
               + Register Pod
             </button>
@@ -54,15 +54,15 @@ export default function CapabilityMap() {
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 mt-4">
           <div className="border rounded-sm p-2.5">
-            <p className="text-[10px] uppercase tracking-[0.16em] text-muted-foreground">Total Pods</p>
+            <p className="text-xs text-muted-foreground">Total Pods</p>
             <p className="text-lg font-semibold mt-1">{totalPods}</p>
           </div>
           <div className="border rounded-sm p-2.5">
-            <p className="text-[10px] uppercase tracking-[0.16em] text-muted-foreground">Primary Linked</p>
+            <p className="text-xs text-muted-foreground">Primary Linked</p>
             <p className="text-lg font-semibold mt-1">{linkedPrimary}</p>
           </div>
           <div className="border rounded-sm p-2.5">
-            <p className="text-[10px] uppercase tracking-[0.16em] text-muted-foreground">Secondary Linked</p>
+            <p className="text-xs text-muted-foreground">Secondary Linked</p>
             <p className="text-lg font-semibold mt-1">{linkedSecondary}</p>
           </div>
         </div>

@@ -67,7 +67,7 @@ export default function DriftIndicators({ betId }: DriftIndicatorsProps) {
             <div className="flex-1 min-w-0">
               <span
                 className={cn(
-                  "text-[10px] font-semibold uppercase tracking-wider",
+                  "text-xs font-semibold",
                   config.color,
                 )}
               >

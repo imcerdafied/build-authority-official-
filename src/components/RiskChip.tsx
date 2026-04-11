@@ -34,7 +34,7 @@ export default function RiskChip({ indicator, className }: RiskChipProps) {
       <TooltipTrigger asChild>
         <span
           className={cn(
-            "inline-flex items-center gap-1.5 px-2 py-0.5 text-[11px] font-medium uppercase tracking-wider rounded-sm border",
+            "inline-flex items-center gap-1.5 px-2 py-0.5 text-xs font-medium rounded-sm border",
             chipStyle,
             className
           )}

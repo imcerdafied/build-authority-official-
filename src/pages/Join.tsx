@@ -335,7 +335,7 @@ export default function Join() {
             <p className="text-xs text-signal-red">{joinError}</p>
             <button
               onClick={joinOrg}
-              className="mt-2 text-[11px] font-semibold uppercase tracking-wider border border-foreground text-foreground px-3 py-1.5 rounded-sm hover:bg-foreground hover:text-background transition-colors"
+              className="mt-2 text-sm font-semibold border border-foreground text-foreground px-3 py-1.5 rounded-sm hover:bg-foreground hover:text-background transition-colors"
             >
               Retry
             </button>

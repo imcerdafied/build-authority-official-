@@ -56,7 +56,7 @@ export default function WorkspaceSwitcher({ onCreateWorkspace }: WorkspaceSwitch
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <button
-          className="inline-flex items-center gap-1 text-[10px] uppercase tracking-widest text-muted-foreground hover:text-foreground transition-colors"
+          className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors"
           aria-label="Switch workspace"
         >
           <span className="truncate max-w-[180px]">{currentOrg?.name ?? "Workspace"}</span>
@@ -80,7 +80,7 @@ export default function WorkspaceSwitcher({ onCreateWorkspace }: WorkspaceSwitch
                   </span>
                   <span
                     className={cn(
-                      "text-[9px] font-semibold uppercase tracking-wider px-1.5 py-0.5 rounded-sm shrink-0",
+                      "text-[9px] font-semibold px-1.5 py-0.5 rounded-sm shrink-0",
                       roleChipClass(semanticRole),
                     )}
                   >
@@ -88,7 +88,7 @@ export default function WorkspaceSwitcher({ onCreateWorkspace }: WorkspaceSwitch
                   </span>
                 </div>
                 {membership.role_label && (
-                  <p className="text-[10px] text-muted-foreground mt-0.5 truncate">
+                  <p className="text-xs text-muted-foreground mt-0.5 truncate">
                     {membership.role_label}
                   </p>
                 )}
@@ -99,7 +99,7 @@ export default function WorkspaceSwitcher({ onCreateWorkspace }: WorkspaceSwitch
         <DropdownMenuSeparator />
         <DropdownMenuItem
           onSelect={onCreateWorkspace}
-          className="cursor-pointer text-[11px] font-semibold uppercase tracking-wider"
+          className="cursor-pointer text-sm font-semibold"
         >
           + New Workspace
         </DropdownMenuItem>

@@ -86,7 +86,7 @@ export default function ChatAdvisor({ chatOpen, setChatOpen }: { chatOpen: boole
           <div className="flex items-start justify-between gap-2">
             <div className="flex-1 min-w-0">
               <h2 className="text-sm font-semibold">Build Authority Agent</h2>
-              <p className="text-[10px] text-muted-foreground mt-0.5">
+              <p className="text-xs text-muted-foreground mt-0.5">
                 Ask about your bets, the program, or tradeoffs
               </p>
             </div>

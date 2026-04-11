@@ -57,7 +57,7 @@ export default function Review() {
   });
 
   if (decisionsLoading || activityLoading) {
-    return <p className="text-xs text-muted-foreground uppercase tracking-widest">Loading...</p>;
+    return <p className="text-sm text-muted-foreground">Loading...</p>;
   }
 
   const weekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).getTime();
@@ -126,17 +126,17 @@ export default function Review() {
       <div className="bg-muted/30 border rounded-lg p-4 md:p-5 mb-8">
         <div className="flex flex-col md:flex-row md:flex-wrap gap-6 md:gap-8">
           <div>
-            <p className="text-[11px] uppercase tracking-wider text-muted-foreground mb-1">Bets Moved</p>
+            <p className="text-xs text-muted-foreground mb-1">Bets Moved</p>
             <p className={cn("text-2xl font-bold", movedClass)}>
               {movedCount}/{activeDecisions.length}
             </p>
           </div>
           <div>
-            <p className="text-[11px] uppercase tracking-wider text-muted-foreground mb-1">Stagnant</p>
+            <p className="text-xs text-muted-foreground mb-1">Stagnant</p>
             <p className={cn("text-2xl font-bold", stagnantCount > 0 && "text-signal-red")}>{stagnantCount}</p>
           </div>
           <div>
-            <p className="text-[11px] uppercase tracking-wider text-muted-foreground mb-1">Avg Days in State</p>
+            <p className="text-xs text-muted-foreground mb-1">Avg Days in State</p>
             <p
               className={cn(
                 "text-2xl font-bold",
@@ -150,7 +150,7 @@ export default function Review() {
       </div>
 
       <section>
-        <h2 className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground mb-3">Per-Bet Breakdown</h2>
+        <h2 className="text-xs font-semibold text-muted-foreground mb-3">Per-Bet Breakdown</h2>
         <div className="space-y-3">
           {decisionsWithActivity.map(({ decision: d, activityCount, lastActivity }) => {
             const acts = activityByDecision[d.id] || [];
@@ -181,14 +181,14 @@ export default function Review() {
                     ? `${statusChangeInWeek.old_value ?? "—"} → ${statusChangeInWeek.new_value ?? "—"}`
                     : "No movement"}
                 </p>
-                <p className="text-[11px] text-muted-foreground mt-0.5">
+                <p className="text-xs text-muted-foreground mt-0.5">
                   {activityCount} field updates · Last: {lastActivity ? relativeTime(lastActivity) : "—"}
                 </p>
                 {stateChangeNote && (
-                  <p className="text-[12px] text-muted-foreground italic mt-2">— {stateChangeNote}</p>
+                  <p className="text-xs text-muted-foreground italic mt-2">— {stateChangeNote}</p>
                 )}
                 {hasOperational && (
-                  <p className="text-[11px] text-muted-foreground mt-1">
+                  <p className="text-xs text-muted-foreground mt-1">
                     Capacity: {capacityAllocated}% · Diverted: {capacityDiverted}%
                   </p>
                 )}
@@ -202,7 +202,7 @@ export default function Review() {
       </section>
 
       <section>
-        <h2 className="text-[11px] font-semibold uppercase tracking-widest text-muted-foreground mb-3">Exposure Changes</h2>
+        <h2 className="text-xs font-semibold text-muted-foreground mb-3">Exposure Changes</h2>
         {exposureChanges.length === 0 ? (
           <p className="text-muted-foreground italic">No exposure changes this week</p>
         ) : (
@@ -211,7 +211,7 @@ export default function Review() {
               const bet = decisions.find((d) => d.id === a.decision_id);
               return (
                 <div key={a.id} className="text-sm border rounded p-2 w-full">
-                  <p className="text-[10px] text-muted-foreground">{relativeTime(a.created_at)}</p>
+                  <p className="text-xs text-muted-foreground">{relativeTime(a.created_at)}</p>
                   <p className="font-medium">{bet?.title ?? "Unknown bet"}</p>
                   <p className="text-muted-foreground">{a.old_value ?? "—"} → {a.new_value ?? "—"}</p>
                 </div>
@@ -222,7 +222,7 @@ export default function Review() {
       </section>
 
       <section>
-        <h2 className="text-[11px] font-semibold uppercase tracking-widest text-muted-foreground mb-3">All Activity</h2>
+        <h2 className="text-xs font-semibold text-muted-foreground mb-3">All Activity</h2>
         {allActivity.length === 0 ? (
           <p className="text-muted-foreground italic">No activity this week</p>
         ) : (
@@ -232,10 +232,10 @@ export default function Review() {
               const label = fieldLabels[a.field_name] ?? a.field_name;
               return (
                 <div key={a.id} className="text-sm border rounded p-2 w-full flex flex-col md:flex-row md:items-start md:gap-2">
-                  <p className="text-[10px] text-muted-foreground order-first md:order-none">{relativeTime(a.created_at)}</p>
+                  <p className="text-xs text-muted-foreground order-first md:order-none">{relativeTime(a.created_at)}</p>
                   <div>
-                    <p className="font-medium text-[12px]">{bet?.title ?? "Unknown bet"}</p>
-                    <p className="text-[12px] text-muted-foreground">
+                    <p className="font-medium text-xs">{bet?.title ?? "Unknown bet"}</p>
+                    <p className="text-xs text-muted-foreground">
                       {label} → {a.old_value ?? "—"} → {a.new_value ?? "—"}
                     </p>
                   </div>

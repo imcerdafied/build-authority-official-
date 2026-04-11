@@ -13,7 +13,7 @@ export default function ClosedBets() {
   const { data: decisions = [], isLoading } = useDecisions();
 
   if (isLoading) {
-    return <p className="text-xs text-muted-foreground uppercase tracking-widest">Loading...</p>;
+    return <p className="text-sm text-muted-foreground">Loading...</p>;
   }
 
   const closed = decisions
@@ -23,7 +23,7 @@ export default function ClosedBets() {
   return (
     <div className="space-y-4">
       <div className="border rounded-md p-4 md:p-5">
-        <p className="text-[11px] uppercase tracking-widest text-muted-foreground mb-1">Archive</p>
+        <p className="text-xs text-muted-foreground mb-1">Archive</p>
         <h1 className="text-xl md:text-2xl font-semibold tracking-tight">Closed Bets</h1>
         <p className="text-sm text-muted-foreground mt-2">
           Bets moved here when status is set to closed.
@@ -50,15 +50,15 @@ export default function ClosedBets() {
               </div>
               <div className="px-4 md:px-5 py-3 grid grid-cols-1 md:grid-cols-3 gap-3 text-sm">
                 <div>
-                  <p className="text-[11px] uppercase tracking-[0.16em] text-muted-foreground">Category</p>
+                  <p className="text-xs text-muted-foreground">Category</p>
                   <p>{d.outcome_category_key || d.outcome_category || "—"}</p>
                 </div>
                 <div>
-                  <p className="text-[11px] uppercase tracking-[0.16em] text-muted-foreground">Owner</p>
+                  <p className="text-xs text-muted-foreground">Owner</p>
                   <p>{d.owner || "TBD"}</p>
                 </div>
                 <div>
-                  <p className="text-[11px] uppercase tracking-[0.16em] text-muted-foreground">Domain</p>
+                  <p className="text-xs text-muted-foreground">Domain</p>
                   <p>{d.solution_domain || "—"}</p>
                 </div>
               </div>

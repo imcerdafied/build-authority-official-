@@ -569,12 +569,12 @@ export default function CreateDecisionForm({ onClose, navigateAfter = false }: {
   return (
     <div className="border rounded-md p-5 mb-6 bg-surface-elevated">
       <div className="flex items-center justify-between mb-4">
-        <h2 className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Register High-Impact Bet</h2>
+        <h2 className="text-xs font-semibold text-muted-foreground">Register High-Impact Bet</h2>
         <button onClick={onClose} className="text-xs text-muted-foreground hover:text-foreground">Cancel</button>
       </div>
       <div className="border rounded-sm p-3 mb-4 bg-background">
-        <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground mb-1">Bulk Strategy Import (Beta)</p>
-        <p className="text-[11px] text-muted-foreground mb-2">
+        <p className="text-xs font-semibold text-muted-foreground mb-1">Bulk Strategy Import (Beta)</p>
+        <p className="text-xs text-muted-foreground mb-2">
           Import one strategy source to map multiple bets, then create all mapped bets at once.
         </p>
         <div className="space-y-2">
@@ -598,7 +598,7 @@ export default function CreateDecisionForm({ onClose, navigateAfter = false }: {
             onChange={(e) => setStrategyFile(e.target.files?.[0] || null)}
             className="w-full text-xs text-muted-foreground"
           />
-          <p className="text-[10px] text-muted-foreground">
+          <p className="text-xs text-muted-foreground">
             File upload is for batch mapping only, not for attaching to a single bet.
           </p>
           <div className="flex items-center gap-2">
@@ -606,7 +606,7 @@ export default function CreateDecisionForm({ onClose, navigateAfter = false }: {
               type="button"
               onClick={analyzeStrategy}
               disabled={strategyLoading}
-              className="text-[11px] font-semibold uppercase tracking-wider text-foreground border border-foreground px-3 py-1.5 rounded-sm hover:bg-foreground hover:text-background transition-colors disabled:opacity-50"
+              className="text-sm font-semibold text-foreground border border-foreground px-3 py-1.5 rounded-sm hover:bg-foreground hover:text-background transition-colors disabled:opacity-50"
             >
               {strategyLoading ? "Analyzing..." : "Map Strategy"}
             </button>
@@ -615,7 +615,7 @@ export default function CreateDecisionForm({ onClose, navigateAfter = false }: {
                 type="button"
                 onClick={createAllSuggestions}
                 disabled={createDecision.isPending}
-                className="text-[11px] font-semibold uppercase tracking-wider text-background bg-foreground px-3 py-1.5 rounded-sm hover:bg-foreground/90 transition-colors disabled:opacity-50"
+                className="text-sm font-semibold text-background bg-foreground px-3 py-1.5 rounded-sm hover:bg-foreground/90 transition-colors disabled:opacity-50"
               >
                 {createDecision.isPending ? "Creating..." : `Create ${strategySuggestions.length} Bet${strategySuggestions.length === 1 ? "" : "s"}`}
               </button>
@@ -623,30 +623,30 @@ export default function CreateDecisionForm({ onClose, navigateAfter = false }: {
           </div>
           {strategySummary && <p className="text-xs text-muted-foreground">{strategySummary}</p>}
           {strategyWarnings.length > 0 && (
-            <div className="text-[11px] text-signal-amber space-y-0.5">
+            <div className="text-xs text-signal-amber space-y-0.5">
               {strategyWarnings.map((w, i) => <p key={`${w}-${i}`}>• {w}</p>)}
             </div>
           )}
           {strategySuggestions.length > 0 && (
             <div className="space-y-2">
-              <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+              <p className="text-xs font-semibold text-muted-foreground">
                 Mapped Candidate Bets
               </p>
               {strategySuggestions.map((s, i) => (
                 <div key={`${s.title}-${i}`} className="border rounded-sm p-2">
                   <p className="text-xs font-semibold">{s.title}</p>
-                  <p className="text-[11px] text-muted-foreground">{s.owner || "Owner missing"} · {s.product_area || "Product area missing"}</p>
-                  {s.expected_impact && <p className="text-[11px] text-muted-foreground mt-1">{s.expected_impact}</p>}
+                  <p className="text-xs text-muted-foreground">{s.owner || "Owner missing"} · {s.product_area || "Product area missing"}</p>
+                  {s.expected_impact && <p className="text-xs text-muted-foreground mt-1">{s.expected_impact}</p>}
                   <button
                     type="button"
                     onClick={() => applySuggestionToForm(s)}
-                    className="mt-2 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground hover:text-foreground"
+                    className="mt-2 text-xs font-semibold text-muted-foreground hover:text-foreground"
                   >
                     Use In Form
                   </button>
                 </div>
               ))}
-              <p className="text-[10px] text-muted-foreground">
+              <p className="text-xs text-muted-foreground">
                 Sponsor in the form is used when provided; otherwise parsed sponsor or "TBD" is applied.
               </p>
             </div>
@@ -656,24 +656,24 @@ export default function CreateDecisionForm({ onClose, navigateAfter = false }: {
       <form onSubmit={handleSubmit} className="space-y-3">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
           <div>
-            <label className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground block mb-1">Title *</label>
+            <label className="text-xs font-semibold text-muted-foreground block mb-1">Title *</label>
             <input required value={title} onChange={(e) => setTitle(e.target.value)}
               className="w-full border rounded-sm px-3 py-2 text-sm bg-background focus:outline-none focus:ring-1 focus:ring-foreground" />
           </div>
           <div>
-            <label className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground block mb-1">Owner *</label>
+            <label className="text-xs font-semibold text-muted-foreground block mb-1">Owner *</label>
             <input required value={owner} onChange={(e) => setOwner(e.target.value)}
               className="w-full border rounded-sm px-3 py-2 text-sm bg-background focus:outline-none focus:ring-1 focus:ring-foreground" />
           </div>
           <div>
-            <label className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground block mb-1">Sponsor *</label>
+            <label className="text-xs font-semibold text-muted-foreground block mb-1">Sponsor *</label>
             <input required value={sponsor} onChange={(e) => setSponsor(e.target.value)}
               className="w-full border rounded-sm px-3 py-2 text-sm bg-background focus:outline-none focus:ring-1 focus:ring-foreground" />
           </div>
         </div>
         <div className="grid grid-cols-2 gap-3">
           <div>
-            <label className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground block mb-1">Product Area *</label>
+            <label className="text-xs font-semibold text-muted-foreground block mb-1">Product Area *</label>
             <input
               required
               list="org-product-area-options"
@@ -689,7 +689,7 @@ export default function CreateDecisionForm({ onClose, navigateAfter = false }: {
             </datalist>
           </div>
           <div>
-            <label className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground block mb-1">Outcome Category</label>
+            <label className="text-xs font-semibold text-muted-foreground block mb-1">Outcome Category</label>
             <select value={outcomeCategoryKey} onChange={(e) => setOutcomeCategoryKey(e.target.value)}
               className="w-full border rounded-sm px-3 py-2 text-sm bg-background focus:outline-none focus:ring-1 focus:ring-foreground">
               <option value="" disabled>Select…</option>
@@ -698,44 +698,44 @@ export default function CreateDecisionForm({ onClose, navigateAfter = false }: {
               ))}
             </select>
             {outcomeCategoriesError && (
-              <p className="text-[10px] text-signal-amber mt-0.5">{outcomeCategoriesError}</p>
+              <p className="text-xs text-signal-amber mt-0.5">{outcomeCategoriesError}</p>
             )}
           </div>
         </div>
         <div className="grid grid-cols-2 gap-3">
           <div>
-            <label className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground block mb-1">Outcome Target</label>
+            <label className="text-xs font-semibold text-muted-foreground block mb-1">Outcome Target</label>
             <input value={outcomeTarget} onChange={(e) => setOutcomeTarget(e.target.value)}
               className="w-full border rounded-sm px-3 py-2 text-sm bg-background focus:outline-none focus:ring-1 focus:ring-foreground" />
           </div>
           <div>
-            <label className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground block mb-1">Expected Impact</label>
+            <label className="text-xs font-semibold text-muted-foreground block mb-1">Expected Impact</label>
             <input value={expectedImpact} onChange={(e) => setExpectedImpact(e.target.value)} placeholder="e.g. +15% adoption"
               className="w-full border rounded-sm px-3 py-2 text-sm bg-background focus:outline-none focus:ring-1 focus:ring-foreground" />
           </div>
         </div>
         <div className="grid grid-cols-2 gap-3">
           <div>
-            <label className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground block mb-1">Exposure Value</label>
+            <label className="text-xs font-semibold text-muted-foreground block mb-1">Exposure Value</label>
             <input value={exposureValue} onChange={(e) => setExposureValue(e.target.value)} placeholder="e.g. $2.1M ARR at risk"
               className="w-full border rounded-sm px-3 py-2 text-sm bg-background focus:outline-none focus:ring-1 focus:ring-foreground" />
           </div>
           <div>
-            <label className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground block mb-1">Revenue at Risk</label>
+            <label className="text-xs font-semibold text-muted-foreground block mb-1">Revenue at Risk</label>
             <input value={revenueAtRisk} onChange={(e) => setRevenueAtRisk(e.target.value)} placeholder="$4.8M ARR"
               className="w-full border rounded-sm px-3 py-2 text-sm bg-background focus:outline-none focus:ring-1 focus:ring-foreground" />
           </div>
         </div>
         <div className="grid grid-cols-2 gap-3">
           <div>
-            <label className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground block mb-1">Trigger Signal *</label>
+            <label className="text-xs font-semibold text-muted-foreground block mb-1">Trigger Signal *</label>
             <input required value={triggerSignal} onChange={(e) => setTriggerSignal(e.target.value)}
               className="w-full border rounded-sm px-3 py-2 text-sm bg-background focus:outline-none focus:ring-1 focus:ring-foreground" />
           </div>
         </div>
         <div className="flex justify-end pt-2">
           <button type="submit" disabled={createDecision.isPending}
-            className="text-[11px] font-semibold uppercase tracking-wider text-background bg-foreground px-4 py-2 rounded-sm hover:bg-foreground/90 transition-colors disabled:opacity-50">
+            className="text-sm font-semibold text-background bg-foreground px-4 py-2 rounded-sm hover:bg-foreground/90 transition-colors disabled:opacity-50">
             {createDecision.isPending ? "Registering..." : "Register Bet"}
           </button>
         </div>

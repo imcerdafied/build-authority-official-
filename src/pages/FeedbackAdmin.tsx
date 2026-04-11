@@ -56,7 +56,7 @@ export default function FeedbackAdmin() {
   if (isLoading) {
     return (
       <div className="py-12 text-center">
-        <p className="text-xs uppercase tracking-widest text-muted-foreground">Loading...</p>
+        <p className="text-sm text-muted-foreground">Loading...</p>
       </div>
     );
   }
@@ -81,16 +81,16 @@ export default function FeedbackAdmin() {
               <div className="flex flex-wrap items-center gap-2 mb-2">
                 <span
                   className={cn(
-                    "text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded",
+                    "text-xs font-semibold px-2 py-0.5 rounded",
                     TYPE_STYLES[f.feedback_type as string] ?? "bg-muted text-muted-foreground"
                   )}
                 >
                   {f.feedback_type}
                 </span>
-                <span className="text-[10px] text-muted-foreground">
+                <span className="text-xs text-muted-foreground">
                   {f.user_email ?? "—"} · {f.page ?? "—"}
                 </span>
-                <span className="text-[10px] text-muted-foreground ml-auto">
+                <span className="text-xs text-muted-foreground ml-auto">
                   {relativeTime(f.created_at)}
                 </span>
               </div>

@@ -129,7 +129,7 @@ export default function QuarterReview() {
   /* --- loading --- */
 
   if (okrsLoading) {
-    return <p className="text-xs text-muted-foreground uppercase tracking-widest py-12 text-center">Loading...</p>;
+    return <p className="text-sm text-muted-foreground py-12 text-center">Loading...</p>;
   }
 
   /* --- render --- */
@@ -141,7 +141,7 @@ export default function QuarterReview() {
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <h1 className="text-lg font-bold">Quarter Review</h1>
-            <span className="text-[10px] uppercase tracking-wider text-muted-foreground border border-border rounded-sm px-1.5 py-0.5">
+            <span className="text-xs text-muted-foreground border border-border rounded-sm px-1.5 py-0.5">
               {currentQuarter}
             </span>
           </div>
@@ -149,7 +149,7 @@ export default function QuarterReview() {
             onClick={handleCloseQuarter}
             disabled={closing || activeOkrs === 0}
             className={cn(
-              "text-xs uppercase tracking-wider font-semibold border rounded-sm px-3 py-1.5 transition-colors",
+              "text-xs font-semibold border rounded-sm px-3 py-1.5 transition-colors",
               activeOkrs > 0
                 ? "border-foreground/20 hover:bg-foreground/5"
                 : "border-border text-muted-foreground cursor-not-allowed",
@@ -163,23 +163,23 @@ export default function QuarterReview() {
       {/* stats */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
         <div className="border border-border rounded-sm px-3 py-2">
-          <span className="text-[10px] uppercase tracking-wider text-muted-foreground block">Objectives</span>
+          <span className="text-xs text-muted-foreground block">Objectives</span>
           <span className="text-lg font-bold tabular-nums">{totalOkrs}</span>
         </div>
         <div className="border border-border rounded-sm px-3 py-2">
-          <span className="text-[10px] uppercase tracking-wider text-muted-foreground block">Active</span>
+          <span className="text-xs text-muted-foreground block">Active</span>
           <span className="text-lg font-bold tabular-nums">{activeOkrs}</span>
         </div>
         <div className="border border-border rounded-sm px-3 py-2">
-          <span className="text-[10px] uppercase tracking-wider text-muted-foreground block">Complete</span>
+          <span className="text-xs text-muted-foreground block">Complete</span>
           <span className="text-lg font-bold tabular-nums">{completeOkrs}</span>
         </div>
         <div className="border border-border rounded-sm px-3 py-2">
-          <span className="text-[10px] uppercase tracking-wider text-muted-foreground block">KRs On Track</span>
+          <span className="text-xs text-muted-foreground block">KRs On Track</span>
           <span className="text-lg font-bold tabular-nums">{totalOnTrack}</span>
           <span className="text-xs text-muted-foreground ml-1">/ {totalKRs}</span>
           {totalKRs > 0 && (
-            <span className="text-[10px] text-muted-foreground ml-1">({overallPct}%)</span>
+            <span className="text-xs text-muted-foreground ml-1">({overallPct}%)</span>
           )}
         </div>
       </div>
@@ -187,12 +187,12 @@ export default function QuarterReview() {
       {/* empty state */}
       {summary.length === 0 && (
         <div className="flex flex-col items-center justify-center py-16 gap-3 text-center">
-          <p className="text-xs uppercase tracking-wider text-muted-foreground max-w-sm leading-relaxed">
+          <p className="text-xs text-muted-foreground max-w-sm leading-relaxed">
             No goals found for {currentQuarter}. Create goals to populate this review.
           </p>
           <Link
             to="/goals"
-            className="text-xs uppercase tracking-wider font-semibold text-muted-foreground hover:text-foreground"
+            className="text-xs font-semibold text-muted-foreground hover:text-foreground"
           >
             &larr; Back to Goals
           </Link>
@@ -204,14 +204,14 @@ export default function QuarterReview() {
         <div className="border border-border rounded-sm">
           {/* table header */}
           <div className="flex items-center gap-3 px-4 py-2 bg-muted/30 border-b border-border">
-            <span className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold flex-1">Objective</span>
-            <span className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold w-20 text-center hidden sm:block">
+            <span className="text-xs text-muted-foreground font-semibold flex-1">Objective</span>
+            <span className="text-xs text-muted-foreground font-semibold w-20 text-center hidden sm:block">
               Status
             </span>
-            <span className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold w-32 text-center hidden md:block">
+            <span className="text-xs text-muted-foreground font-semibold w-32 text-center hidden md:block">
               Key Results
             </span>
-            <span className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold w-32 hidden md:block">
+            <span className="text-xs text-muted-foreground font-semibold w-32 hidden md:block">
               Progress
             </span>
           </div>
@@ -230,7 +230,7 @@ export default function QuarterReview() {
                 {/* status */}
                 <span
                   className={cn(
-                    "text-[10px] uppercase tracking-wider font-semibold rounded-sm px-1.5 py-0.5 shrink-0 w-20 text-center",
+                    "text-xs font-semibold rounded-sm px-1.5 py-0.5 shrink-0 w-20 text-center",
                     STATUS_COLORS[row.status] ?? "bg-muted text-muted-foreground",
                   )}
                 >
@@ -238,7 +238,7 @@ export default function QuarterReview() {
                 </span>
 
                 {/* KR count */}
-                <span className="text-[10px] text-muted-foreground tabular-nums w-32 text-center shrink-0 hidden md:block">
+                <span className="text-xs text-muted-foreground tabular-nums w-32 text-center shrink-0 hidden md:block">
                   {row.krOnTrack}/{row.krTotal} on track
                 </span>
 
@@ -250,7 +250,7 @@ export default function QuarterReview() {
                       style={{ width: `${row.pct}%` }}
                     />
                   </div>
-                  <span className="text-[10px] text-muted-foreground tabular-nums w-8 text-right">{row.pct}%</span>
+                  <span className="text-xs text-muted-foreground tabular-nums w-8 text-right">{row.pct}%</span>
                 </div>
               </Link>
             ))}

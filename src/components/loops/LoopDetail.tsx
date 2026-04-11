@@ -76,10 +76,10 @@ function VersionTimeline({ versions, members }: { versions: LoopVersion[]; membe
             </div>
             <div className="pb-3 min-w-0">
               <div className="flex items-center gap-2">
-                <span className="text-[11px] font-semibold uppercase tracking-wider">
+                <span className="text-sm font-semibold">
                   {changeTypeLabel[v.change_type] || v.change_type}
                 </span>
-                <span className="text-[10px] text-muted-foreground">
+                <span className="text-xs text-muted-foreground">
                   v{v.version_number} · {formatRelative(v.created_at)}
                 </span>
               </div>
@@ -98,7 +98,7 @@ function VersionTimeline({ versions, members }: { versions: LoopVersion[]; membe
               {v.change_type === "status" && v.status && (
                 <LoopStatusBadge status={v.status} className="!text-[9px] !px-1.5 !py-0 mt-0.5" />
               )}
-              <p className="text-[10px] text-muted-foreground mt-0.5">{changedByName}</p>
+              <p className="text-xs text-muted-foreground mt-0.5">{changedByName}</p>
             </div>
           </div>
         );
@@ -238,7 +238,7 @@ export default function LoopDetail({ loop, onClose, canWrite }: LoopDetailProps)
             <div className="flex items-center gap-2 mt-1">
               <LoopStatusBadge status={loop.status} />
               <LoopDecisionBadge decision={loop.current_decision} />
-              <span className="text-[10px] text-white/50">v{loop.version_number}</span>
+              <span className="text-xs text-white/50">v{loop.version_number}</span>
             </div>
             <p className="text-xs text-white/60 mt-1">Owner: {ownerName}</p>
           </div>
@@ -259,7 +259,7 @@ export default function LoopDetail({ loop, onClose, canWrite }: LoopDetailProps)
                 onClick={() => handleStatusChange(opt.value)}
                 disabled={loop.status === opt.value || updateLoop.isPending}
                 className={cn(
-                  "text-[9px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-sm border transition-colors",
+                  "text-[9px] font-semibold px-2 py-0.5 rounded-sm border transition-colors",
                   loop.status === opt.value
                     ? "bg-white text-black border-white"
                     : "border-white/30 text-white/60 hover:border-white hover:text-white"
@@ -286,7 +286,7 @@ export default function LoopDetail({ loop, onClose, canWrite }: LoopDetailProps)
 
         {loop.velocity_days !== null && (
           <div className="flex items-center gap-2">
-            <span className="text-[11px] uppercase tracking-[0.16em] text-muted-foreground">
+            <span className="text-xs text-muted-foreground">
               Loop Velocity
             </span>
             <span className="text-sm font-semibold tabular-nums">{loop.velocity_days}d</span>
@@ -296,20 +296,20 @@ export default function LoopDetail({ loop, onClose, canWrite }: LoopDetailProps)
 
       {/* Latest State */}
       <div className="px-4 md:px-5 py-4 border-t space-y-3">
-        <span className="text-[11px] uppercase tracking-[0.16em] text-muted-foreground block">
+        <span className="text-xs text-muted-foreground block">
           Latest State
         </span>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
           {/* Last Ship */}
           <div className="border rounded-sm p-3">
-            <span className="text-[10px] uppercase tracking-wider text-muted-foreground block mb-1">
+            <span className="text-xs text-muted-foreground block mb-1">
               Last Ship
             </span>
             {loop.last_ship_summary ? (
               <>
                 <p className="text-sm">{loop.last_ship_summary}</p>
-                <p className="text-[10px] text-muted-foreground mt-1">{formatDate(loop.last_ship_date)}</p>
+                <p className="text-xs text-muted-foreground mt-1">{formatDate(loop.last_ship_date)}</p>
               </>
             ) : (
               <p className="text-xs text-muted-foreground italic">Nothing shipped yet</p>
@@ -318,13 +318,13 @@ export default function LoopDetail({ loop, onClose, canWrite }: LoopDetailProps)
 
           {/* Last Learning */}
           <div className="border rounded-sm p-3">
-            <span className="text-[10px] uppercase tracking-wider text-muted-foreground block mb-1">
+            <span className="text-xs text-muted-foreground block mb-1">
               Last Learning
             </span>
             {loop.last_learning ? (
               <>
                 <p className="text-sm">{loop.last_learning}</p>
-                <p className="text-[10px] text-muted-foreground mt-1">{formatDate(loop.last_learning_date)}</p>
+                <p className="text-xs text-muted-foreground mt-1">{formatDate(loop.last_learning_date)}</p>
               </>
             ) : (
               <p className="text-xs text-muted-foreground italic">No learnings yet</p>
@@ -333,7 +333,7 @@ export default function LoopDetail({ loop, onClose, canWrite }: LoopDetailProps)
 
           {/* Decision */}
           <div className="border rounded-sm p-3">
-            <span className="text-[10px] uppercase tracking-wider text-muted-foreground block mb-1">
+            <span className="text-xs text-muted-foreground block mb-1">
               Decision
             </span>
             <LoopDecisionBadge decision={loop.current_decision} />
@@ -348,19 +348,19 @@ export default function LoopDetail({ loop, onClose, canWrite }: LoopDetailProps)
           <div className="flex items-center gap-2 flex-wrap">
             <button
               onClick={() => { setShowShipForm(!showShipForm); setShowLearnForm(false); setShowDecisionForm(false); }}
-              className="text-[11px] font-semibold uppercase tracking-wider text-foreground border border-foreground px-3 py-1.5 rounded-sm hover:bg-foreground hover:text-background transition-colors"
+              className="text-sm font-semibold text-foreground border border-foreground px-3 py-1.5 rounded-sm hover:bg-foreground hover:text-background transition-colors"
             >
               Log Ship
             </button>
             <button
               onClick={() => { setShowLearnForm(!showLearnForm); setShowShipForm(false); setShowDecisionForm(false); }}
-              className="text-[11px] font-semibold uppercase tracking-wider text-foreground border border-foreground px-3 py-1.5 rounded-sm hover:bg-foreground hover:text-background transition-colors"
+              className="text-sm font-semibold text-foreground border border-foreground px-3 py-1.5 rounded-sm hover:bg-foreground hover:text-background transition-colors"
             >
               Log Learning
             </button>
             <button
               onClick={() => { setShowDecisionForm(!showDecisionForm); setShowShipForm(false); setShowLearnForm(false); }}
-              className="text-[11px] font-semibold uppercase tracking-wider text-foreground border border-foreground px-3 py-1.5 rounded-sm hover:bg-foreground hover:text-background transition-colors"
+              className="text-sm font-semibold text-foreground border border-foreground px-3 py-1.5 rounded-sm hover:bg-foreground hover:text-background transition-colors"
             >
               Update Decision
             </button>
@@ -381,7 +381,7 @@ export default function LoopDetail({ loop, onClose, canWrite }: LoopDetailProps)
               <button
                 onClick={handleShip}
                 disabled={!shipSummary.trim() || updateLoop.isPending}
-                className="text-[11px] font-semibold uppercase tracking-wider text-background bg-foreground px-3 py-1.5 rounded-sm disabled:opacity-50"
+                className="text-sm font-semibold text-background bg-foreground px-3 py-1.5 rounded-sm disabled:opacity-50"
               >
                 {updateLoop.isPending ? "Saving..." : "Save"}
               </button>
@@ -406,7 +406,7 @@ export default function LoopDetail({ loop, onClose, canWrite }: LoopDetailProps)
               <button
                 onClick={handleLearn}
                 disabled={!learnText.trim() || updateLoop.isPending}
-                className="text-[11px] font-semibold uppercase tracking-wider text-background bg-foreground px-3 py-1.5 rounded-sm disabled:opacity-50"
+                className="text-sm font-semibold text-background bg-foreground px-3 py-1.5 rounded-sm disabled:opacity-50"
               >
                 {updateLoop.isPending ? "Saving..." : "Save"}
               </button>
@@ -426,7 +426,7 @@ export default function LoopDetail({ loop, onClose, canWrite }: LoopDetailProps)
                   key={opt.value}
                   onClick={() => setDecisionValue(opt.value)}
                   className={cn(
-                    "text-[11px] font-semibold uppercase tracking-wider px-3 py-1 rounded-sm border transition-colors",
+                    "text-sm font-semibold px-3 py-1 rounded-sm border transition-colors",
                     decisionValue === opt.value
                       ? "bg-foreground text-background border-foreground"
                       : "border-border hover:border-foreground"
@@ -447,7 +447,7 @@ export default function LoopDetail({ loop, onClose, canWrite }: LoopDetailProps)
               <button
                 onClick={handleDecision}
                 disabled={updateLoop.isPending}
-                className="text-[11px] font-semibold uppercase tracking-wider text-background bg-foreground px-3 py-1.5 rounded-sm disabled:opacity-50"
+                className="text-sm font-semibold text-background bg-foreground px-3 py-1.5 rounded-sm disabled:opacity-50"
               >
                 {updateLoop.isPending ? "Saving..." : "Save Decision"}
               </button>
@@ -481,7 +481,7 @@ export default function LoopDetail({ loop, onClose, canWrite }: LoopDetailProps)
                     {(m?.display_name || m?.email || "?")[0]}
                   </span>
                   <span className="font-medium">{m?.display_name || m?.email || "Unknown"}</span>
-                  <span className="text-[10px] uppercase tracking-wider text-muted-foreground px-1.5 py-0 border rounded-sm">
+                  <span className="text-xs text-muted-foreground px-1.5 py-0 border rounded-sm">
                     {c.role}
                   </span>
                   {c.note && <span className="text-muted-foreground">{c.note}</span>}
@@ -492,7 +492,7 @@ export default function LoopDetail({ loop, onClose, canWrite }: LoopDetailProps)
             {canEdit && !showContribForm && (
               <button
                 onClick={() => setShowContribForm(true)}
-                className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground hover:text-foreground"
+                className="text-xs font-semibold text-muted-foreground hover:text-foreground"
               >
                 + Add Contributor
               </button>
@@ -535,7 +535,7 @@ export default function LoopDetail({ loop, onClose, canWrite }: LoopDetailProps)
                   <button
                     onClick={handleAddContributor}
                     disabled={!contribUserId || updateLoop.isPending}
-                    className="text-[11px] font-semibold uppercase tracking-wider text-background bg-foreground px-3 py-1 rounded-sm disabled:opacity-50"
+                    className="text-sm font-semibold text-background bg-foreground px-3 py-1 rounded-sm disabled:opacity-50"
                   >
                     Add
                   </button>
@@ -555,7 +555,7 @@ export default function LoopDetail({ loop, onClose, canWrite }: LoopDetailProps)
           <button
             onClick={handleDelete}
             disabled={deleteLoop.isPending}
-            className="text-[10px] font-semibold uppercase tracking-wider text-signal-red hover:text-signal-red/80 disabled:opacity-50"
+            className="text-xs font-semibold text-signal-red hover:text-signal-red/80 disabled:opacity-50"
           >
             {deleteLoop.isPending ? "Deleting..." : "Delete Loop"}
           </button>

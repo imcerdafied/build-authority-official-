@@ -206,7 +206,7 @@ export default function OutcomeDetail() {
 
   if (isLoading) {
     return (
-      <p className="text-xs text-muted-foreground uppercase tracking-widest">
+      <p className="text-sm text-muted-foreground">
         Loading...
       </p>
     );
@@ -217,7 +217,7 @@ export default function OutcomeDetail() {
       <div>
         <Link
           to="/build"
-          className="text-[11px] uppercase tracking-wider text-muted-foreground hover:text-foreground transition-colors"
+          className="text-xs text-muted-foreground hover:text-foreground transition-colors"
         >
           &larr; Back to Outcomes
         </Link>
@@ -233,7 +233,7 @@ export default function OutcomeDetail() {
       {/* Back link */}
       <Link
         to="/build"
-        className="text-[11px] uppercase tracking-wider text-muted-foreground hover:text-foreground transition-colors inline-block mb-4"
+        className="text-xs text-muted-foreground hover:text-foreground transition-colors inline-block mb-4"
       >
         &larr; Back to Outcomes
       </Link>
@@ -252,14 +252,14 @@ export default function OutcomeDetail() {
       <div className="flex items-center gap-4 mb-6 flex-wrap">
         {/* Status dropdown */}
         <div>
-          <label className="text-[10px] uppercase tracking-wider text-muted-foreground block mb-1">
+          <label className="text-xs text-muted-foreground block mb-1">
             Status
           </label>
           <select
             value={outcome.status}
             onChange={(e) => handleFieldSave("status", e.target.value)}
             className={cn(
-              "text-[11px] font-semibold uppercase tracking-wider px-2.5 py-1 rounded-sm border bg-transparent cursor-pointer focus:outline-none",
+              "text-sm font-semibold px-2.5 py-1 rounded-sm border bg-transparent cursor-pointer focus:outline-none",
               STATUS_COLORS[outcome.status] ?? "border-border text-muted-foreground",
             )}
           >
@@ -273,7 +273,7 @@ export default function OutcomeDetail() {
 
         {/* Confidence */}
         <div>
-          <label className="text-[10px] uppercase tracking-wider text-muted-foreground block mb-1">
+          <label className="text-xs text-muted-foreground block mb-1">
             Confidence
           </label>
           <div className="flex items-center gap-2">
@@ -296,7 +296,7 @@ export default function OutcomeDetail() {
 
         {/* Target date */}
         <div>
-          <label className="text-[10px] uppercase tracking-wider text-muted-foreground block mb-1">
+          <label className="text-xs text-muted-foreground block mb-1">
             Target Date
           </label>
           <input
@@ -311,7 +311,7 @@ export default function OutcomeDetail() {
 
         {/* Shipped date */}
         <div>
-          <label className="text-[10px] uppercase tracking-wider text-muted-foreground block mb-1">
+          <label className="text-xs text-muted-foreground block mb-1">
             Shipped Date
           </label>
           <input
@@ -327,7 +327,7 @@ export default function OutcomeDetail() {
 
       {/* Description */}
       <div className="mb-6">
-        <label className="text-[11px] uppercase tracking-wider text-muted-foreground block mb-1">
+        <label className="text-xs text-muted-foreground block mb-1">
           Description
         </label>
         <InlineText
@@ -340,7 +340,7 @@ export default function OutcomeDetail() {
 
       {/* Linked Bet card */}
       <div className="mb-6">
-        <label className="text-[11px] uppercase tracking-wider text-muted-foreground block mb-2">
+        <label className="text-xs text-muted-foreground block mb-2">
           Linked Bet
         </label>
         {linkedBet ? (
@@ -350,11 +350,11 @@ export default function OutcomeDetail() {
           >
             <div className="flex items-center gap-3">
               <span className="text-sm font-medium">{linkedBet.title}</span>
-              <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground bg-muted px-2 py-0.5 rounded-sm border border-border">
+              <span className="text-xs font-semibold text-muted-foreground bg-muted px-2 py-0.5 rounded-sm border border-border">
                 {linkedBet.status}
               </span>
             </div>
-            <p className="text-[11px] text-muted-foreground mt-1 uppercase tracking-wider">
+            <p className="text-xs text-muted-foreground mt-1">
               View in Decisions &rarr;
             </p>
           </Link>
@@ -369,7 +369,7 @@ export default function OutcomeDetail() {
 
       {/* Notes section */}
       <div>
-        <label className="text-[11px] uppercase tracking-wider text-muted-foreground block mb-1">
+        <label className="text-xs text-muted-foreground block mb-1">
           Notes
         </label>
         <NotesEditor

@@ -193,14 +193,14 @@ export default function OKRDetail() {
   /* --- loading --- */
 
   if (okrLoading) {
-    return <p className="text-xs text-muted-foreground uppercase tracking-widest py-12 text-center">Loading...</p>;
+    return <p className="text-sm text-muted-foreground py-12 text-center">Loading...</p>;
   }
 
   if (!okr) {
     return (
       <div className="py-12 text-center">
-        <p className="text-xs text-muted-foreground uppercase tracking-wider mb-3">OKR not found</p>
-        <Link to="/goals" className="text-xs uppercase tracking-wider text-muted-foreground hover:text-foreground">
+        <p className="text-xs text-muted-foreground mb-3">OKR not found</p>
+        <Link to="/goals" className="text-xs text-muted-foreground hover:text-foreground">
           &larr; Back to OKRs
         </Link>
       </div>
@@ -214,7 +214,7 @@ export default function OKRDetail() {
       {/* back link */}
       <Link
         to="/goals"
-        className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground hover:text-foreground mb-4 flex items-center gap-1 inline-flex"
+        className="text-xs font-semibold text-muted-foreground hover:text-foreground mb-4 flex items-center gap-1 inline-flex"
       >
         <span>&larr;</span> Back to OKRs
       </Link>
@@ -225,20 +225,20 @@ export default function OKRDetail() {
         {okr.description && <p className="text-sm text-muted-foreground mb-3">{okr.description}</p>}
         <div className="flex items-center gap-3 flex-wrap">
           {okr.quarter && (
-            <span className="text-[10px] uppercase tracking-wider text-muted-foreground border border-border rounded-sm px-1.5 py-0.5">
+            <span className="text-xs text-muted-foreground border border-border rounded-sm px-1.5 py-0.5">
               {okr.quarter}
             </span>
           )}
           <span
             className={cn(
-              "text-[10px] uppercase tracking-wider font-semibold rounded-sm px-1.5 py-0.5",
+              "text-xs font-semibold rounded-sm px-1.5 py-0.5",
               STATUS_COLORS[okr.status] ?? "bg-muted text-muted-foreground",
             )}
           >
             {okr.status.replace(/_/g, " ")}
           </span>
           {okr.owner_id && (
-            <span className="text-[10px] text-muted-foreground">
+            <span className="text-xs text-muted-foreground">
               Owner: <span className="font-mono">{okr.owner_id.slice(0, 8)}</span>
             </span>
           )}
@@ -247,7 +247,7 @@ export default function OKRDetail() {
 
       {/* key results */}
       <div className="mb-8">
-        <h2 className="text-[10px] uppercase tracking-widest text-muted-foreground font-semibold mb-3">Key Results</h2>
+        <h2 className="text-xs text-muted-foreground font-semibold mb-3">Key Results</h2>
 
         {keyResults.length === 0 ? (
           <p className="text-xs text-muted-foreground">No key results defined for this objective.</p>
@@ -278,7 +278,7 @@ export default function OKRDetail() {
                     </div>
 
                     {/* value */}
-                    <span className="text-[10px] text-muted-foreground tabular-nums shrink-0">
+                    <span className="text-xs text-muted-foreground tabular-nums shrink-0">
                       {kr.current_value ?? 0} / {kr.target_value ?? "?"}
                       {kr.unit ? ` ${kr.unit}` : ""}
                     </span>
@@ -286,7 +286,7 @@ export default function OKRDetail() {
                     {/* confidence badge */}
                     <span
                       className={cn(
-                        "text-[10px] uppercase tracking-wider font-semibold rounded-sm px-1.5 py-0.5 shrink-0",
+                        "text-xs font-semibold rounded-sm px-1.5 py-0.5 shrink-0",
                         confidenceColor(kr.confidence_score),
                       )}
                     >
@@ -296,7 +296,7 @@ export default function OKRDetail() {
                     {/* status badge */}
                     <span
                       className={cn(
-                        "text-[10px] uppercase tracking-wider font-semibold rounded-sm px-1.5 py-0.5 shrink-0",
+                        "text-xs font-semibold rounded-sm px-1.5 py-0.5 shrink-0",
                         STATUS_COLORS[kr.status] ?? "bg-muted text-muted-foreground",
                       )}
                     >
@@ -315,7 +315,7 @@ export default function OKRDetail() {
                           setCheckInNotes("");
                         }
                       }}
-                      className="text-[10px] uppercase tracking-wider font-semibold text-muted-foreground hover:text-foreground shrink-0"
+                      className="text-xs font-semibold text-muted-foreground hover:text-foreground shrink-0"
                     >
                       {isExpanded ? "Cancel" : "+ Check-in"}
                     </button>
@@ -326,7 +326,7 @@ export default function OKRDetail() {
                     <div className="mt-3 border border-border rounded-sm p-3 bg-muted/20 space-y-3">
                       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                         <div>
-                          <label className="text-[10px] uppercase tracking-wider text-muted-foreground block mb-1">Value</label>
+                          <label className="text-xs text-muted-foreground block mb-1">Value</label>
                           <input
                             value={checkInValue}
                             onChange={(e) => setCheckInValue(e.target.value)}
@@ -336,7 +336,7 @@ export default function OKRDetail() {
                           />
                         </div>
                         <div>
-                          <label className="text-[10px] uppercase tracking-wider text-muted-foreground block mb-1">
+                          <label className="text-xs text-muted-foreground block mb-1">
                             Confidence ({checkInConfidence}/10)
                           </label>
                           <input
@@ -349,7 +349,7 @@ export default function OKRDetail() {
                           />
                         </div>
                         <div>
-                          <label className="text-[10px] uppercase tracking-wider text-muted-foreground block mb-1">Notes</label>
+                          <label className="text-xs text-muted-foreground block mb-1">Notes</label>
                           <textarea
                             value={checkInNotes}
                             onChange={(e) => setCheckInNotes(e.target.value)}
@@ -363,7 +363,7 @@ export default function OKRDetail() {
                         onClick={() => submitCheckIn(kr.id)}
                         disabled={!checkInValue || checkInSubmitting}
                         className={cn(
-                          "text-xs uppercase tracking-wider font-semibold border rounded-sm px-3 py-1.5 transition-colors",
+                          "text-xs font-semibold border rounded-sm px-3 py-1.5 transition-colors",
                           checkInValue
                             ? "border-foreground/20 hover:bg-foreground/5"
                             : "border-border text-muted-foreground cursor-not-allowed",
@@ -378,12 +378,12 @@ export default function OKRDetail() {
                   {krCheckIns.length > 0 && (
                     <div className="mt-2 space-y-1">
                       {krCheckIns.map((ci) => (
-                        <div key={ci.id} className="flex items-center gap-2 text-[10px] text-muted-foreground">
+                        <div key={ci.id} className="flex items-center gap-2 text-xs text-muted-foreground">
                           <span className="tabular-nums font-semibold">{ci.value}</span>
                           {ci.confidence_score != null && (
                             <span
                               className={cn(
-                                "uppercase tracking-wider rounded-sm px-1 py-px",
+                                "rounded-sm px-1 py-px",
                                 confidenceColor(ci.confidence_score),
                               )}
                             >
@@ -406,7 +406,7 @@ export default function OKRDetail() {
       {/* linked bets */}
       {linkedBets.length > 0 && (
         <div>
-          <h2 className="text-[10px] uppercase tracking-widest text-muted-foreground font-semibold mb-3">Linked Bets</h2>
+          <h2 className="text-xs text-muted-foreground font-semibold mb-3">Linked Bets</h2>
           <div className="border border-border rounded-sm divide-y divide-border">
             {linkedBets.map((bet) => (
               <Link
@@ -417,7 +417,7 @@ export default function OKRDetail() {
                 <span className="text-sm flex-1 min-w-0 truncate">{bet.title}</span>
                 <span
                   className={cn(
-                    "text-[10px] uppercase tracking-wider font-semibold rounded-sm px-1.5 py-0.5 shrink-0",
+                    "text-xs font-semibold rounded-sm px-1.5 py-0.5 shrink-0",
                     STATUS_COLORS[bet.status] ?? "bg-muted text-muted-foreground",
                   )}
                 >

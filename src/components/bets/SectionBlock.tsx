@@ -23,13 +23,13 @@ export default function SectionBlock({
       {collapsible ? (
         <button
           onClick={() => setOpen(!open)}
-          className="flex items-center gap-1.5 text-[11px] uppercase tracking-[0.16em] text-muted-foreground hover:text-foreground transition-colors"
+          className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors"
         >
-          <span className="text-[10px]">{open ? "\u25BC" : "\u25B6"}</span>
+          <span className="text-xs">{open ? "\u25BC" : "\u25B6"}</span>
           {label}
         </button>
       ) : (
-        <span className="text-[11px] uppercase tracking-[0.16em] text-muted-foreground block">
+        <span className="text-xs text-muted-foreground block">
           {label}
         </span>
       )}

@@ -31,11 +31,11 @@ export default function BetCapabilityPodsSection({ betId, canWrite }: BetCapabil
     return (
       <div className="px-4 md:px-6 py-3 border-t">
         <div className="flex items-center justify-between">
-          <span className="text-[11px] uppercase tracking-[0.16em] text-muted-foreground">Capability Pods</span>
+          <span className="text-xs text-muted-foreground">Capability Pods</span>
           {canWrite && (
             <button
               onClick={() => setShowCreate(true)}
-              className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground hover:text-foreground transition-colors"
+              className="text-xs font-semibold text-muted-foreground hover:text-foreground transition-colors"
             >
               + Register Pod
             </button>
@@ -48,13 +48,13 @@ export default function BetCapabilityPodsSection({ betId, canWrite }: BetCapabil
   return (
     <div className="px-4 md:px-6 py-4 border-t">
       <div className="flex items-center justify-between mb-3">
-        <span className="text-[11px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+        <span className="text-xs font-semibold text-muted-foreground">
           Capability Pods ({pods.length})
         </span>
         {canWrite && !showCreate && (
           <button
             onClick={() => setShowCreate(true)}
-            className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground hover:text-foreground transition-colors"
+            className="text-xs font-semibold text-muted-foreground hover:text-foreground transition-colors"
           >
             + Register Pod
           </button>
@@ -70,7 +70,7 @@ export default function BetCapabilityPodsSection({ betId, canWrite }: BetCapabil
 
       {primaryPods.length > 0 && (
         <div className="space-y-2 mb-2">
-          <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+          <p className="text-xs font-semibold text-muted-foreground">
             Primary to this bet
           </p>
           {primaryPods.map((pod) => (
@@ -88,7 +88,7 @@ export default function BetCapabilityPodsSection({ betId, canWrite }: BetCapabil
 
       {secondaryPods.length > 0 && (
         <div className="space-y-2">
-          <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+          <p className="text-xs font-semibold text-muted-foreground">
             Secondary support for this bet
           </p>
           {secondaryPods.map((pod) => (

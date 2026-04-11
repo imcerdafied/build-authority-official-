@@ -75,13 +75,13 @@ export default function Auth({ skipInviteCode }: AuthProps = {}) {
           <h1 className="text-sm font-bold tracking-widest uppercase text-foreground">
             Build Authority
           </h1>
-          <p className="text-[10px] uppercase tracking-widest text-muted-foreground mt-1">
+          <p className="text-xs text-muted-foreground mt-1">
             Operating Layer
           </p>
         </div>
 
         <div className="border rounded-md p-6">
-          <p className="text-[10px] uppercase tracking-widest text-muted-foreground mb-4">
+          <p className="text-xs text-muted-foreground mb-4">
             Sign in with Google
           </p>
 
@@ -89,7 +89,7 @@ export default function Auth({ skipInviteCode }: AuthProps = {}) {
             type="button"
             disabled={loading}
             onClick={handleGoogleSSO}
-            className="w-full text-[11px] font-semibold uppercase tracking-wider border border-foreground text-foreground px-4 py-2.5 rounded-sm hover:bg-foreground hover:text-background transition-colors disabled:opacity-50"
+            className="w-full text-sm font-semibold border border-foreground text-foreground px-4 py-2.5 rounded-sm hover:bg-foreground hover:text-background transition-colors disabled:opacity-50"
           >
             Continue with Google
           </button>
@@ -101,7 +101,7 @@ export default function Auth({ skipInviteCode }: AuthProps = {}) {
             <p className="text-xs text-signal-green font-medium mt-3">{message}</p>
           )}
 
-          <div className="mt-4 pt-4 border-t flex items-center justify-center gap-4 text-[11px]">
+          <div className="mt-4 pt-4 border-t flex items-center justify-center gap-4 text-xs">
             <a
               href="/privacy-policy.pdf"
               target="_blank"

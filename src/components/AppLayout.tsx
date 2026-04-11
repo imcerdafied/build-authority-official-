@@ -26,11 +26,11 @@ const roleLabels: Record<string, string> = {
 
 const Sep = () => <span className="text-muted-foreground/30 mx-3 hidden md:inline">|</span>;
 
-const navLinkClass = "text-[13px] uppercase tracking-wider text-muted-foreground hover:text-foreground transition-colors font-medium min-h-[44px] min-w-[44px] flex items-center justify-center md:min-h-0 md:min-w-0 md:flex-initial";
+const navLinkClass = "text-sm uppercase tracking-widest text-muted-foreground hover:text-foreground transition-colors font-medium min-h-[44px] min-w-[44px] flex items-center justify-center md:min-h-0 md:min-w-0 md:flex-initial";
 
-const altitudePillClass = "text-[13px] uppercase tracking-widest font-semibold px-3 py-1 rounded transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center md:min-h-0 md:min-w-0 md:flex-initial";
+const altitudePillClass = "text-sm uppercase tracking-widest font-semibold px-3 py-1 rounded transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center md:min-h-0 md:min-w-0 md:flex-initial";
 
-const subNavLinkClass = "text-[12px] uppercase tracking-wider text-muted-foreground hover:text-foreground transition-colors font-medium px-2 py-1";
+const subNavLinkClass = "text-sm text-muted-foreground hover:text-foreground transition-colors font-medium px-2 py-1";
 
 type Altitude = "goals" | "bets" | "build";
 
@@ -149,7 +149,7 @@ export default function AppLayout({ children }: { children: ReactNode }) {
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <button
-                    className="text-[10px] uppercase tracking-wider text-muted-foreground hover:text-foreground transition-colors flex items-center gap-2 min-h-[44px] md:min-h-0"
+                    className="text-xs text-muted-foreground hover:text-foreground transition-colors flex items-center gap-2 min-h-[44px] md:min-h-0"
                     aria-label="Profile menu"
                   >
                     <span className="w-6 h-6 rounded-full bg-foreground/10 border border-foreground/20 flex items-center justify-center text-[10px] font-bold uppercase text-foreground shrink-0">
@@ -165,7 +165,7 @@ export default function AppLayout({ children }: { children: ReactNode }) {
                   <div className="px-2 py-1.5">
                     <p className="text-xs font-medium truncate">{user?.email}</p>
                     {currentRole && (
-                      <p className="text-[10px] uppercase tracking-wider text-muted-foreground mt-0.5">
+                      <p className="text-xs text-muted-foreground mt-0.5">
                         {roleLabels[currentRole] || currentRole}
                       </p>
                     )}
@@ -173,14 +173,14 @@ export default function AppLayout({ children }: { children: ReactNode }) {
                   <DropdownMenuSeparator />
                   <DropdownMenuItem
                     onSelect={() => { closeMenu(); navigate("/team"); }}
-                    className="text-[11px] uppercase tracking-wider cursor-pointer"
+                    className="text-sm cursor-pointer"
                   >
                     Team
                   </DropdownMenuItem>
                   {currentRole === "admin" && (
                     <DropdownMenuItem
                       onSelect={() => { closeMenu(); navigate("/feedback"); }}
-                      className="text-[11px] uppercase tracking-wider cursor-pointer flex items-center justify-between"
+                      className="text-sm cursor-pointer flex items-center justify-between"
                     >
                       <span>Feedback</span>
                       {unreadCount != null && unreadCount > 0 && (
@@ -191,21 +191,21 @@ export default function AppLayout({ children }: { children: ReactNode }) {
                   {currentRole === "admin" && (
                     <DropdownMenuItem
                       onSelect={() => { closeMenu(); navigate("/settings"); }}
-                      className="text-[11px] uppercase tracking-wider cursor-pointer"
+                      className="text-sm cursor-pointer"
                     >
                       Settings
                     </DropdownMenuItem>
                   )}
                   <DropdownMenuItem
                     onSelect={() => { closeMenu(); setCreateWorkspaceOpen(true); }}
-                    className="text-[11px] uppercase tracking-wider cursor-pointer"
+                    className="text-sm cursor-pointer"
                   >
                     Create Workspace
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem
                     onSelect={() => { closeMenu(); signOut(); }}
-                    className="text-[11px] uppercase tracking-wider cursor-pointer text-muted-foreground"
+                    className="text-sm cursor-pointer text-muted-foreground"
                   >
                     Sign Out
                   </DropdownMenuItem>

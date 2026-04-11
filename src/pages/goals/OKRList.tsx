@@ -227,7 +227,7 @@ export default function OKRList() {
   /* --- loading / empty --- */
 
   if (isLoading) {
-    return <p className="text-xs text-muted-foreground uppercase tracking-widest py-12 text-center">Loading...</p>;
+    return <p className="text-sm text-muted-foreground py-12 text-center">Loading...</p>;
   }
 
   if (okrs.length === 0) {
@@ -247,7 +247,7 @@ export default function OKRList() {
           </div>
           <button
             onClick={() => setShowCreate(true)}
-            className="text-xs uppercase tracking-wider font-semibold border border-foreground/20 rounded-sm px-3 py-1.5 hover:bg-foreground/5 transition-colors"
+            className="text-xs font-semibold border border-foreground/20 rounded-sm px-3 py-1.5 hover:bg-foreground/5 transition-colors"
           >
             + New Goal
           </button>
@@ -261,7 +261,7 @@ export default function OKRList() {
           >
             <div className="flex items-start justify-between">
               <div className="flex-1">
-                <div className="text-[10px] uppercase tracking-widest text-muted-foreground/60 mb-1">
+                <div className="text-xs text-muted-foreground/60 mb-1">
                   {ghost.label}
                 </div>
                 <div className="text-sm text-muted-foreground/50 italic">
@@ -271,12 +271,12 @@ export default function OKRList() {
                   {['Key Result 1', 'Key Result 2', 'Key Result 3'].map((kr, j) => (
                     <div key={j} className="flex items-center gap-2">
                       <div className="w-1.5 h-1.5 rounded-full bg-muted-foreground/20" />
-                      <div className="text-[11px] text-muted-foreground/40">{kr}: measure what matters</div>
+                      <div className="text-xs text-muted-foreground/40">{kr}: measure what matters</div>
                     </div>
                   ))}
                 </div>
               </div>
-              <span className="text-[10px] text-muted-foreground/40 group-hover:text-foreground/40 ml-4 mt-1">
+              <span className="text-xs text-muted-foreground/40 group-hover:text-foreground/40 ml-4 mt-1">
                 + Add →
               </span>
             </div>
@@ -304,7 +304,7 @@ export default function OKRList() {
         <div className="fixed top-0 right-0 h-full w-full max-w-lg bg-background border-l border-border z-50 overflow-y-auto shadow-xl animate-in slide-in-from-right duration-200">
           <div className="p-6 space-y-5">
             <div className="flex items-center justify-between">
-              <h2 className="text-sm font-bold uppercase tracking-wider">Create Goal</h2>
+              <h2 className="text-sm font-bold">Create Goal</h2>
               <button
                 onClick={() => setShowCreate(false)}
                 className="text-muted-foreground hover:text-foreground text-lg leading-none"
@@ -316,7 +316,7 @@ export default function OKRList() {
 
             {/* objective title */}
             <div>
-              <label className="text-[10px] uppercase tracking-wider text-muted-foreground block mb-1">
+              <label className="text-xs text-muted-foreground block mb-1">
                 Objective Title <span className="text-signal-red">*</span>
               </label>
               <input
@@ -329,7 +329,7 @@ export default function OKRList() {
 
             {/* description */}
             <div>
-              <label className="text-[10px] uppercase tracking-wider text-muted-foreground block mb-1">Description</label>
+              <label className="text-xs text-muted-foreground block mb-1">Description</label>
               <textarea
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
@@ -341,7 +341,7 @@ export default function OKRList() {
 
             {/* quarter */}
             <div>
-              <label className="text-[10px] uppercase tracking-wider text-muted-foreground block mb-1">Quarter</label>
+              <label className="text-xs text-muted-foreground block mb-1">Quarter</label>
               <select
                 value={quarter}
                 onChange={(e) => setQuarter(e.target.value)}
@@ -357,16 +357,16 @@ export default function OKRList() {
 
             {/* key results */}
             <div>
-              <label className="text-[10px] uppercase tracking-wider text-muted-foreground block mb-2">Key Results</label>
+              <label className="text-xs text-muted-foreground block mb-2">Key Results</label>
               <div className="space-y-3">
                 {keyResults.map((kr, i) => (
                   <div key={i} className="border border-border rounded-sm p-3 space-y-2">
                     <div className="flex items-center justify-between">
-                      <span className="text-[10px] uppercase tracking-wider text-muted-foreground">KR {i + 1}</span>
+                      <span className="text-xs text-muted-foreground">KR {i + 1}</span>
                       {keyResults.length > 1 && (
                         <button
                           onClick={() => removeKR(i)}
-                          className="text-[10px] text-muted-foreground hover:text-signal-red uppercase tracking-wider"
+                          className="text-xs text-muted-foreground hover:text-signal-red"
                         >
                           Remove
                         </button>
@@ -409,7 +409,7 @@ export default function OKRList() {
               </div>
               <button
                 onClick={() => setKeyResults((prev) => [...prev, emptyKR()])}
-                className="mt-2 text-[11px] uppercase tracking-wider font-semibold text-muted-foreground hover:text-foreground"
+                className="mt-2 text-xs font-semibold text-muted-foreground hover:text-foreground"
               >
                 + Add Key Result
               </button>
@@ -421,7 +421,7 @@ export default function OKRList() {
                 onClick={handleCreate}
                 disabled={!title.trim() || submitting}
                 className={cn(
-                  "text-xs uppercase tracking-wider font-semibold border rounded-sm px-4 py-2 transition-colors",
+                  "text-xs font-semibold border rounded-sm px-4 py-2 transition-colors",
                   title.trim()
                     ? "border-foreground/20 hover:bg-foreground/5"
                     : "border-border text-muted-foreground cursor-not-allowed",
@@ -434,7 +434,7 @@ export default function OKRList() {
                   resetForm();
                   setShowCreate(false);
                 }}
-                className="text-xs uppercase tracking-wider text-muted-foreground hover:text-foreground"
+                className="text-xs text-muted-foreground hover:text-foreground"
               >
                 Cancel
               </button>
@@ -458,7 +458,7 @@ export default function OKRList() {
           </div>
           <button
             onClick={() => setShowCreate(true)}
-            className="text-xs uppercase tracking-wider font-semibold border border-foreground/20 rounded-sm px-3 py-1.5 hover:bg-foreground/5 transition-colors"
+            className="text-xs font-semibold border border-foreground/20 rounded-sm px-3 py-1.5 hover:bg-foreground/5 transition-colors"
           >
             + New Goal
           </button>
@@ -469,7 +469,7 @@ export default function OKRList() {
       <div className="space-y-6">
         {grouped.map(([quarterLabel, items]) => (
           <div key={quarterLabel}>
-            <h2 className="text-[10px] uppercase tracking-widest text-muted-foreground font-semibold mb-2">{quarterLabel}</h2>
+            <h2 className="text-xs text-muted-foreground font-semibold mb-2">{quarterLabel}</h2>
             <div className="border border-border rounded-sm divide-y divide-border">
               {items.map((okr) => {
                 const expanded = expandedOkrs.has(okr.id);
@@ -510,7 +510,7 @@ export default function OKRList() {
 
                       {/* quarter badge */}
                       {okr.quarter && (
-                        <span className="text-[10px] uppercase tracking-wider text-muted-foreground border border-border rounded-sm px-1.5 py-0.5 shrink-0">
+                        <span className="text-xs text-muted-foreground border border-border rounded-sm px-1.5 py-0.5 shrink-0">
                           {okr.quarter}
                         </span>
                       )}
@@ -518,7 +518,7 @@ export default function OKRList() {
                       {/* status badge */}
                       <span
                         className={cn(
-                          "text-[10px] uppercase tracking-wider font-semibold rounded-sm px-1.5 py-0.5 shrink-0",
+                          "text-xs font-semibold rounded-sm px-1.5 py-0.5 shrink-0",
                           STATUS_COLORS[okr.status] ?? "bg-muted text-muted-foreground",
                         )}
                       >
@@ -526,14 +526,14 @@ export default function OKRList() {
                       </span>
 
                       {/* KR summary */}
-                      <span className="text-[10px] text-muted-foreground hidden md:inline shrink-0">{krSummary(okr.id)}</span>
+                      <span className="text-xs text-muted-foreground hidden md:inline shrink-0">{krSummary(okr.id)}</span>
                     </div>
 
                     {/* expanded key results */}
                     {expanded && (
                       <div className="bg-muted/30 border-t border-border px-4 py-3">
                         {krs.length === 0 ? (
-                          <p className="text-[10px] text-muted-foreground uppercase tracking-wider">No key results yet</p>
+                          <p className="text-xs text-muted-foreground">No key results yet</p>
                         ) : (
                           <div className="space-y-2">
                             {krs.map((kr) => {
@@ -551,12 +551,12 @@ export default function OKRList() {
                                       style={{ width: `${pct}%` }}
                                     />
                                   </div>
-                                  <span className="text-[10px] text-muted-foreground tabular-nums shrink-0 w-14 text-right">
+                                  <span className="text-xs text-muted-foreground tabular-nums shrink-0 w-14 text-right">
                                     {kr.current_value ?? 0} / {kr.target_value ?? "?"}
                                   </span>
                                   <span
                                     className={cn(
-                                      "text-[10px] uppercase tracking-wider font-semibold rounded-sm px-1.5 py-0.5 shrink-0",
+                                      "text-xs font-semibold rounded-sm px-1.5 py-0.5 shrink-0",
                                       STATUS_COLORS[kr.status] ?? "bg-muted text-muted-foreground",
                                     )}
                                   >

@@ -62,19 +62,19 @@ export default function DataExport() {
     <div className="flex gap-2">
       <button
         onClick={() => handleExport("decisions")}
-        className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground border rounded-sm px-2.5 py-1 hover:bg-accent transition-colors"
+        className="text-xs font-semibold text-muted-foreground border rounded-sm px-2.5 py-1 hover:bg-accent transition-colors"
       >
         Export Bets
       </button>
       <button
         onClick={() => handleExport("signals")}
-        className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground border rounded-sm px-2.5 py-1 hover:bg-accent transition-colors"
+        className="text-xs font-semibold text-muted-foreground border rounded-sm px-2.5 py-1 hover:bg-accent transition-colors"
       >
         Export Signals
       </button>
       <button
         onClick={() => handleExport("pods")}
-        className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground border rounded-sm px-2.5 py-1 hover:bg-accent transition-colors"
+        className="text-xs font-semibold text-muted-foreground border rounded-sm px-2.5 py-1 hover:bg-accent transition-colors"
       >
         Export Units
       </button>

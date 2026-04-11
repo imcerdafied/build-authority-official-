@@ -74,7 +74,7 @@ export default function StatusBadge({ status, className }: StatusBadgeProps) {
   return (
     <span
       className={cn(
-        "inline-flex items-center px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wider rounded-sm",
+        "inline-flex items-center px-2 py-0.5 text-xs font-semibold rounded-sm",
         statusStyles[status] || "bg-muted text-muted-foreground",
         className
       )}

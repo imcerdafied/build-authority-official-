@@ -36,7 +36,7 @@ export default function LoopCard({ loop, onClick }: LoopCardProps) {
           <p className="text-sm font-semibold leading-snug truncate group-hover:text-foreground">
             {loop.title}
           </p>
-          <p className="text-[11px] text-muted-foreground mt-0.5 truncate">
+          <p className="text-xs text-muted-foreground mt-0.5 truncate">
             {ownerName}
           </p>
         </div>
@@ -46,7 +46,7 @@ export default function LoopCard({ loop, onClick }: LoopCardProps) {
         </div>
       </div>
 
-      <div className="mt-2 flex items-center gap-3 text-[10px] text-muted-foreground">
+      <div className="mt-2 flex items-center gap-3 text-xs text-muted-foreground">
         {loop.last_ship_summary && (
           <span className="truncate max-w-[140px]" title={loop.last_ship_summary}>
             Ship: {loop.last_ship_summary}
@@ -65,12 +65,12 @@ export default function LoopCard({ loop, onClick }: LoopCardProps) {
       {(loop.is_stale || loop.has_no_decision) && (
         <div className="mt-1.5 flex items-center gap-2">
           {loop.is_stale && (
-            <span className="text-[9px] uppercase tracking-wider text-signal-amber font-semibold">
+            <span className="text-[9px] text-signal-amber font-semibold">
               Stale ({loop.days_since_update}d)
             </span>
           )}
           {loop.has_no_decision && (
-            <span className="text-[9px] uppercase tracking-wider text-signal-red font-semibold">
+            <span className="text-[9px] text-signal-red font-semibold">
               Needs Decision
             </span>
           )}

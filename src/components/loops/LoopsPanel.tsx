@@ -23,7 +23,7 @@ export default function LoopsPanel({ betId, canWrite }: LoopsPanelProps) {
   if (isLoading) {
     return (
       <div className="px-4 md:px-6 py-3 border-t">
-        <span className="text-[11px] uppercase tracking-[0.16em] text-muted-foreground block mb-2">
+        <span className="text-xs text-muted-foreground block mb-2">
           Outcome Loops
         </span>
         <div className="space-y-2">
@@ -42,7 +42,7 @@ export default function LoopsPanel({ betId, canWrite }: LoopsPanelProps) {
       <div className="px-4 md:px-6 py-3 border-t">
         <button
           onClick={() => setSelectedLoop(null)}
-          className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground hover:text-foreground mb-2 flex items-center gap-1"
+          className="text-xs font-semibold text-muted-foreground hover:text-foreground mb-2 flex items-center gap-1"
         >
           <span>&larr;</span> Back to loops
         </button>
@@ -58,16 +58,16 @@ export default function LoopsPanel({ betId, canWrite }: LoopsPanelProps) {
   return (
     <div className="px-4 md:px-6 py-3 border-t">
       <div className="flex items-center justify-between mb-2">
-        <span className="text-[11px] uppercase tracking-[0.16em] text-muted-foreground">
+        <span className="text-xs text-muted-foreground">
           Outcome Loops
           {loops.length > 0 && (
-            <span className="ml-1 text-[10px]">({activeLoops.length} active)</span>
+            <span className="ml-1 text-xs">({activeLoops.length} active)</span>
           )}
         </span>
         {canWrite && !showCreate && (
           <button
             onClick={() => setShowCreate(true)}
-            className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground hover:text-foreground"
+            className="text-xs font-semibold text-muted-foreground hover:text-foreground"
           >
             + New Loop
           </button>
@@ -102,7 +102,7 @@ export default function LoopsPanel({ betId, canWrite }: LoopsPanelProps) {
         <div className="mt-3">
           <button
             onClick={() => setShowClosed(!showClosed)}
-            className="flex items-center gap-1.5 text-[10px] uppercase tracking-wider text-muted-foreground hover:text-foreground"
+            className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground"
           >
             <span className={cn("transition-transform text-[9px]", showClosed && "rotate-90")}>
               &#9654;

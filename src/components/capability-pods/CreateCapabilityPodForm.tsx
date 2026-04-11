@@ -47,7 +47,7 @@ export default function CreateCapabilityPodForm({ defaultPrimaryBetId, onClose }
     onClose();
   };
 
-  const labelClass = "text-[11px] font-semibold uppercase tracking-wider text-muted-foreground block mb-1";
+  const labelClass = "text-xs font-semibold text-muted-foreground block mb-1";
   const inputClass = "w-full border rounded-sm px-3 py-2 text-sm bg-background focus:outline-none focus:ring-1 focus:ring-foreground";
 
   return (
@@ -84,7 +84,7 @@ export default function CreateCapabilityPodForm({ defaultPrimaryBetId, onClose }
                 <option key={b.id} value={b.id}>{b.title}</option>
               ))}
             </select>
-            <p className="text-[11px] text-muted-foreground mt-1">
+            <p className="text-xs text-muted-foreground mt-1">
               Each capability pod must ladder to one primary bet.
             </p>
           </div>
@@ -131,7 +131,7 @@ export default function CreateCapabilityPodForm({ defaultPrimaryBetId, onClose }
           <button
             type="submit"
             disabled={createPod.isPending || !name || !primaryBetId || !owner}
-            className="text-[11px] font-semibold uppercase tracking-wider text-background bg-foreground px-4 py-2 rounded-sm hover:bg-foreground/90 transition-colors disabled:opacity-50"
+            className="text-sm font-semibold text-background bg-foreground px-4 py-2 rounded-sm hover:bg-foreground/90 transition-colors disabled:opacity-50"
           >
             {createPod.isPending ? "Registering…" : "Register Pod"}
           </button>

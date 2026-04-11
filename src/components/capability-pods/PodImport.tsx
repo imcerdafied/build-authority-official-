@@ -52,12 +52,12 @@ export default function PodImport({ onClose }: PodImportProps) {
   return (
     <div className="border rounded-md p-4 mb-4 bg-surface-elevated">
       <div className="flex items-center justify-between mb-3">
-        <h3 className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Import Pods</h3>
+        <h3 className="text-xs font-semibold text-muted-foreground">Import Pods</h3>
         <button onClick={onClose} className="text-xs text-muted-foreground hover:text-foreground">Cancel</button>
       </div>
 
       <p className="text-xs text-muted-foreground mb-2">
-        Paste pipe or tab-delimited data: <code className="bg-muted px-1 rounded text-[10px]">pod_name | primary_bet | secondary_bet | owner | status | deliverable</code>
+        Paste pipe or tab-delimited data: <code className="bg-muted px-1 rounded text-xs">pod_name | primary_bet | secondary_bet | owner | status | deliverable</code>
       </p>
 
       <textarea
@@ -72,7 +72,7 @@ export default function PodImport({ onClose }: PodImportProps) {
         <button
           onClick={handleParse}
           disabled={!text.trim()}
-          className="text-[11px] font-semibold uppercase tracking-wider text-foreground border border-foreground px-3 py-1.5 rounded-sm hover:bg-foreground hover:text-background transition-colors disabled:opacity-50"
+          className="text-sm font-semibold text-foreground border border-foreground px-3 py-1.5 rounded-sm hover:bg-foreground hover:text-background transition-colors disabled:opacity-50"
         >
           Parse
         </button>
@@ -117,7 +117,7 @@ export default function PodImport({ onClose }: PodImportProps) {
             <button
               onClick={handleImport}
               disabled={validCount === 0 || bulkCreate.isPending}
-              className="text-[11px] font-semibold uppercase tracking-wider text-background bg-foreground px-4 py-2 rounded-sm hover:bg-foreground/90 transition-colors disabled:opacity-50"
+              className="text-sm font-semibold text-background bg-foreground px-4 py-2 rounded-sm hover:bg-foreground/90 transition-colors disabled:opacity-50"
             >
               {bulkCreate.isPending ? "Importing…" : `Import ${validCount} Pods`}
             </button>

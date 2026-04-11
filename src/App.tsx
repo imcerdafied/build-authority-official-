@@ -49,7 +49,7 @@ function AuthGate({ children }: { children: React.ReactNode }) {
   if (authLoading || orgLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
-        <p className="text-xs uppercase tracking-widest text-muted-foreground">Loading...</p>
+        <p className="text-sm text-muted-foreground">Loading...</p>
       </div>
     );
   }

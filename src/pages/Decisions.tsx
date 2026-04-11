@@ -198,7 +198,7 @@ function InlineEdit({
               type="button"
               onClick={handleSave}
               className={cn(
-                "text-[11px] font-semibold uppercase tracking-wider px-2.5 py-1 rounded-sm",
+                "text-sm font-semibold px-2.5 py-1 rounded-sm",
                 variant === "title"
                   ? "bg-white text-black hover:bg-white/90"
                   : "bg-foreground text-background hover:bg-foreground/90"
@@ -210,7 +210,7 @@ function InlineEdit({
               type="button"
               onClick={handleCancel}
               className={cn(
-                "text-[11px] uppercase tracking-wider px-2.5 py-1 rounded-sm border",
+                "text-xs px-2.5 py-1 rounded-sm border",
                 variant === "title"
                   ? "border-white/40 text-white hover:bg-white/10"
                   : "border-muted-foreground/40 text-muted-foreground hover:text-foreground hover:border-foreground/40"
@@ -219,7 +219,7 @@ function InlineEdit({
               Cancel
             </button>
           </div>
-          {saveError && <p className="text-[11px] text-signal-red">{saveError}</p>}
+          {saveError && <p className="text-xs text-signal-red">{saveError}</p>}
         </div>
       );
     }
@@ -377,7 +377,7 @@ function LogInterruptionForm({
   return (
     <div className="mt-2 p-3 border rounded bg-muted/30 space-y-2">
       <div>
-        <label className="text-[11px] uppercase tracking-wider text-muted-foreground block mb-1">Description</label>
+        <label className="text-xs text-muted-foreground block mb-1">Description</label>
         <input
           value={logDesc}
           onChange={(e) => setLogDesc(e.target.value)}
@@ -386,7 +386,7 @@ function LogInterruptionForm({
         />
       </div>
       <div>
-        <label className="text-[11px] uppercase tracking-wider text-muted-foreground block mb-1">Source</label>
+        <label className="text-xs text-muted-foreground block mb-1">Source</label>
         <select value={logSource} onChange={(e) => setLogSource(e.target.value)} className="text-xs border rounded px-2 py-1.5 bg-background w-full">
           {SOURCE_OPTIONS.map((o) => (
             <option key={o.value} value={o.value}>{o.label}</option>
@@ -395,16 +395,16 @@ function LogInterruptionForm({
       </div>
       <div className="grid grid-cols-1 gap-2">
         <div>
-          <label className="text-[11px] uppercase tracking-wider text-muted-foreground block mb-1">Estimated Days</label>
+          <label className="text-xs text-muted-foreground block mb-1">Estimated Days</label>
           <input type="number" min={0} value={logDays || ""} onChange={(e) => setLogDays(parseInt(e.target.value, 10) || 0)} placeholder="0" className="w-full text-xs border rounded px-2 py-1.5 bg-background" />
         </div>
       </div>
       <div>
-        <label className="text-[11px] uppercase tracking-wider text-muted-foreground block mb-1">Impact Note (optional)</label>
+        <label className="text-xs text-muted-foreground block mb-1">Impact Note (optional)</label>
         <input value={logImpact} onChange={(e) => setLogImpact(e.target.value)} placeholder="What does this cost?" className="w-full text-xs border rounded px-2 py-1.5 bg-background" />
       </div>
       <div className="flex items-center gap-3">
-        <button onClick={handleLogInterruption} disabled={!logDesc.trim()} className="text-[11px] font-semibold uppercase tracking-wider px-3 py-1 rounded bg-foreground text-background disabled:opacity-50">
+        <button onClick={handleLogInterruption} disabled={!logDesc.trim()} className="text-sm font-semibold px-3 py-1 rounded bg-foreground text-background disabled:opacity-50">
           Save
         </button>
         <button onClick={onClose} className="text-xs text-muted-foreground hover:text-foreground">Cancel</button>
@@ -460,14 +460,14 @@ function ResourceRealitySection({
 
   return (
     <div className={cn("mt-3 space-y-3", wrapperClass)}>
-      <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Resource Reality</p>
+      <p className="text-xs font-semibold text-muted-foreground">Resource Reality</p>
       <div className="space-y-2">
         <div className="h-2 rounded-full overflow-hidden flex bg-muted">
           <div className="bg-signal-green" style={{ width: `${capacityAllocated}%` }} />
           <div className="bg-signal-red" style={{ width: `${capacityDiverted}%` }} />
           <div className="bg-muted-foreground/20" style={{ width: `${grayPct}%` }} />
         </div>
-        <div className="flex gap-4 text-[10px]">
+        <div className="flex gap-4 text-xs">
           <span className="text-signal-green">Allocated: <InlineEdit value={String(capacityAllocated)} field="capacity_allocated" decisionId={d.id} canEdit={canWrite} onSave={handleInlineSave} logActivity={logActivity} inputType="number" />%</span>
           <span className="text-signal-red">Diverted: <InlineEdit value={String(capacityDiverted)} field="capacity_diverted" decisionId={d.id} canEdit={canWrite} onSave={handleInlineSave} logActivity={logActivity} inputType="number" />%</span>
         </div>
@@ -479,7 +479,7 @@ function ResourceRealitySection({
       </div>
       {capacityDiverted > 20 && (
         <div className="border-l-2 border-signal-red bg-signal-red/5 p-3 rounded-r-md">
-          <p className="text-[12px] text-signal-red font-medium">
+          <p className="text-xs text-signal-red font-medium">
             ⚠ {capacityDiverted}% capacity diverted. Estimated slip: ~{Math.ceil(capacityDiverted / 10)} weeks. Exposure at risk: {d.revenue_at_risk || d.exposure_value || "—"}
           </p>
         </div>
@@ -487,7 +487,7 @@ function ResourceRealitySection({
       <div className="pt-2">
         <button
           onClick={() => setInterruptExpanded(!interruptExpanded)}
-          className="text-[11px] uppercase tracking-wider text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+          className="text-xs text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
         >
           Interruptions ({interruptions.length})
         </button>
@@ -502,8 +502,8 @@ function ResourceRealitySection({
                     {SOURCE_OPTIONS.find((o) => o.value === i.source)?.label ?? i.source}
                   </span>
                   <p className="font-medium mt-1">{i.description}</p>
-                  <p className="text-muted-foreground text-[10px]">{i.estimated_days} days</p>
-                  <p className="text-[10px] text-muted-foreground">{i.created_at ? relativeTime(i.created_at) : ""}</p>
+                  <p className="text-muted-foreground text-xs">{i.estimated_days} days</p>
+                  <p className="text-xs text-muted-foreground">{i.created_at ? relativeTime(i.created_at) : ""}</p>
                 </div>
               ))
             )}
@@ -512,7 +512,7 @@ function ResourceRealitySection({
                 {!logFormExpanded ? (
                   <button
                     onClick={() => setLogFormExpanded(true)}
-                    className="text-[11px] font-semibold uppercase tracking-wider text-foreground border border-foreground px-3 py-1 rounded-sm hover:bg-foreground hover:text-background transition-colors"
+                    className="text-sm font-semibold text-foreground border border-foreground px-3 py-1 rounded-sm hover:bg-foreground hover:text-background transition-colors"
                   >
                     Log Interruption
                   </button>
@@ -552,7 +552,7 @@ function DecisionActivityFeed({
       <div className="flex items-center gap-2 flex-wrap">
         <button
           onClick={() => setExpanded(!expanded)}
-          className="text-[11px] uppercase tracking-wider text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+          className="text-xs text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
         >
           Activity ({activity.length})
         </button>
@@ -561,7 +561,7 @@ function DecisionActivityFeed({
             <span className="text-muted-foreground/50">·</span>
             <button
               onClick={logInterruptionOnClick}
-              className="text-[11px] uppercase tracking-wider text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+              className="text-xs text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
             >
               Log Interruption
             </button>
@@ -582,7 +582,7 @@ function DecisionActivityFeed({
               const when = a.created_at ? relativeTime(a.created_at) : "";
               return (
                 <div key={a.id}>
-                  <p className="text-[10px] text-muted-foreground">{when}</p>
+                  <p className="text-xs text-muted-foreground">{when}</p>
                   <p className="font-medium">{label}</p>
                   <p className="text-muted-foreground">{oldVal} → {newVal}</p>
                 </div>
@@ -753,21 +753,21 @@ function PodConfigurationSection({
         onClick={onToggle}
         className="w-full px-4 py-2 flex items-center justify-between text-left hover:bg-muted/30 transition-colors"
       >
-        <span className="text-[11px] uppercase tracking-widest font-semibold text-muted-foreground">
+        <span className="text-xs font-semibold text-muted-foreground">
           BET OUTCOME POD · {pod.pod_name} · {pod.total_headcount} people
         </span>
-        <span className="text-muted-foreground text-[10px]">{expanded ? "−" : "+"}</span>
+        <span className="text-muted-foreground text-xs">{expanded ? "−" : "+"}</span>
       </button>
       {expanded && (
         <div className="px-4 pb-4 pt-0 space-y-3 border-t">
           <div className="flex items-center gap-2 flex-wrap pt-3">
-            <span className="text-[11px] uppercase tracking-widest font-semibold text-muted-foreground">
+            <span className="text-xs font-semibold text-muted-foreground">
               OUTCOME POD CONFIGURATION
             </span>
-            <span className="text-[10px] font-semibold uppercase px-2 py-0.5 rounded-sm bg-muted text-foreground">
+            <span className="text-xs font-semibold px-2 py-0.5 rounded-sm bg-muted text-foreground">
               {pod.pod_name}
             </span>
-            <span className="text-[10px] font-semibold uppercase px-2 py-0.5 rounded-sm bg-muted/80 text-muted-foreground">
+            <span className="text-xs font-semibold px-2 py-0.5 rounded-sm bg-muted/80 text-muted-foreground">
               {pod.pod_type?.replace(/_/g, " ")}
             </span>
           </div>
@@ -808,7 +808,7 @@ function PodConfigurationSection({
                     value={c.note ?? ""}
                     onSave={(v) => updateComposition(i, { note: v })}
                     canEdit={canWrite}
-                    className="text-[10px] text-muted-foreground mt-0.5 block"
+                    className="text-xs text-muted-foreground mt-0.5 block"
                     placeholder="Note…"
                   />
                 </div>
@@ -827,7 +827,7 @@ function PodConfigurationSection({
           {canWrite && (
             <button
               onClick={addRole}
-              className="text-[11px] uppercase tracking-wider text-muted-foreground hover:text-foreground cursor-pointer"
+              className="text-xs text-muted-foreground hover:text-foreground cursor-pointer"
             >
               Add Role
             </button>
@@ -836,24 +836,24 @@ function PodConfigurationSection({
           <div className="grid grid-cols-2 gap-2">
             {faKeys.map((k) => (
               <div key={k}>
-                <span className="text-[10px] uppercase tracking-wider text-muted-foreground block">{faLabels[k]}</span>
+                <span className="text-xs text-muted-foreground block">{faLabels[k]}</span>
                 <PodInlineEdit
                   value={fa[k] ?? ""}
                   onSave={(v) => updateFa(k, v)}
                   canEdit={canWrite}
-                  className="text-[12px] block"
+                  className="text-xs block"
                   placeholder="—"
                 />
               </div>
             ))}
           </div>
           {(pod.dependencies?.length ?? 0) > 0 && (
-            <p className="text-[11px] text-muted-foreground">
+            <p className="text-xs text-muted-foreground">
               Dependencies: {pod.dependencies!.join(", ")}
             </p>
           )}
           {pod.sizing_rationale && (
-            <p className="text-[11px] text-muted-foreground italic">{pod.sizing_rationale}</p>
+            <p className="text-xs text-muted-foreground italic">{pod.sizing_rationale}</p>
           )}
         </div>
       )}
@@ -1093,7 +1093,7 @@ function BetCard({
         <div className="flex flex-col xl:flex-row xl:items-center xl:justify-between gap-4">
           <div className="min-w-0 w-full xl:flex-[1.2]">
             {d.linked_okr_title && (
-              <div className="text-[10px] uppercase tracking-widest text-white/50 mb-1 flex items-center gap-1">
+              <div className="text-xs text-white/50 mb-1 flex items-center gap-1">
                 <span className="w-1.5 h-1.5 rounded-full bg-teal-400 inline-block" />
                 GOAL: {d.linked_okr_title}
               </div>
@@ -1168,7 +1168,7 @@ function BetCard({
 
         {pendingStatus?.decisionId === d.id && (
           <div className="mt-3 p-3 border border-white/20 rounded-sm max-w-xl">
-            <label className="text-[11px] uppercase tracking-wider text-white/60 block mb-1">What changed? What&apos;s the evidence? (optional)</label>
+            <label className="text-xs text-white/60 block mb-1">What changed? What&apos;s the evidence? (optional)</label>
             <textarea
               rows={2}
               placeholder="Optional context for this lifecycle change"
@@ -1179,7 +1179,7 @@ function BetCard({
             <div className="mt-2 flex items-center gap-3">
               <button
                 onClick={handleStatusConfirm}
-                className="text-[11px] font-semibold uppercase tracking-wider px-3 py-1 rounded-sm bg-white text-black"
+                className="text-sm font-semibold px-3 py-1 rounded-sm bg-white text-black"
               >
                 Confirm
               </button>
@@ -1235,13 +1235,13 @@ function BetCard({
             {stale.label}
           </span>
           {!canUpdateStatus && (
-            <p className="text-[11px] text-muted-foreground sm:text-right">Only assigned owner or admin can update lifecycle.</p>
+            <p className="text-xs text-muted-foreground sm:text-right">Only assigned owner or admin can update lifecycle.</p>
           )}
           {showNudge && (
             <a
               href={nudgeMailto(d.title ?? "Untitled", stale.days, d.owner ?? "", d.exposure_value ?? d.revenue_at_risk ?? "--")}
               className={cn(
-                "text-[10px] uppercase tracking-wider px-2 py-0.5 border rounded-sm transition-colors",
+                "text-xs px-2 py-0.5 border rounded-sm transition-colors",
                 stale.isRed ? "border-signal-red text-signal-red hover:bg-signal-red/10" : "border-signal-amber text-signal-amber hover:bg-signal-amber/10"
               )}
             >
@@ -1267,7 +1267,7 @@ function BetCard({
 
       {!hasResourceReality && canWrite && logFormExpanded && (
         <div className="px-4 md:px-5 py-3">
-          <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground mb-2">Log Interruption</p>
+          <p className="text-xs font-semibold text-muted-foreground mb-2">Log Interruption</p>
           <LogInterruptionForm
             decision={d}
             canWrite={canWrite}
@@ -1298,14 +1298,14 @@ function BetCard({
 
       {betOutcomes && betOutcomes.length > 0 && (
         <div className="px-4 md:px-5 py-3 border-t border-border/40">
-          <div className="text-[10px] uppercase tracking-widest text-muted-foreground mb-1.5 flex items-center gap-1">
+          <div className="text-xs text-muted-foreground mb-1.5 flex items-center gap-1">
             <span className="w-1.5 h-1.5 rounded-full bg-purple-400 inline-block" />
             BUILD: {betOutcomes.length} outcome{betOutcomes.length !== 1 ? 's' : ''}
           </div>
           <div className="flex flex-wrap gap-1">
             {betOutcomes.slice(0, 3).map((o: any) => (
               <span key={o.id} className={cn(
-                "text-[10px] px-1.5 py-0.5 rounded border",
+                "text-xs px-1.5 py-0.5 rounded border",
                 o.status === 'shipped' ? 'border-green-200 text-green-700 bg-green-50' :
                 o.status === 'in_progress' ? 'border-blue-200 text-blue-700 bg-blue-50' :
                 'border-border/40 text-muted-foreground'
@@ -1314,7 +1314,7 @@ function BetCard({
               </span>
             ))}
             {betOutcomes.length > 3 && (
-              <span className="text-[10px] text-muted-foreground">+{betOutcomes.length - 3} more</span>
+              <span className="text-xs text-muted-foreground">+{betOutcomes.length - 3} more</span>
             )}
           </div>
         </div>
@@ -1405,7 +1405,7 @@ export default function Decisions() {
     qc.invalidateQueries({ queryKey: ["decision_activity", id] });
   };
 
-  if (decisionsLoading || risksLoading) return <p className="text-xs text-muted-foreground uppercase tracking-widest">Loading...</p>;
+  if (decisionsLoading || risksLoading) return <p className="text-sm text-muted-foreground">Loading...</p>;
 
   const activeDecisions = decisions.filter((d) => !isClosedBetLifecycle(d.status));
   const closedDecisions = decisions
@@ -1471,14 +1471,14 @@ export default function Decisions() {
               {(filterStatus || filterRisk || filterDomain) && (
                 <button
                   onClick={() => { setFilterStatus(""); setFilterRisk(""); setFilterDomain(""); }}
-                  className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground hover:text-foreground"
+                  className="text-xs font-semibold text-muted-foreground hover:text-foreground"
                 >
                   Clear
                 </button>
               )}
               {canWrite && !showCreate && (
                 <button onClick={() => setShowCreate(true)}
-                  className="text-[11px] font-semibold uppercase tracking-wider text-foreground border border-foreground px-3 py-1.5 rounded-sm hover:bg-foreground hover:text-background transition-colors min-h-[44px] md:min-h-0">
+                  className="text-sm font-semibold text-foreground border border-foreground px-3 py-1.5 rounded-sm hover:bg-foreground hover:text-background transition-colors min-h-[44px] md:min-h-0">
                   + Register Bet
                 </button>
               )}
@@ -1507,7 +1507,7 @@ export default function Decisions() {
             </button>
           )}
           <div className="mt-8 pt-6 border-t border-border/40">
-            <p className="text-[10px] uppercase tracking-widest font-semibold text-muted-foreground mb-3">
+            <p className="text-xs font-semibold text-muted-foreground mb-3">
               Also in the BSPG Strategic OS
             </p>
             <div className="flex flex-col sm:flex-row justify-center gap-4 text-xs text-muted-foreground">
@@ -1552,7 +1552,7 @@ export default function Decisions() {
                       )}
                     >
                       <div className="px-2.5 py-2 bg-black/90 text-white">
-                        <p className="text-[11px] font-semibold leading-tight line-clamp-2 min-w-0">
+                        <p className="text-sm font-medium leading-tight line-clamp-2 min-w-0">
                           <span className="text-white/80 mr-0.5">{index + 1}.</span>
                           {d.title || "Untitled"}
                         </p>
@@ -1609,10 +1609,10 @@ export default function Decisions() {
                 aria-expanded={closedBetsOpen}
                 className="flex items-center gap-2 w-full text-left group"
               >
-                <span className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground group-hover:text-foreground transition-colors">
+                <span className="text-xs font-semibold text-muted-foreground group-hover:text-foreground transition-colors">
                   Closed Bets
                 </span>
-                <span className="text-[11px] text-muted-foreground">({closedCount})</span>
+                <span className="text-xs text-muted-foreground">({closedCount})</span>
                 <span className={cn("text-muted-foreground transition-transform text-xs", closedBetsOpen && "rotate-90")}>
                   &#9654;
                 </span>
@@ -1623,11 +1623,11 @@ export default function Decisions() {
                     <div key={d.id} className="border rounded-md px-4 py-3 flex flex-col md:flex-row md:items-center md:justify-between gap-2">
                       <div className="min-w-0">
                         <p className="text-sm font-medium truncate">{d.title || "Untitled"}</p>
-                        <p className="text-[10px] text-muted-foreground uppercase tracking-wider mt-0.5">
+                        <p className="text-xs text-muted-foreground mt-0.5">
                           {categoryLabels[(d.outcome_category_key ?? d.outcome_category) ?? ""] || "—"}
                         </p>
                       </div>
-                      <p className="text-[10px] text-muted-foreground shrink-0">
+                      <p className="text-xs text-muted-foreground shrink-0">
                         Closed {formatDate(d.updated_at)}
                       </p>
                     </div>

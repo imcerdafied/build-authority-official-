@@ -17,7 +17,7 @@ export default function MetricCard({ label, value, sub, alert, danger, children 
       danger ? "border-signal-red/40 bg-signal-red/5" :
       alert ? "border-signal-amber/40 bg-signal-amber/5" : "border-border"
     )}>
-      <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground mb-1">
+      <p className="text-xs font-semibold text-muted-foreground mb-1">
         {label}
       </p>
       <p className={cn(
@@ -29,7 +29,7 @@ export default function MetricCard({ label, value, sub, alert, danger, children 
       </p>
       {sub && (
         <p className={cn(
-          "text-[12px] mt-0.5",
+          "text-xs mt-0.5",
           danger ? "text-signal-red/80" :
           alert ? "text-signal-amber/80" : "text-muted-foreground"
         )}>{sub}</p>

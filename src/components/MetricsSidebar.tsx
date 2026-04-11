@@ -70,7 +70,7 @@ export default function MetricsSidebar({ betId, canWrite }: MetricsSidebarProps)
   if (isLoading) {
     return (
       <div className="px-4 md:px-6 py-3 border-t">
-        <span className="text-[11px] uppercase tracking-[0.16em] text-muted-foreground">Outcome Metrics</span>
+        <span className="text-xs text-muted-foreground">Outcome Metrics</span>
         <div className="mt-2 space-y-2.5">
           <MetricSkeleton />
           <MetricSkeleton />
@@ -83,11 +83,11 @@ export default function MetricsSidebar({ betId, canWrite }: MetricsSidebarProps)
     return (
       <div className="px-4 md:px-6 py-3 border-t">
         <div className="flex items-center justify-between">
-          <span className="text-[11px] uppercase tracking-[0.16em] text-muted-foreground">Outcome Metrics</span>
+          <span className="text-xs text-muted-foreground">Outcome Metrics</span>
           {canWrite && (
             <button
               onClick={() => setShowAdd(true)}
-              className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground hover:text-foreground transition-colors"
+              className="text-xs font-semibold text-muted-foreground hover:text-foreground transition-colors"
             >
               + Add Metric
             </button>
@@ -100,13 +100,13 @@ export default function MetricsSidebar({ betId, canWrite }: MetricsSidebarProps)
   return (
     <div className="px-4 md:px-6 py-4 border-t">
       <div className="flex items-center justify-between mb-3">
-        <span className="text-[11px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+        <span className="text-xs font-semibold text-muted-foreground">
           Outcome Metrics ({metrics.length})
         </span>
         {canWrite && !showAdd && (
           <button
             onClick={() => setShowAdd(true)}
-            className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground hover:text-foreground transition-colors"
+            className="text-xs font-semibold text-muted-foreground hover:text-foreground transition-colors"
           >
             + Add Metric
           </button>
@@ -267,17 +267,17 @@ function MetricRow({
   if (alignment) {
     if (alignment.total === 0) {
       alignmentDisplay = (
-        <span className="text-[10px] text-muted-foreground/50">No initiatives yet</span>
+        <span className="text-xs text-muted-foreground/50">No initiatives yet</span>
       );
     } else if (alignment.aligned === 0) {
       alignmentDisplay = (
-        <span className="text-[10px] text-signal-red tabular-nums">
+        <span className="text-xs text-signal-red tabular-nums">
           0 of {alignment.total} aligned
         </span>
       );
     } else {
       alignmentDisplay = (
-        <span className="text-[10px] text-muted-foreground/50 tabular-nums">
+        <span className="text-xs text-muted-foreground/50 tabular-nums">
           {alignment.aligned} of {alignment.total} aligned
         </span>
       );
@@ -311,13 +311,13 @@ function MetricRow({
           <div className="flex items-center gap-1.5 min-w-0">
             <span className="text-xs font-medium truncate">{metric.metric_name}</span>
             {canWrite && (
-              <span className="text-muted-foreground/0 group-hover:text-muted-foreground/50 transition-colors text-[10px]" aria-hidden="true">
+              <span className="text-muted-foreground/0 group-hover:text-muted-foreground/50 transition-colors text-xs" aria-hidden="true">
                 ✎
               </span>
             )}
           </div>
           <span className={cn(
-            "text-[10px] font-semibold uppercase px-1.5 py-0.5 rounded-sm border transition-colors duration-500 shrink-0 ml-2",
+            "text-xs font-semibold px-1.5 py-0.5 rounded-sm border transition-colors duration-500 shrink-0 ml-2",
             STATUS_COLORS[metric.status],
           )}>
             {metric.status}
@@ -330,7 +330,7 @@ function MetricRow({
               style={{ width: `${pct}%` }}
             />
           </div>
-          <div className="text-[10px] text-muted-foreground tabular-nums whitespace-nowrap">
+          <div className="text-xs text-muted-foreground tabular-nums whitespace-nowrap">
             {canWrite && editing ? (
               <input
                 ref={inputRef}
@@ -343,7 +343,7 @@ function MetricRow({
                 onBlur={handleCommit}
                 onKeyDown={handleKeyDown}
                 onClick={(e) => e.stopPropagation()}
-                className="w-14 border rounded-sm px-1 py-0.5 text-[10px] bg-background text-right focus:outline-none focus:ring-1 focus:ring-foreground"
+                className="w-14 border rounded-sm px-1 py-0.5 text-xs bg-background text-right focus:outline-none focus:ring-1 focus:ring-foreground"
                 aria-label={`Current value for ${metric.metric_name}`}
               />
             ) : (
@@ -374,7 +374,7 @@ function MetricRow({
           </div>
         </div>
         <div className="flex items-center justify-between mt-0.5">
-          <span className="text-[10px] text-muted-foreground/60">{metric.outcome_key}</span>
+          <span className="text-xs text-muted-foreground/60">{metric.outcome_key}</span>
           {alignmentDisplay}
         </div>
       </div>
@@ -383,7 +383,7 @@ function MetricRow({
       {expanded && canWrite && (
         <div className="px-3 pb-3 pt-1 border-t space-y-2" onKeyDown={handleExpandKeyDown}>
           <div>
-            <label className="text-[10px] uppercase tracking-[0.16em] text-muted-foreground block mb-0.5">Metric Name</label>
+            <label className="text-xs text-muted-foreground block mb-0.5">Metric Name</label>
             <input
               value={draftName}
               onChange={(e) => setDraftName(e.target.value)}
@@ -391,7 +391,7 @@ function MetricRow({
             />
           </div>
           <div>
-            <label className="text-[10px] uppercase tracking-[0.16em] text-muted-foreground block mb-0.5">Outcome Key</label>
+            <label className="text-xs text-muted-foreground block mb-0.5">Outcome Key</label>
             <input
               value={draftOutcome}
               onChange={(e) => setDraftOutcome(e.target.value)}
@@ -399,7 +399,7 @@ function MetricRow({
             />
           </div>
           <div>
-            <label className="text-[10px] uppercase tracking-[0.16em] text-muted-foreground block mb-0.5">Target Value</label>
+            <label className="text-xs text-muted-foreground block mb-0.5">Target Value</label>
             <input
               type="number"
               min="0.01"
@@ -425,7 +425,7 @@ function MetricRow({
             <button
               type="button"
               onClick={handleExpandedSave}
-              className="text-[11px] font-semibold uppercase tracking-wider text-background bg-foreground px-3 py-1 rounded-sm hover:bg-foreground/90 transition-colors"
+              className="text-sm font-semibold text-background bg-foreground px-3 py-1 rounded-sm hover:bg-foreground/90 transition-colors"
             >
               Save
             </button>
@@ -463,24 +463,24 @@ function AddMetricForm({
   return (
     <form onSubmit={handleSubmit} className="border rounded-sm p-3 mb-3 space-y-2.5 bg-muted/30">
       <div>
-        <label htmlFor="metric-outcome" className="text-[11px] uppercase tracking-[0.16em] text-muted-foreground block mb-1">Outcome Key</label>
+        <label htmlFor="metric-outcome" className="text-xs text-muted-foreground block mb-1">Outcome Key</label>
         <input id="metric-outcome" required value={outcomeKey} onChange={(e) => setOutcomeKey(e.target.value)} placeholder="e.g. retention" className={inputClass} />
-        <p className="text-[10px] text-muted-foreground/60 mt-0.5">A short keyword that groups this metric with related initiatives (e.g., retention, revenue, activation)</p>
+        <p className="text-xs text-muted-foreground/60 mt-0.5">A short keyword that groups this metric with related initiatives (e.g., retention, revenue, activation)</p>
       </div>
       <div>
-        <label htmlFor="metric-name" className="text-[11px] uppercase tracking-[0.16em] text-muted-foreground block mb-1">Metric Name</label>
+        <label htmlFor="metric-name" className="text-xs text-muted-foreground block mb-1">Metric Name</label>
         <input id="metric-name" required value={metricName} onChange={(e) => setMetricName(e.target.value)} placeholder="e.g. 90-day churn rate" className={inputClass} />
       </div>
       <div>
-        <label htmlFor="metric-target" className="text-[11px] uppercase tracking-[0.16em] text-muted-foreground block mb-1">Target Value</label>
+        <label htmlFor="metric-target" className="text-xs text-muted-foreground block mb-1">Target Value</label>
         <input id="metric-target" required type="number" min="0.01" step="any" value={targetValue} onChange={(e) => setTargetValue(e.target.value)} placeholder="100" className={inputClass} />
-        <p className="text-[10px] text-muted-foreground/60 mt-0.5">The measurable target for this outcome (e.g., 85% retention, $2M ARR, 10 activations)</p>
+        <p className="text-xs text-muted-foreground/60 mt-0.5">The measurable target for this outcome (e.g., 85% retention, $2M ARR, 10 activations)</p>
       </div>
       <div className="flex items-center justify-end gap-2 pt-1">
         <button type="button" onClick={onCancel} className="text-xs text-muted-foreground hover:text-foreground">
           Cancel
         </button>
-        <button type="submit" disabled={submitting || !outcomeKey.trim() || !metricName.trim()} className="text-[11px] font-semibold uppercase tracking-wider text-background bg-foreground px-4 py-1.5 rounded-sm hover:bg-foreground/90 transition-colors disabled:opacity-50">
+        <button type="submit" disabled={submitting || !outcomeKey.trim() || !metricName.trim()} className="text-sm font-semibold text-background bg-foreground px-4 py-1.5 rounded-sm hover:bg-foreground/90 transition-colors disabled:opacity-50">
           {submitting ? "Adding…" : "Add Metric"}
         </button>
       </div>

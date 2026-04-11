@@ -67,7 +67,7 @@ export default function InitiativesPanel({ betId, canWrite }: InitiativesPanelPr
   if (isLoading) {
     return (
       <div className="px-4 md:px-6 py-3 border-t">
-        <span className="text-[11px] uppercase tracking-[0.16em] text-muted-foreground">Initiatives</span>
+        <span className="text-xs text-muted-foreground">Initiatives</span>
         <div className="mt-2 space-y-2">
           <InitiativeSkeleton />
           <InitiativeSkeleton />
@@ -80,11 +80,11 @@ export default function InitiativesPanel({ betId, canWrite }: InitiativesPanelPr
     return (
       <div className="px-4 md:px-6 py-3 border-t">
         <div className="flex items-center justify-between">
-          <span className="text-[11px] uppercase tracking-[0.16em] text-muted-foreground">Initiatives</span>
+          <span className="text-xs text-muted-foreground">Initiatives</span>
           {canWrite && (
             <button
               onClick={() => setShowAdd(true)}
-              className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground hover:text-foreground transition-colors"
+              className="text-xs font-semibold text-muted-foreground hover:text-foreground transition-colors"
             >
               + Add Initiative
             </button>
@@ -97,13 +97,13 @@ export default function InitiativesPanel({ betId, canWrite }: InitiativesPanelPr
   return (
     <div className="px-4 md:px-6 py-4 border-t">
       <div className="flex items-center justify-between mb-3">
-        <span className="text-[11px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+        <span className="text-xs font-semibold text-muted-foreground">
           Initiatives ({initiatives.length})
         </span>
         {canWrite && !showAdd && (
           <button
             onClick={() => setShowAdd(true)}
-            className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground hover:text-foreground transition-colors"
+            className="text-xs font-semibold text-muted-foreground hover:text-foreground transition-colors"
           >
             + Add Initiative
           </button>
@@ -231,13 +231,13 @@ function InitiativeCard({
             <span className="text-xs font-medium tabular-nums">
               V³ {init.score_v3.toFixed(2)}
             </span>
-            <span className={cn("text-[10px] font-semibold tabular-nums", deltaColor)}>
+            <span className={cn("text-xs font-semibold tabular-nums", deltaColor)}>
               {deltaIcon} {deltaSign}{Math.abs(init.last_score_delta).toFixed(2)}
             </span>
             {/* Multiplier badge */}
             <span
               className={cn(
-                "text-[10px] font-semibold tabular-nums px-1 py-px rounded-sm",
+                "text-xs font-semibold tabular-nums px-1 py-px rounded-sm",
                 init.outcome_multiplier > 1
                   ? "bg-signal-green/10 text-signal-green"
                   : "text-muted-foreground",
@@ -263,7 +263,7 @@ function InitiativeCard({
                   <span
                     key={o}
                     className={cn(
-                      "text-[10px] px-1.5 py-0.5 rounded-sm border border-transparent",
+                      "text-xs px-1.5 py-0.5 rounded-sm border border-transparent",
                       pillClass,
                     )}
                   >
@@ -273,14 +273,14 @@ function InitiativeCard({
               })}
             </div>
           ) : (
-            <p className="text-[10px] text-muted-foreground/50 mt-1.5">
+            <p className="text-xs text-muted-foreground/50 mt-1.5">
               No outcome alignment — multiplier is 1.0x
             </p>
           )}
         </div>
 
         {/* Expand indicator */}
-        <span className="text-[10px] text-muted-foreground mt-1" aria-hidden="true">
+        <span className="text-xs text-muted-foreground mt-1" aria-hidden="true">
           {expanded ? "▼" : "▶"}
         </span>
       </button>
@@ -293,7 +293,7 @@ function InitiativeCard({
 
           {outcomeKeys.length > 0 && (
             <fieldset>
-              <legend className="text-[11px] uppercase tracking-[0.16em] text-muted-foreground mb-1">
+              <legend className="text-xs text-muted-foreground mb-1">
                 Aligned Outcomes
               </legend>
               <div className="flex flex-wrap gap-1.5">
@@ -306,7 +306,7 @@ function InitiativeCard({
                       onClick={() => setAligned(active ? aligned.filter((k) => k !== key) : [...aligned, key])}
                       aria-pressed={active}
                       className={cn(
-                        "text-[10px] px-2 py-1 rounded-sm border transition-colors",
+                        "text-xs px-2 py-1 rounded-sm border transition-colors",
                         active
                           ? "bg-foreground text-background border-foreground"
                           : "bg-background text-muted-foreground border-border hover:border-foreground"
@@ -328,14 +328,14 @@ function InitiativeCard({
                 await onUpdate({ value, confidence, effort: safeEffort, aligned_outcomes: aligned });
               }}
               disabled={updating}
-              className="text-[11px] font-semibold uppercase tracking-wider text-background bg-foreground px-4 py-1.5 rounded-sm hover:bg-foreground/90 transition-colors disabled:opacity-50"
+              className="text-sm font-semibold text-background bg-foreground px-4 py-1.5 rounded-sm hover:bg-foreground/90 transition-colors disabled:opacity-50"
             >
               {updating ? "Saving…" : "Save"}
             </button>
             {!confirmDelete ? (
               <button
                 onClick={() => setConfirmDelete(true)}
-                className="text-[11px] text-muted-foreground hover:text-signal-red transition-colors"
+                className="text-xs text-muted-foreground hover:text-signal-red transition-colors"
               >
                 Delete
               </button>
@@ -343,13 +343,13 @@ function InitiativeCard({
               <span className="flex items-center gap-2">
                 <button
                   onClick={onDelete}
-                  className="text-[11px] font-semibold text-signal-red hover:underline"
+                  className="text-xs font-semibold text-signal-red hover:underline"
                 >
                   Confirm delete
                 </button>
                 <button
                   onClick={() => setConfirmDelete(false)}
-                  className="text-[11px] text-muted-foreground"
+                  className="text-xs text-muted-foreground"
                 >
                   Cancel
                 </button>
@@ -392,7 +392,7 @@ function AddInitiativeForm({
   return (
     <form onSubmit={handleSubmit} className="border rounded-sm p-3 mb-3 space-y-3 bg-muted/30">
       <div>
-        <label htmlFor="init-desc" className="text-[11px] uppercase tracking-[0.16em] text-muted-foreground block mb-1">Description</label>
+        <label htmlFor="init-desc" className="text-xs text-muted-foreground block mb-1">Description</label>
         <input
           id="init-desc"
           required
@@ -409,7 +409,7 @@ function AddInitiativeForm({
 
       {outcomeKeys.length > 0 && (
         <fieldset>
-          <legend className="text-[11px] uppercase tracking-[0.16em] text-muted-foreground mb-1">
+          <legend className="text-xs text-muted-foreground mb-1">
             Aligned Outcomes
           </legend>
           <div className="flex flex-wrap gap-1.5">
@@ -422,7 +422,7 @@ function AddInitiativeForm({
                   onClick={() => setAligned(active ? aligned.filter((k) => k !== key) : [...aligned, key])}
                   aria-pressed={active}
                   className={cn(
-                    "text-[10px] px-2 py-1 rounded-sm border transition-colors",
+                    "text-xs px-2 py-1 rounded-sm border transition-colors",
                     active
                       ? "bg-foreground text-background border-foreground"
                       : "bg-background text-muted-foreground border-border hover:border-foreground"
@@ -440,7 +440,7 @@ function AddInitiativeForm({
         <button
           type="submit"
           disabled={submitting || !description.trim()}
-          className="text-[11px] font-semibold uppercase tracking-wider text-background bg-foreground px-4 py-1.5 rounded-sm hover:bg-foreground/90 transition-colors disabled:opacity-50"
+          className="text-sm font-semibold text-background bg-foreground px-4 py-1.5 rounded-sm hover:bg-foreground/90 transition-colors disabled:opacity-50"
         >
           {submitting ? "Adding…" : "Add Initiative"}
         </button>
@@ -518,10 +518,10 @@ function SliderField({
   return (
     <div>
       <div className="flex items-center justify-between mb-1">
-        <label htmlFor={id} className="text-[11px] uppercase tracking-[0.16em] text-muted-foreground">{label}</label>
+        <label htmlFor={id} className="text-xs text-muted-foreground">{label}</label>
         <div className="flex items-center gap-2">
           {calibrationLabel && (
-            <span className="text-[10px] text-muted-foreground/60">{calibrationLabel}</span>
+            <span className="text-xs text-muted-foreground/60">{calibrationLabel}</span>
           )}
           <span className="text-xs font-medium tabular-nums" aria-live="polite">{value.toFixed(decimals)}</span>
         </div>
