@@ -8,18 +8,18 @@ import { useNavigate } from "react-router-dom";
 import type { Database } from "@/integrations/supabase/types";
 import type { TablesInsert } from "@/integrations/supabase/types";
 import { fetchOutcomeCategories, type OutcomeCategoryItem } from "@/lib/taxonomy";
-
-type SolutionDomain = Database["public"]["Enums"]["solution_domain"];
+import { useOrgDomains } from "@/hooks/useOrgData";
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 export default function CreateDecisionForm({ onClose, navigateAfter = false }: { onClose: () => void; navigateAfter?: boolean }) {
   const createDecision = useCreateDecision();
   const { currentOrg, currentRole, productAreas, customOutcomeCategories } = useOrg();
 
+  const { data: orgDomains = [] } = useOrgDomains();
   const domainLabels: Record<string, string> = Object.fromEntries(
     productAreas.map((pa) => [pa.key, pa.label]),
   );
-  const domainKeys = productAreas.map((pa) => pa.key) as SolutionDomain[];
+  const domainKeys = productAreas.map((pa) => pa.key);
   const { user } = useAuth();
   const navigate = useNavigate();
   const canCreate = currentRole === "admin" || currentRole === "pod_lead";
@@ -83,10 +83,15 @@ export default function CreateDecisionForm({ onClose, navigateAfter = false }: {
 
   if (!canCreate) return null;
 
-  const resolveSolutionDomain = (labelRaw: string): SolutionDomain => {
+  const resolveSolutionDomain = (labelRaw: string): string => {
     const label = labelRaw.trim().toLowerCase();
+    // Try org-configurable domains first
+    const orgMatch = orgDomains.find((d) => d.name.toLowerCase() === label || d.label.toLowerCase() === label);
+    if (orgMatch) return orgMatch.name;
+    // Fallback to product areas
     const exact = productAreas.find((pa) => pa.label.trim().toLowerCase() === label);
-    if (exact) return exact.key as SolutionDomain;
+    if (exact) return exact.key;
+    if (orgDomains.length > 0) return orgDomains[0].name;
     if (domainKeys.length > 0) return domainKeys[0];
     return "Cross";
   };
@@ -461,7 +466,8 @@ export default function CreateDecisionForm({ onClose, navigateAfter = false }: {
           sponsor: sponsorForBatch,
           owner_user_id: user?.id ?? null,
           surface: s.product_area || domainLabels[solutionDomain] || solutionDomain,
-          solution_domain: solutionDomain,
+          solution_domain: solutionDomain as any,
+          solution_domain_key: solutionDomain,
           impact_tier: "High",
           status: "defined",
           risk_level: "healthy",
@@ -518,7 +524,8 @@ export default function CreateDecisionForm({ onClose, navigateAfter = false }: {
         sponsor: normalizedSponsor,
         owner_user_id: user?.id ?? null,
         surface: normalizedProductArea,
-        solution_domain: solutionDomain,
+        solution_domain: solutionDomain as any,
+        solution_domain_key: solutionDomain,
         impact_tier: "High",
         status: "defined",
         risk_level: "healthy",
