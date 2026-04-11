@@ -21,7 +21,6 @@ import ScoreHistory from "@/components/ScoreHistory";
 import DriftIndicators from "@/components/DriftIndicators";
 import { DriftBadge } from "@/components/DriftIndicators";
 import StatusBadge from "@/components/StatusBadge";
-import AltitudeLinkPanel from "@/components/AltitudeLinkPanel";
 import { supabase } from "@/integrations/supabase/client";
 import {
   BET_LIFECYCLE_LABELS,
@@ -1274,63 +1273,6 @@ function BetCard({
         canWrite={canWrite}
       />
 
-      <AltitudeLinkPanel
-        betId={d.id}
-        betTitle={d.title ?? ""}
-        linkedOkrId={d.linked_okr_id ?? null}
-        linkedOkrTitle={d.linked_okr_title ?? null}
-        linkedOutcomeIds={Array.isArray(d.linked_outcome_ids) ? d.linked_outcome_ids : []}
-        linkedOutcomeTitles={
-          typeof d.linked_outcome_titles === "object" && d.linked_outcome_titles
-            ? d.linked_outcome_titles
-            : {}
-        }
-        onLinkOkr={async (okrId, okrTitle) => {
-          await supabase
-            .from("decisions")
-            .update({ linked_okr_id: okrId, linked_okr_title: okrTitle })
-            .eq("id", d.id);
-          qc.invalidateQueries({ queryKey: ["decisions"] });
-        }}
-        onUnlinkOkr={async () => {
-          await supabase
-            .from("decisions")
-            .update({ linked_okr_id: null, linked_okr_title: null })
-            .eq("id", d.id);
-          qc.invalidateQueries({ queryKey: ["decisions"] });
-        }}
-        onLinkOutcome={async (outcomeId, outcomeTitle) => {
-          const existingIds = Array.isArray(d.linked_outcome_ids) ? d.linked_outcome_ids : [];
-          const existingTitles =
-            typeof d.linked_outcome_titles === "object" && d.linked_outcome_titles
-              ? d.linked_outcome_titles
-              : {};
-          await supabase
-            .from("decisions")
-            .update({
-              linked_outcome_ids: [...existingIds, outcomeId],
-              linked_outcome_titles: { ...existingTitles, [outcomeId]: outcomeTitle },
-            })
-            .eq("id", d.id);
-          qc.invalidateQueries({ queryKey: ["decisions"] });
-        }}
-        onUnlinkOutcome={async (outcomeId) => {
-          const existingIds = Array.isArray(d.linked_outcome_ids) ? d.linked_outcome_ids : [];
-          const existingTitles =
-            typeof d.linked_outcome_titles === "object" && d.linked_outcome_titles
-              ? { ...d.linked_outcome_titles }
-              : {};
-          delete existingTitles[outcomeId];
-          await supabase
-            .from("decisions")
-            .update({
-              linked_outcome_ids: existingIds.filter((id: string) => id !== outcomeId),
-              linked_outcome_titles: existingTitles,
-            })
-            .eq("id", d.id);
-          qc.invalidateQueries({ queryKey: ["decisions"] });
-        }}
-      />
 
       <LoopsPanel betId={d.id} canWrite={canWrite} />
 

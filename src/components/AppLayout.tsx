@@ -1,10 +1,9 @@
-import { ReactNode, useState } from "react";
+import { ReactNode, useState, useMemo } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "@/contexts/AuthContext";
 import { useOrg } from "@/contexts/OrgContext";
 import logo from "@/assets/logo.png";
-import { SharedNav } from "@/components/SharedNav";
 import { cn } from "@/lib/utils";
 import ChatAdvisor from "@/components/ChatAdvisor";
 import FeedbackButton from "@/components/FeedbackButton";
@@ -28,6 +27,38 @@ const roleLabels: Record<string, string> = {
 const Sep = () => <span className="text-muted-foreground/30 mx-3 hidden md:inline">|</span>;
 
 const navLinkClass = "text-[13px] uppercase tracking-wider text-muted-foreground hover:text-foreground transition-colors font-medium min-h-[44px] min-w-[44px] flex items-center justify-center md:min-h-0 md:min-w-0 md:flex-initial";
+
+const altitudePillClass = "text-[13px] uppercase tracking-widest font-semibold px-3 py-1 rounded transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center md:min-h-0 md:min-w-0 md:flex-initial";
+
+const subNavLinkClass = "text-[12px] uppercase tracking-wider text-muted-foreground hover:text-foreground transition-colors font-medium px-2 py-1";
+
+type Altitude = "goals" | "bets" | "build";
+
+function getAltitude(pathname: string): Altitude {
+  if (pathname.startsWith("/goals")) return "goals";
+  if (pathname.startsWith("/build") || pathname.startsWith("/outcomes") || pathname.startsWith("/roadmap")) return "build";
+  // Everything else defaults to bets (decisions, loops, review, signals, pods, capability-map, ask, memory)
+  return "bets";
+}
+
+const SUB_NAV: Record<Altitude, { label: string; to: string }[]> = {
+  goals: [
+    { label: "OKRs", to: "/goals" },
+    { label: "Q Review", to: "/goals/review" },
+  ],
+  bets: [
+    { label: "Bets", to: "/decisions" },
+    { label: "Loops", to: "/loops" },
+    { label: "Signals", to: "/signals" },
+    { label: "Pods", to: "/pods" },
+    { label: "AI Advisor", to: "/ask" },
+    { label: "Capability Map", to: "/capability-map" },
+  ],
+  build: [
+    { label: "Outcomes", to: "/build" },
+    { label: "Roadmap", to: "/build/roadmap" },
+  ],
+};
 
 export default function AppLayout({ children }: { children: ReactNode }) {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -55,17 +86,18 @@ export default function AppLayout({ children }: { children: ReactNode }) {
   });
 
   const location = useLocation();
-  const isHomePage = location.pathname === "/" || location.pathname === "/home";
   const closeMenu = () => setMenuOpen(false);
+
+  const currentAltitude = useMemo(() => getAltitude(location.pathname), [location.pathname]);
+  const subNavItems = SUB_NAV[currentAltitude];
 
   return (
     <div className="min-h-screen flex flex-col">
-      <SharedNav activeApp="bets" orgName={currentOrg?.name} orgId={currentOrg?.id} />
-      {!isHomePage && <header className="border-b px-4 lg:px-6 py-4">
+      <header className="border-b px-4 lg:px-6 py-4">
         <div className="flex flex-col md:flex-row md:flex-wrap md:items-center md:justify-between">
           <div className="flex items-center justify-between w-full md:w-auto">
             <div className="flex flex-col">
-              <Link to="/" className="flex items-center gap-2.5" onClick={closeMenu}>
+              <Link to="/goals" className="flex items-center gap-2.5" onClick={closeMenu}>
                 <img src={logo} alt="Build Authority" className="w-8 h-8" />
                 <span className="text-sm font-bold tracking-widest uppercase leading-tight">
                   BUILD AUTHORITY
@@ -92,19 +124,29 @@ export default function AppLayout({ children }: { children: ReactNode }) {
           )}>
             <div className="flex flex-col md:flex-row md:items-center">
               <Sep />
-              <Link to="/" className={navLinkClass} onClick={closeMenu}>Home</Link>
+              <Link
+                to="/goals"
+                className={cn(altitudePillClass, currentAltitude === "goals" ? "text-foreground bg-foreground/5" : "text-muted-foreground hover:text-foreground")}
+                onClick={closeMenu}
+              >
+                Goals
+              </Link>
               <Sep />
-              <Link to="/decisions" className={navLinkClass} onClick={closeMenu}>Bets</Link>
+              <Link
+                to="/decisions"
+                className={cn(altitudePillClass, currentAltitude === "bets" ? "text-foreground bg-foreground/5" : "text-muted-foreground hover:text-foreground")}
+                onClick={closeMenu}
+              >
+                Bets
+              </Link>
               <Sep />
-              <Link to="/loops" className={navLinkClass} onClick={closeMenu}>Loops</Link>
-              <Sep />
-              <Link to="/review" className={navLinkClass} onClick={closeMenu}>Review</Link>
-              <Sep />
-              <Link to="/altitude" className={navLinkClass} onClick={closeMenu}>Altitude</Link>
-              <Sep />
-              <Link to="/capability-map" className={navLinkClass} onClick={closeMenu}>Capability Map</Link>
-              <Sep />
-              <Link to="/how-it-works" className={navLinkClass} onClick={closeMenu}>How It Works</Link>
+              <Link
+                to="/build"
+                className={cn(altitudePillClass, currentAltitude === "build" ? "text-foreground bg-foreground/5" : "text-muted-foreground hover:text-foreground")}
+                onClick={closeMenu}
+              >
+                Build
+              </Link>
             </div>
             <div className="flex flex-col md:flex-row md:items-center gap-1 md:gap-4 pt-2 md:pt-0 border-t md:border-t-0 mt-2 md:mt-0">
               <Sep />
@@ -176,7 +218,26 @@ export default function AppLayout({ children }: { children: ReactNode }) {
             </div>
           </nav>
         </div>
-      </header>}
+      </header>
+
+      {/* Sub-navigation for the current altitude */}
+      <div className="border-b px-4 lg:px-6 py-2 flex items-center gap-1 overflow-x-auto">
+        {subNavItems.map((item) => (
+          <Link
+            key={item.to}
+            to={item.to}
+            className={cn(
+              subNavLinkClass,
+              location.pathname === item.to
+                ? "text-foreground font-semibold"
+                : ""
+            )}
+            onClick={closeMenu}
+          >
+            {item.label}
+          </Link>
+        ))}
+      </div>
 
       <main className={cn("flex-1 overflow-auto transition-all duration-300", chatOpen && "md:mr-96")}>
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-8 w-full">

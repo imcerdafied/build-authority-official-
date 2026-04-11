@@ -6,7 +6,6 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider, useAuth } from "@/contexts/AuthContext";
 import { OrgProvider, useOrg } from "@/contexts/OrgContext";
 import AppLayout from "@/components/AppLayout";
-import Home from "@/pages/Home";
 import Decisions from "@/pages/Decisions";
 import Loops from "@/pages/Loops";
 import Review from "@/pages/Review";
@@ -18,13 +17,21 @@ import Ask from "@/pages/Ask";
 import Team from "@/pages/Team";
 import FeedbackAdmin from "@/pages/FeedbackAdmin";
 import CapabilityMap from "@/pages/CapabilityMap";
-// ClosedBets moved inline to Decisions page
-import Altitude from "@/pages/Altitude";
 import OrgSettings from "@/pages/OrgSettings";
 import Join from "@/pages/Join";
 import Auth from "@/pages/Auth";
 import OrgSetup from "@/components/OrgSetup";
 import NotFound from "./pages/NotFound";
+
+// Goals altitude
+import OKRList from "@/pages/goals/OKRList";
+import OKRDetail from "@/pages/goals/OKRDetail";
+import QuarterReview from "@/pages/goals/QuarterReview";
+
+// Build altitude
+import OutcomeList from "@/pages/build/OutcomeList";
+import OutcomeDetail from "@/pages/build/OutcomeDetail";
+import Roadmap from "@/pages/build/Roadmap";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -62,19 +69,34 @@ function AppContent() {
         <AuthGate>
           <AppLayout>
             <Routes>
-              <Route path="/" element={<Home />} />
-              <Route path="/home" element={<Home />} />
+              {/* Redirect root and old home to Goals */}
+              <Route path="/" element={<Navigate to="/goals" replace />} />
+              <Route path="/home" element={<Navigate to="/goals" replace />} />
+
+              {/* Goals altitude */}
+              <Route path="/goals" element={<OKRList />} />
+              <Route path="/goals/review" element={<QuarterReview />} />
+              <Route path="/goals/:okrId" element={<OKRDetail />} />
+
+              {/* Bets altitude (existing) */}
               <Route path="/decisions" element={<Decisions />} />
               <Route path="/loops" element={<Loops />} />
               <Route path="/review" element={<Review />} />
-              <Route path="/how-it-works" element={<HowItWorks />} />
               <Route path="/signals" element={<Signals />} />
-              <Route path="/altitude" element={<Altitude />} />
-              <Route path="/capability-map" element={<CapabilityMap />} />
-              <Route path="/closed-bets" element={<Navigate to="/" replace />} />
               <Route path="/pods" element={<Pods />} />
-              <Route path="/memory" element={<Memory />} />
+              <Route path="/capability-map" element={<CapabilityMap />} />
               <Route path="/ask" element={<Ask />} />
+              <Route path="/memory" element={<Memory />} />
+              <Route path="/how-it-works" element={<HowItWorks />} />
+
+              {/* Build altitude */}
+              <Route path="/build" element={<OutcomeList />} />
+              <Route path="/build/roadmap" element={<Roadmap />} />
+              <Route path="/build/:outcomeId" element={<OutcomeDetail />} />
+
+              {/* Utility routes */}
+              <Route path="/closed-bets" element={<Navigate to="/decisions" replace />} />
+              <Route path="/altitude" element={<Navigate to="/goals" replace />} />
               <Route path="/team" element={<Team />} />
               <Route path="/feedback" element={<FeedbackAdmin />} />
               <Route path="/settings" element={<OrgSettings />} />

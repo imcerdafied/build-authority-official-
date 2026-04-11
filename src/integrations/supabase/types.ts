@@ -1107,6 +1107,300 @@ export type Database = {
         ]
       }
     }
+      key_results: {
+        Row: {
+          confidence_score: number | null
+          created_at: string
+          current_value: number | null
+          id: string
+          metric_type: string
+          okr_id: string
+          org_id: string
+          status: string
+          target_value: number | null
+          title: string
+          unit: string | null
+          updated_at: string
+        }
+        Insert: {
+          confidence_score?: number | null
+          created_at?: string
+          current_value?: number | null
+          id?: string
+          metric_type?: string
+          okr_id: string
+          org_id: string
+          status?: string
+          target_value?: number | null
+          title: string
+          unit?: string | null
+          updated_at?: string
+        }
+        Update: {
+          confidence_score?: number | null
+          created_at?: string
+          current_value?: number | null
+          id?: string
+          metric_type?: string
+          okr_id?: string
+          org_id?: string
+          status?: string
+          target_value?: number | null
+          title?: string
+          unit?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "key_results_okr_id_fkey"
+            columns: ["okr_id"]
+            isOneToOne: false
+            referencedRelation: "okrs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "key_results_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      okr_check_ins: {
+        Row: {
+          confidence_score: number | null
+          created_at: string
+          created_by: string | null
+          id: string
+          key_result_id: string
+          notes: string | null
+          org_id: string
+          value: number
+        }
+        Insert: {
+          confidence_score?: number | null
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          key_result_id: string
+          notes?: string | null
+          org_id: string
+          value: number
+        }
+        Update: {
+          confidence_score?: number | null
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          key_result_id?: string
+          notes?: string | null
+          org_id?: string
+          value?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "okr_check_ins_key_result_id_fkey"
+            columns: ["key_result_id"]
+            isOneToOne: false
+            referencedRelation: "key_results"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "okr_check_ins_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      okrs: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          description: string | null
+          id: string
+          org_id: string
+          owner_id: string | null
+          quarter: string | null
+          status: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          org_id: string
+          owner_id?: string | null
+          quarter?: string | null
+          status?: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          org_id?: string
+          owner_id?: string | null
+          quarter?: string | null
+          status?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "okrs_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      outcomes: {
+        Row: {
+          bet_id: string | null
+          confidence_score: number | null
+          created_at: string
+          created_by: string | null
+          description: string | null
+          id: string
+          notes: string | null
+          org_id: string
+          owner_id: string | null
+          shipped_date: string | null
+          status: string
+          target_date: string | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          bet_id?: string | null
+          confidence_score?: number | null
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          notes?: string | null
+          org_id: string
+          owner_id?: string | null
+          shipped_date?: string | null
+          status?: string
+          target_date?: string | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          bet_id?: string | null
+          confidence_score?: number | null
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          notes?: string | null
+          org_id?: string
+          owner_id?: string | null
+          shipped_date?: string | null
+          status?: string
+          target_date?: string | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "outcomes_bet_id_fkey"
+            columns: ["bet_id"]
+            isOneToOne: false
+            referencedRelation: "decisions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "outcomes_bet_id_fkey"
+            columns: ["bet_id"]
+            isOneToOne: false
+            referencedRelation: "decisions_computed"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "outcomes_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      roadmap_items: {
+        Row: {
+          bet_id: string | null
+          created_at: string
+          description: string | null
+          id: string
+          org_id: string
+          outcome_id: string | null
+          quarter: string | null
+          status: string
+          title: string
+        }
+        Insert: {
+          bet_id?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          org_id: string
+          outcome_id?: string | null
+          quarter?: string | null
+          status?: string
+          title: string
+        }
+        Update: {
+          bet_id?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          org_id?: string
+          outcome_id?: string | null
+          quarter?: string | null
+          status?: string
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "roadmap_items_bet_id_fkey"
+            columns: ["bet_id"]
+            isOneToOne: false
+            referencedRelation: "decisions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "roadmap_items_bet_id_fkey"
+            columns: ["bet_id"]
+            isOneToOne: false
+            referencedRelation: "decisions_computed"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "roadmap_items_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "roadmap_items_outcome_id_fkey"
+            columns: ["outcome_id"]
+            isOneToOne: false
+            referencedRelation: "outcomes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+    }
     Views: {
       decisions_computed: {
         Row: {
