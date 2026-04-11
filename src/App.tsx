@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider, useAuth } from "@/contexts/AuthContext";
 import { OrgProvider, useOrg } from "@/contexts/OrgContext";
 import AppLayout from "@/components/AppLayout";
+import Home from "@/pages/Home";
 import Decisions from "@/pages/Decisions";
 import Loops from "@/pages/Loops";
 import Review from "@/pages/Review";
@@ -61,7 +62,8 @@ function AppContent() {
         <AuthGate>
           <AppLayout>
             <Routes>
-              <Route path="/" element={<Decisions />} />
+              <Route path="/" element={<Home />} />
+              <Route path="/home" element={<Home />} />
               <Route path="/decisions" element={<Decisions />} />
               <Route path="/loops" element={<Loops />} />
               <Route path="/review" element={<Review />} />

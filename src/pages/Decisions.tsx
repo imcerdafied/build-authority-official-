@@ -1514,11 +1514,35 @@ export default function Decisions() {
       {showCreate && <CreateDecisionForm onClose={() => setShowCreate(false)} />}
 
       {isEmpty && !showCreate ? (
-        <div className="border border-dashed rounded-md px-6 py-10 text-center">
-          <p className="text-sm font-medium text-muted-foreground">No bets registered.</p>
-          <p className="text-xs text-muted-foreground/70 mt-1.5">Register first high-impact bet to initiate constraint.</p>
-          <div className="flex justify-center gap-6 mt-4 text-xs text-muted-foreground/50">
-            <span>Hard cap: 10</span><span>10-day slice rule</span><span>Outcome required</span><span>Owner required</span>
+        <div className="border border-dashed rounded-lg px-8 py-12 text-center max-w-xl mx-auto">
+          <p className="text-lg font-semibold text-foreground">You're at the Bets altitude</p>
+          <p className="text-sm text-muted-foreground mt-3 leading-relaxed">
+            Bets are the strategic decisions your team is making to move toward your goals.
+            Each bet has a score, metrics, and a clear thesis for why you're making it.
+          </p>
+          <p className="text-sm text-muted-foreground mt-2 leading-relaxed">
+            Start by registering your first bet — a significant product or strategic decision your team is pursuing.
+          </p>
+          {canWrite && (
+            <button
+              onClick={() => setShowCreate(true)}
+              className="mt-6 px-5 py-2.5 bg-foreground text-background rounded-md text-sm font-medium hover:bg-foreground/90 transition-colors"
+            >
+              Register Your First Bet
+            </button>
+          )}
+          <div className="mt-8 pt-6 border-t border-border/40">
+            <p className="text-[10px] uppercase tracking-widest font-semibold text-muted-foreground mb-3">
+              Also in the BSPG Strategic OS
+            </p>
+            <div className="flex flex-col sm:flex-row justify-center gap-4 text-xs text-muted-foreground">
+              <a href={import.meta.env.VITE_TRUENORTHOS_URL ?? "https://truenorthos.vercel.app"} target="_blank" rel="noopener noreferrer" className="hover:text-foreground transition-colors">
+                🎯 Goals altitude (TrueNorthOS) → Set your OKRs first
+              </a>
+              <a href={import.meta.env.VITE_OUTCOMEOS_URL ?? "https://outcomeos.vercel.app"} target="_blank" rel="noopener noreferrer" className="hover:text-foreground transition-colors">
+                🔨 Build altitude (OutcomeOS) → Track what you build
+              </a>
+            </div>
           </div>
         </div>
       ) : (

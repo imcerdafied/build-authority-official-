@@ -172,6 +172,140 @@ export async function fetchLinkedOutcomes(outcomeIds: string[]): Promise<LinkedO
   return results;
 }
 
+// ---------------------------------------------------------------------------
+// Cross-app summary counts (for Command Center)
+// ---------------------------------------------------------------------------
+
+export interface OKRSummary {
+  total: number;
+  active: number;
+  closed: number;
+}
+
+export interface OutcomeSummary {
+  total: number;
+}
+
+export async function fetchOKRSummary(): Promise<OKRSummary | null> {
+  try {
+    const headers = { apikey: TNO_ANON, Authorization: `Bearer ${TNO_ANON}` };
+    const res = await fetchWithTimeout(
+      `${TNO_URL}/rest/v1/okrs?select=id,status`,
+      headers,
+    );
+    if (!res.ok) return null;
+    const rows = await res.json();
+    if (!Array.isArray(rows)) return null;
+    return {
+      total: rows.length,
+      active: rows.filter((r: any) => r.status === 'active').length,
+      closed: rows.filter((r: any) => r.status === 'closed').length,
+    };
+  } catch {
+    return null;
+  }
+}
+
+export async function fetchOutcomeSummary(): Promise<OutcomeSummary | null> {
+  try {
+    const headers = { apikey: OOS_ANON, Authorization: `Bearer ${OOS_ANON}` };
+    const res = await fetchWithTimeout(
+      `${OOS_URL}/rest/v1/outcomes?select=id`,
+      headers,
+    );
+    if (!res.ok) return null;
+    const rows = await res.json();
+    if (!Array.isArray(rows)) return null;
+    return { total: rows.length };
+  } catch {
+    return null;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Cross-app activity events (for Activity Feed)
+// ---------------------------------------------------------------------------
+
+export interface CrossAppEvent {
+  id: string;
+  altitude: 'goals' | 'bets' | 'build';
+  type: string;
+  description: string;
+  timestamp: string;
+}
+
+export async function fetchTNORecentActivity(): Promise<CrossAppEvent[]> {
+  const events: CrossAppEvent[] = [];
+  const headers = { apikey: TNO_ANON, Authorization: `Bearer ${TNO_ANON}` };
+  try {
+    // Recent OKRs
+    const okrRes = await fetchWithTimeout(
+      `${TNO_URL}/rest/v1/okrs?select=id,objective_text,created_at&order=created_at.desc&limit=5`,
+      headers,
+    );
+    if (okrRes.ok) {
+      const rows = await okrRes.json();
+      for (const r of rows) {
+        events.push({
+          id: `tno-okr-${r.id}`,
+          altitude: 'goals',
+          type: 'okr_created',
+          description: `New OKR: ${r.objective_text}`,
+          timestamp: r.created_at,
+        });
+      }
+    }
+  } catch { /* graceful */ }
+  try {
+    // Recent check-ins
+    const ciRes = await fetchWithTimeout(
+      `${TNO_URL}/rest/v1/check_ins?select=id,created_at,okr_id&order=created_at.desc&limit=5`,
+      headers,
+    );
+    if (ciRes.ok) {
+      const rows = await ciRes.json();
+      for (const r of rows) {
+        events.push({
+          id: `tno-ci-${r.id}`,
+          altitude: 'goals',
+          type: 'checkin_added',
+          description: `Check-in added for OKR`,
+          timestamp: r.created_at,
+        });
+      }
+    }
+  } catch { /* graceful */ }
+  return events;
+}
+
+export async function fetchOOSRecentActivity(): Promise<CrossAppEvent[]> {
+  const events: CrossAppEvent[] = [];
+  const headers = { apikey: OOS_ANON, Authorization: `Bearer ${OOS_ANON}` };
+  try {
+    const res = await fetchWithTimeout(
+      `${OOS_URL}/rest/v1/outcomes?select=id,title,created_at&order=created_at.desc&limit=5`,
+      headers,
+    );
+    if (res.ok) {
+      const rows = await res.json();
+      for (const r of rows) {
+        events.push({
+          id: `oos-${r.id}`,
+          altitude: 'build',
+          type: 'outcome_created',
+          description: `New outcome: ${r.title}`,
+          timestamp: r.created_at,
+        });
+      }
+    }
+  } catch { /* graceful */ }
+  return events;
+}
+
+// ---------------------------------------------------------------------------
+// Single-bet fetch (for satellite apps)
+// ---------------------------------------------------------------------------
+
 export async function fetchLinkedBet(betId: string): Promise<LinkedBet | null> {
   if (betCache.has(betId)) return betCache.get(betId)!;
   try {

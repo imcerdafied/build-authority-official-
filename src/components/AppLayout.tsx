@@ -90,7 +90,9 @@ export default function AppLayout({ children }: { children: ReactNode }) {
           )}>
             <div className="flex flex-col md:flex-row md:items-center">
               <Sep />
-              <Link to="/" className={navLinkClass} onClick={closeMenu}>Bets</Link>
+              <Link to="/" className={navLinkClass} onClick={closeMenu}>Home</Link>
+              <Sep />
+              <Link to="/decisions" className={navLinkClass} onClick={closeMenu}>Bets</Link>
               <Sep />
               <Link to="/loops" className={navLinkClass} onClick={closeMenu}>Loops</Link>
               <Sep />
