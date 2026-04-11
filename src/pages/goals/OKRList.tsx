@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -79,7 +79,7 @@ export default function OKRList() {
   const { currentOrg } = useOrg();
   const queryClient = useQueryClient();
 
-  const [expandedOkrId, setExpandedOkrId] = useState<string | null>(null);
+  const [expandedOkrs, setExpandedOkrs] = useState<Set<string>>(new Set());
   const [showCreate, setShowCreate] = useState(false);
 
   /* --- form state --- */
@@ -119,6 +119,14 @@ export default function OKRList() {
     },
     enabled: !!currentOrg,
   });
+
+  /* --- auto-expand when <= 5 OKRs --- */
+
+  useEffect(() => {
+    if (okrs.length > 0 && okrs.length <= 5) {
+      setExpandedOkrs(new Set(okrs.map(o => o.id)));
+    }
+  }, [okrs.length]);
 
   /* --- derived data --- */
 
@@ -464,7 +472,7 @@ export default function OKRList() {
             <h2 className="text-[10px] uppercase tracking-widest text-muted-foreground font-semibold mb-2">{quarterLabel}</h2>
             <div className="border border-border rounded-sm divide-y divide-border">
               {items.map((okr) => {
-                const expanded = expandedOkrId === okr.id;
+                const expanded = expandedOkrs.has(okr.id);
                 const krs = krByOkr.get(okr.id) ?? [];
 
                 return (
@@ -473,7 +481,11 @@ export default function OKRList() {
                     <div className="flex items-center gap-3 px-4 py-3 group">
                       {/* expand toggle */}
                       <button
-                        onClick={() => setExpandedOkrId(expanded ? null : okr.id)}
+                        onClick={() => setExpandedOkrs(prev => {
+                          const next = new Set(prev);
+                          if (next.has(okr.id)) next.delete(okr.id); else next.add(okr.id);
+                          return next;
+                        })}
                         className="text-muted-foreground hover:text-foreground transition-colors shrink-0"
                         aria-label={expanded ? "Collapse key results" : "Expand key results"}
                       >
