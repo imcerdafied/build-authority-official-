@@ -161,7 +161,19 @@ Rules:
   });
 
   const data = await response.json();
-  const text = data.content[0].text.trim();
+
+  // Surface API errors clearly
+  if (!response.ok || data.error) {
+    const errMsg = data.error?.message ?? `API error ${response.status}`;
+    throw new Error(errMsg);
+  }
+  if (!data.content?.[0]?.text) {
+    throw new Error(`Unexpected response shape: ${JSON.stringify(data).slice(0, 200)}`);
+  }
+
+  // Strip code fences in case Claude wraps the JSON
+  const raw = data.content[0].text.trim();
+  const text = raw.replace(/^```(?:json)?\n?/i, "").replace(/\n?```$/i, "").trim();
   return JSON.parse(text);
 }
 
@@ -835,7 +847,7 @@ export default function Analyze() {
         .from("intel_sources")
         .update({ processing_status: "failed" } as any)
         .eq("id", source.id);
-      toast.error("Analysis failed — please try again");
+      toast.error(`Analysis failed: ${err instanceof Error ? err.message : String(err)}`);
       setAnalyzing(false);
       return;
     }
