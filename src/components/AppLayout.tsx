@@ -36,27 +36,22 @@ type Altitude = "goals" | "bets" | "build";
 
 function getAltitude(pathname: string): Altitude {
   if (pathname.startsWith("/goals")) return "goals";
-  if (pathname.startsWith("/build") || pathname.startsWith("/outcomes") || pathname.startsWith("/roadmap")) return "build";
-  // Everything else defaults to bets (decisions, loops, review, signals, pods, capability-map, ask, memory)
+  if (pathname.startsWith("/build") || pathname.startsWith("/outcomes") || pathname.startsWith("/roadmap") || pathname.startsWith("/loops") || pathname.startsWith("/pods")) return "build";
   return "bets";
 }
 
 const SUB_NAV: Record<Altitude, { label: string; to: string }[]> = {
-  goals: [
-    { label: "OKRs", to: "/goals" },
-    { label: "Q Review", to: "/goals/review" },
-  ],
+  goals: [],
   bets: [
     { label: "Bets", to: "/decisions" },
-    { label: "Loops", to: "/loops" },
+    { label: "Review", to: "/review" },
     { label: "Signals", to: "/signals" },
-    { label: "Pods", to: "/pods" },
-    { label: "AI Advisor", to: "/ask" },
-    { label: "Capability Map", to: "/capability-map" },
   ],
   build: [
     { label: "Outcomes", to: "/build" },
     { label: "Roadmap", to: "/build/roadmap" },
+    { label: "Loops", to: "/loops" },
+    { label: "Pods", to: "/pods" },
   ],
 };
 
@@ -221,23 +216,25 @@ export default function AppLayout({ children }: { children: ReactNode }) {
       </header>
 
       {/* Sub-navigation for the current altitude */}
-      <div className="border-b px-4 lg:px-6 py-2 flex items-center gap-1 overflow-x-auto">
-        {subNavItems.map((item) => (
-          <Link
-            key={item.to}
-            to={item.to}
-            className={cn(
-              subNavLinkClass,
-              location.pathname === item.to
-                ? "text-foreground font-semibold"
-                : ""
-            )}
-            onClick={closeMenu}
-          >
-            {item.label}
-          </Link>
-        ))}
-      </div>
+      {subNavItems.length > 0 && (
+        <div className="border-b px-4 lg:px-6 py-2 flex items-center gap-1 overflow-x-auto">
+          {subNavItems.map((item) => (
+            <Link
+              key={item.to}
+              to={item.to}
+              className={cn(
+                subNavLinkClass,
+                location.pathname === item.to
+                  ? "text-foreground font-semibold"
+                  : ""
+              )}
+              onClick={closeMenu}
+            >
+              {item.label}
+            </Link>
+          ))}
+        </div>
+      )}
 
       <main className={cn("flex-1 overflow-auto transition-all duration-300", chatOpen && "md:mr-96")}>
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-8 w-full">
