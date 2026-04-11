@@ -1400,6 +1400,207 @@ export type Database = {
           },
         ]
       }
+      intel_sources: {
+        Row: {
+          id: string
+          org_id: string
+          name: string
+          source_type: string
+          content: string
+          processing_status: string
+          uploaded_by: string | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          org_id: string
+          name: string
+          source_type?: string
+          content: string
+          processing_status?: string
+          uploaded_by?: string | null
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          org_id?: string
+          name?: string
+          source_type?: string
+          content?: string
+          processing_status?: string
+          uploaded_by?: string | null
+          created_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "intel_sources_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      intel_friction_points: {
+        Row: {
+          id: string
+          org_id: string
+          source_id: string
+          title: string
+          summary: string
+          severity: string
+          cluster: string | null
+          confidence_score: number
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          org_id: string
+          source_id: string
+          title: string
+          summary: string
+          severity?: string
+          cluster?: string | null
+          confidence_score?: number
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          org_id?: string
+          source_id?: string
+          title?: string
+          summary?: string
+          severity?: string
+          cluster?: string | null
+          confidence_score?: number
+          created_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "intel_friction_points_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "intel_friction_points_source_id_fkey"
+            columns: ["source_id"]
+            isOneToOne: false
+            referencedRelation: "intel_sources"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      intel_insights: {
+        Row: {
+          id: string
+          org_id: string
+          source_id: string
+          title: string
+          summary: string
+          severity: string
+          confidence_score: number
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          org_id: string
+          source_id: string
+          title: string
+          summary: string
+          severity?: string
+          confidence_score?: number
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          org_id?: string
+          source_id?: string
+          title?: string
+          summary?: string
+          severity?: string
+          confidence_score?: number
+          created_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "intel_insights_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "intel_insights_source_id_fkey"
+            columns: ["source_id"]
+            isOneToOne: false
+            referencedRelation: "intel_sources"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      intel_hypotheses: {
+        Row: {
+          id: string
+          org_id: string
+          source_id: string
+          title: string
+          description: string
+          expected_impact: string | null
+          value_score: number
+          effort_score: number
+          v_squared: number
+          confidence_score: number
+          promoted_to_roadmap: boolean
+          promoted_at: string | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          org_id: string
+          source_id: string
+          title: string
+          description: string
+          expected_impact?: string | null
+          value_score?: number
+          effort_score?: number
+          confidence_score?: number
+          promoted_to_roadmap?: boolean
+          promoted_at?: string | null
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          org_id?: string
+          source_id?: string
+          title?: string
+          description?: string
+          expected_impact?: string | null
+          value_score?: number
+          effort_score?: number
+          confidence_score?: number
+          promoted_to_roadmap?: boolean
+          promoted_at?: string | null
+          created_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "intel_hypotheses_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "intel_hypotheses_source_id_fkey"
+            columns: ["source_id"]
+            isOneToOne: false
+            referencedRelation: "intel_sources"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       decisions_computed: {
