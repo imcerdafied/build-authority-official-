@@ -70,6 +70,7 @@ interface DisplayItem {
   status: string;
   type: "roadmap" | "outcome";
   quarter: string;
+  bet_id?: string | null;
 }
 
 // ---------------------------------------------------------------------------
@@ -215,6 +216,11 @@ function ItemCard({
         >
           {STATUS_LABELS[item.status] ?? item.status}
         </span>
+        {item.type === "roadmap" && !item.bet_id && (
+          <span className="text-xs px-1.5 py-0.5 rounded-sm border border-purple-200 text-purple-600 bg-purple-50">
+            Intelligence
+          </span>
+        )}
       </div>
       <p className="text-sm font-medium mb-2">{item.title}</p>
       <select
@@ -292,6 +298,7 @@ export default function Roadmap() {
           status: ri.status,
           type: "roadmap",
           quarter: qk,
+          bet_id: ri.bet_id,
         });
       }
     }
