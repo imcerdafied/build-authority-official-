@@ -5,6 +5,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { trackEvent } from "@/lib/telemetry";
 import { isClosedBetLifecycle, toBetLifecycleStatus, toBetRiskLevel } from "@/lib/bet-status";
 import type { TablesInsert } from "@/integrations/supabase/types";
+import { fetchOrgDomains, type OrgDomainItem } from "@/lib/taxonomy";
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -462,5 +463,18 @@ export function useDecisionRisks() {
       return (data || []) as unknown as DecisionRisk[];
     },
     enabled: !!currentOrg,
+  });
+}
+
+export function useOrgDomains() {
+  const { currentOrg } = useOrg();
+  return useQuery<OrgDomainItem[]>({
+    queryKey: ["org_domains", currentOrg?.id],
+    queryFn: async () => {
+      if (!currentOrg) return [];
+      return fetchOrgDomains(currentOrg.id);
+    },
+    enabled: !!currentOrg,
+    staleTime: 5 * 60 * 1000,
   });
 }
