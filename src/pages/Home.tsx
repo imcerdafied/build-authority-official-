@@ -1,8 +1,11 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useOrg } from "@/contexts/OrgContext";
+import { useState } from "react";
+import WorkspaceSwitcher from "@/components/WorkspaceSwitcher";
+import CreateWorkspaceModal from "@/components/CreateWorkspaceModal";
 import {
   fetchOKRSummary,
   fetchOutcomeSummary,
@@ -24,6 +27,7 @@ const BUILD_URL = import.meta.env.VITE_OUTCOMEOS_URL ?? "https://outcomeos.verce
 
 function useLocalBetStats() {
   const { currentOrg } = useOrg();
+  const [createWorkspaceOpen, setCreateWorkspaceOpen] = useState(false);
   return useQuery({
     queryKey: ["home-bet-stats", currentOrg?.id],
     queryFn: async () => {
@@ -118,6 +122,7 @@ function AltitudeCard({
 
 export default function Home() {
   const { currentOrg } = useOrg();
+  const [createWorkspaceOpen, setCreateWorkspaceOpen] = useState(false);
   const { data: betStats, isLoading: betsLoading } = useLocalBetStats();
   const [okrSummary, setOkrSummary] = useState<OKRSummary | null | undefined>(undefined);
   const [outcomeSummary, setOutcomeSummary] = useState<OutcomeSummary | null | undefined>(undefined);
@@ -138,12 +143,8 @@ export default function Home() {
         <span className="font-semibold uppercase tracking-widest text-foreground">
           BSPG Strategic OS
         </span>
-        {currentOrg && (
-          <>
-            <span className="text-muted-foreground/30">|</span>
-            <span>{currentOrg.name}</span>
-          </>
-        )}
+        <span className="text-muted-foreground/30">|</span>
+        <WorkspaceSwitcher onCreateWorkspace={() => setCreateWorkspaceOpen(true)} />
         <span className="text-muted-foreground/30">|</span>
         <span>
           Goals: {okrCount === null ? <Skeleton className="inline-block h-3 w-6" /> : <strong className="text-foreground">{okrCount}</strong>} OKRs
@@ -200,6 +201,7 @@ export default function Home() {
       <div className="border border-border/60 rounded-lg p-5">
         <ActivityFeed maxItems={15} showHeader />
       </div>
+      <CreateWorkspaceModal open={createWorkspaceOpen} onOpenChange={setCreateWorkspaceOpen} />
     </div>
   );
 }

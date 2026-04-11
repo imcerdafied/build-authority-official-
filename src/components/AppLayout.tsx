@@ -1,5 +1,5 @@
 import { ReactNode, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "@/contexts/AuthContext";
 import { useOrg } from "@/contexts/OrgContext";
@@ -54,12 +54,14 @@ export default function AppLayout({ children }: { children: ReactNode }) {
     refetchInterval: 30000,
   });
 
+  const location = useLocation();
+  const isHomePage = location.pathname === "/" || location.pathname === "/home";
   const closeMenu = () => setMenuOpen(false);
 
   return (
     <div className="min-h-screen flex flex-col">
       <SharedNav activeApp="bets" orgName={currentOrg?.name} orgId={currentOrg?.id} />
-      <header className="border-b px-4 lg:px-6 py-4">
+      {!isHomePage && <header className="border-b px-4 lg:px-6 py-4">
         <div className="flex flex-col md:flex-row md:flex-wrap md:items-center md:justify-between">
           <div className="flex items-center justify-between w-full md:w-auto">
             <div className="flex flex-col">
@@ -174,7 +176,7 @@ export default function AppLayout({ children }: { children: ReactNode }) {
             </div>
           </nav>
         </div>
-      </header>
+      </header>}
 
       <main className={cn("flex-1 overflow-auto transition-all duration-300", chatOpen && "md:mr-96")}>
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-8 w-full">
