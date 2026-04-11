@@ -319,6 +319,7 @@ function SourcesTab({
   insightCounts,
   hypothesisCounts,
   onDelete,
+  onRetry,
   isAdmin,
 }: {
   sources: IntelSource[];
@@ -326,6 +327,7 @@ function SourcesTab({
   insightCounts: Record<string, number>;
   hypothesisCounts: Record<string, number>;
   onDelete: (id: string) => void;
+  onRetry: (source: IntelSource) => void;
   isAdmin: boolean;
 }) {
   if (sources.length === 0) {
@@ -377,14 +379,24 @@ function SourcesTab({
                 {s.processing_status}
               </span>
             </div>
-            {isAdmin && (
-              <button
-                onClick={() => onDelete(s.id)}
-                className="text-xs text-muted-foreground/50 hover:text-red-500 transition-colors shrink-0"
-              >
-                Delete
-              </button>
-            )}
+            <div className="flex items-center gap-2 shrink-0">
+              {s.processing_status === "failed" && (
+                <button
+                  onClick={() => onRetry(s)}
+                  className="text-xs text-muted-foreground/70 hover:text-foreground transition-colors border border-border/60 rounded px-2 py-0.5 hover:border-foreground/30"
+                >
+                  ↻ Retry
+                </button>
+              )}
+              {isAdmin && (
+                <button
+                  onClick={() => onDelete(s.id)}
+                  className="text-xs text-muted-foreground/50 hover:text-red-500 transition-colors"
+                >
+                  Delete
+                </button>
+              )}
+            </div>
           </div>
           <div className="flex items-center gap-4 mt-1.5">
             <span className="text-xs text-muted-foreground">
@@ -842,7 +854,7 @@ export default function Analyze() {
     let result;
     try {
       result = await analyzeSource(content, name);
-    } catch {
+    } catch (err) {
       await supabase
         .from("intel_sources")
         .update({ processing_status: "failed" } as any)
@@ -896,6 +908,81 @@ export default function Analyze() {
     toast.success(
       `Analysis complete — ${result.hypotheses.length} hypotheses generated`,
     );
+  }
+
+  async function handleRetry(source: IntelSource) {
+    if (!orgId || !user) return;
+    setAnalyzing(true);
+    setAnalyzingStep("Re-analyzing source...");
+
+    // Mark as analyzing
+    await supabase
+      .from("intel_sources")
+      .update({ processing_status: "analyzing" } as any)
+      .eq("id", source.id);
+
+    // Clear any partial results from previous attempt
+    await Promise.all([
+      supabase.from("intel_friction_points").delete().eq("source_id", source.id),
+      supabase.from("intel_insights").delete().eq("source_id", source.id),
+      supabase.from("intel_hypotheses").delete().eq("source_id", source.id),
+    ]);
+
+    setAnalyzingStep("Extracting friction points and insights...");
+
+    let result;
+    try {
+      result = await analyzeSource(source.content, source.name);
+    } catch (err) {
+      await supabase
+        .from("intel_sources")
+        .update({ processing_status: "failed" } as any)
+        .eq("id", source.id);
+      toast.error(`Retry failed: ${err instanceof Error ? err.message : String(err)}`);
+      setAnalyzing(false);
+      return;
+    }
+
+    setAnalyzingStep("Saving results...");
+
+    await Promise.all([
+      result.friction_points.length > 0 &&
+        supabase.from("intel_friction_points").insert(
+          result.friction_points.map((fp) => ({
+            ...fp,
+            org_id: orgId,
+            source_id: source.id,
+          })) as any,
+        ),
+      result.insights.length > 0 &&
+        supabase.from("intel_insights").insert(
+          result.insights.map((i) => ({
+            ...i,
+            org_id: orgId,
+            source_id: source.id,
+          })) as any,
+        ),
+      result.hypotheses.length > 0 &&
+        supabase.from("intel_hypotheses").insert(
+          result.hypotheses.map((h) => ({
+            ...h,
+            org_id: orgId,
+            source_id: source.id,
+          })) as any,
+        ),
+      supabase
+        .from("intel_sources")
+        .update({ processing_status: "complete" } as any)
+        .eq("id", source.id),
+    ]);
+
+    queryClient.invalidateQueries({ queryKey: ["intel-sources", orgId] });
+    queryClient.invalidateQueries({ queryKey: ["intel-friction", orgId] });
+    queryClient.invalidateQueries({ queryKey: ["intel-insights", orgId] });
+    queryClient.invalidateQueries({ queryKey: ["intel-hypotheses", orgId] });
+    setActiveTab("hypotheses");
+    setAnalyzing(false);
+    toast.success(`Retry complete — ${result.hypotheses.length} hypotheses generated`);
   }
 
   async function handlePromote(h: Hypothesis) {
@@ -1022,6 +1109,7 @@ export default function Analyze() {
           insightCounts={insightCounts}
           hypothesisCounts={hypothesisCounts}
           onDelete={handleDeleteSource}
+          onRetry={handleRetry}
           isAdmin={currentRole === "admin"}
         />
       )}
