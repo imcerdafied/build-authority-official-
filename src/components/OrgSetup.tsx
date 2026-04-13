@@ -126,8 +126,9 @@ export default function OrgSetup() {
 
   const [step, setStep] = useState<1 | 2 | 3>(1);
 
-  // Step 1 — workspace name
+  // Step 1 — workspace name + optional email-domain auto-detect
   const [name, setName] = useState("");
+  const [emailDomain, setEmailDomain] = useState("");
   const [createLoading, setCreateLoading] = useState(false);
   const [createError, setCreateError] = useState<string | null>(null);
   const [createdOrgId, setCreatedOrgId] = useState<string | null>(null);
@@ -151,16 +152,31 @@ export default function OrgSetup() {
   // Handlers
   // -------------------------------------------------------------------------
 
+  const normalizedDomain = emailDomain
+    .trim()
+    .toLowerCase()
+    .replace(/^@/, "")
+    .replace(/\s+/g, "");
+
   const handleCreateWorkspace = async () => {
     if (!name.trim()) return;
     setCreateLoading(true);
     setCreateError(null);
     try {
-      const orgId = await createOrg(name.trim());
+      const orgId = await createOrg(
+        name.trim(),
+        undefined,
+        undefined,
+        normalizedDomain || undefined,
+      );
       setCreatedOrgId(orgId);
       void trackEvent("onboarding_workspace_created", {
         userId: user?.id ?? null,
-        metadata: { org_id: orgId, org_name: name.trim() },
+        metadata: {
+          org_id: orgId,
+          org_name: name.trim(),
+          allowed_email_domain: normalizedDomain || null,
+        },
       });
       setStep(2);
     } catch (err) {
@@ -346,18 +362,44 @@ export default function OrgSetup() {
                 You'll be the Admin. Everything else can be set up later.
               </p>
               <div className="space-y-4">
-                <input
-                  type="text"
-                  required
-                  autoFocus
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  className="w-full border rounded-sm px-3 py-2 text-sm bg-background text-foreground focus:outline-none focus:ring-1 focus:ring-foreground"
-                  placeholder="Your company or team name"
-                  onKeyDown={(e) =>
-                    e.key === "Enter" && name.trim() && handleCreateWorkspace()
-                  }
-                />
+                <div>
+                  <label className="text-xs font-semibold text-muted-foreground block mb-1">
+                    Workspace name
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    autoFocus
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    className="w-full border rounded-sm px-3 py-2 text-sm bg-background text-foreground focus:outline-none focus:ring-1 focus:ring-foreground"
+                    placeholder="Your company or team name"
+                    onKeyDown={(e) =>
+                      e.key === "Enter" && name.trim() && handleCreateWorkspace()
+                    }
+                  />
+                </div>
+
+                <div>
+                  <label className="text-xs font-semibold text-muted-foreground block mb-1">
+                    Team email domain{" "}
+                    <span className="font-normal text-muted-foreground/60">
+                      (optional)
+                    </span>
+                  </label>
+                  <input
+                    type="text"
+                    value={emailDomain}
+                    onChange={(e) => setEmailDomain(e.target.value)}
+                    className="w-full border rounded-sm px-3 py-2 text-sm bg-background text-foreground focus:outline-none focus:ring-1 focus:ring-foreground placeholder:text-muted-foreground/40"
+                    placeholder="yourcompany.com"
+                  />
+                  <p className="text-xs text-muted-foreground/70 mt-1 leading-relaxed">
+                    When teammates sign up with an email at this domain, they'll
+                    be prompted to request access instead of creating a duplicate
+                    workspace. Leave blank for private or consulting workspaces.
+                  </p>
+                </div>
 
                 <div>
                   <p className="text-xs uppercase tracking-widest text-muted-foreground mb-2 font-semibold">
