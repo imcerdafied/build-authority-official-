@@ -1,3 +1,4 @@
+import React from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -20,6 +21,7 @@ import OrgSettings from "@/pages/OrgSettings";
 import Join from "@/pages/Join";
 import Auth from "@/pages/Auth";
 import OrgSetup from "@/components/OrgSetup";
+import DomainJoinPrompt from "@/components/DomainJoinPrompt";
 import NotFound from "./pages/NotFound";
 
 // Goals altitude
@@ -46,6 +48,7 @@ const queryClient = new QueryClient({
 function AuthGate({ children }: { children: React.ReactNode }) {
   const { user, loading: authLoading } = useAuth();
   const { memberships, loading: orgLoading } = useOrg();
+  const [forceCreateOrg, setForceCreateOrg] = React.useState(false);
 
   if (authLoading || orgLoading) {
     return (
@@ -56,7 +59,15 @@ function AuthGate({ children }: { children: React.ReactNode }) {
   }
 
   if (!user) return <Auth />;
-  if (memberships.length === 0) return <OrgSetup />;
+
+  // No memberships: try to match the user's email domain to an existing
+  // workspace before routing them to OrgSetup (which would duplicate the org).
+  // DomainJoinPrompt calls onFallback() if no domain match is found OR if the
+  // user explicitly chooses to create their own workspace.
+  if (memberships.length === 0) {
+    if (forceCreateOrg) return <OrgSetup />;
+    return <DomainJoinPrompt onFallback={() => setForceCreateOrg(true)} />;
+  }
 
   return <>{children}</>;
 }

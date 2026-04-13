@@ -38,8 +38,8 @@ interface OrgContextType {
   productAreas: ProductArea[];
   customOutcomeCategories: CustomCategory[] | null;
   setCurrentOrgId: (orgId: string) => void;
-  createOrg: (name: string, productAreas?: ProductArea[], customOutcomeCategories?: CustomCategory[]) => Promise<string>;
-  updateOrg: (fields: { product_areas?: ProductArea[]; custom_outcome_categories?: CustomCategory[] }) => Promise<void>;
+  createOrg: (name: string, productAreas?: ProductArea[], customOutcomeCategories?: CustomCategory[], allowedEmailDomain?: string) => Promise<string>;
+  updateOrg: (fields: { product_areas?: ProductArea[]; custom_outcome_categories?: CustomCategory[]; allowed_email_domain?: string | null }) => Promise<void>;
   refetchMemberships: () => Promise<void>;
 }
 
@@ -256,6 +256,7 @@ export function OrgProvider({ children }: { children: ReactNode }) {
     name: string,
     productAreas?: ProductArea[],
     customOutcomeCategories?: CustomCategory[],
+    allowedEmailDomain?: string,
   ): Promise<string> => {
     if (!user) throw new Error("Please sign in again.");
     const payload = {
@@ -266,6 +267,17 @@ export function OrgProvider({ children }: { children: ReactNode }) {
 
     const { data, error } = await supabase.functions.invoke("create-org", { body: payload });
     if (!error && data?.orgId) {
+      // Edge function doesn't accept domain; set it post-create as admin.
+      const domain = allowedEmailDomain?.trim().toLowerCase();
+      if (domain) {
+        const { error: domainErr } = await supabase
+          .from("organizations")
+          .update({ allowed_email_domain: domain } as any)
+          .eq("id", data.orgId);
+        if (domainErr) {
+          console.error("Failed to set allowed_email_domain:", domainErr);
+        }
+      }
       await fetchMemberships();
       handleSetCurrentOrgId(data.orgId);
       return data.orgId;
@@ -276,7 +288,7 @@ export function OrgProvider({ children }: { children: ReactNode }) {
     throw new Error(errorMsg);
   };
 
-  const updateOrg = async (fields: { product_areas?: ProductArea[]; custom_outcome_categories?: CustomCategory[] }) => {
+  const updateOrg = async (fields: { product_areas?: ProductArea[]; custom_outcome_categories?: CustomCategory[]; allowed_email_domain?: string | null }) => {
     if (!currentOrgId) return;
     const { error } = await supabase
       .from("organizations")
