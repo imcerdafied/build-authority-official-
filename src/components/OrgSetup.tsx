@@ -1,131 +1,297 @@
 import { useState } from "react";
-import { useOrg, type ProductArea, type CustomCategory } from "@/contexts/OrgContext";
+import { useOrg } from "@/contexts/OrgContext";
 import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
 import { trackEvent } from "@/lib/telemetry";
 
-const SLOT_KEYS = ["S1", "S2", "S3", "S4", "S5", "S6", "S7"];
+const ANTHROPIC_KEY = import.meta.env.VITE_ANTHROPIC_API_KEY;
 
-const DEFAULT_CATEGORIES: CustomCategory[] = [
-  { key: "revenue_growth", label: "Revenue Growth" },
-  { key: "retention", label: "Retention" },
-  { key: "market_position", label: "Market Position" },
-  { key: "operational_efficiency", label: "Operational Efficiency" },
-];
+// ---------------------------------------------------------------------------
+// Analyze helper — mirrors /build/analyze, text-only, lightweight error paths
+// ---------------------------------------------------------------------------
+
+async function analyzeSource(
+  content: string,
+  sourceName: string,
+): Promise<{
+  friction_points: Array<{
+    title: string;
+    summary: string;
+    severity: "low" | "medium" | "high" | "critical";
+    cluster: string;
+    confidence_score: number;
+  }>;
+  insights: Array<{
+    title: string;
+    summary: string;
+    severity: "low" | "medium" | "high" | "critical";
+    confidence_score: number;
+  }>;
+  hypotheses: Array<{
+    title: string;
+    description: string;
+    expected_impact: string;
+    value_score: number;
+    effort_score: number;
+    confidence_score: number;
+  }>;
+}> {
+  const response = await fetch("https://api.anthropic.com/v1/messages", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "x-api-key": ANTHROPIC_KEY,
+      "anthropic-version": "2023-06-01",
+      "anthropic-dangerous-direct-browser-access": "true",
+    },
+    body: JSON.stringify({
+      model: "claude-haiku-4-5-20251001",
+      max_tokens: 4000,
+      system: `You are an expert product strategist. Analyze source documents to extract actionable intelligence for product teams.
+
+You MUST respond with ONLY valid JSON and nothing else — no preamble, no explanation, no markdown fences.`,
+      messages: [
+        {
+          role: "user",
+          content: `Analyze this source document and extract product intelligence.
+
+SOURCE: "${sourceName}"
+
+CONTENT:
+${content.slice(0, 8000)}
+
+Return a JSON object with exactly this structure:
+{
+  "friction_points": [
+    { "title": "...", "summary": "...", "severity": "low|medium|high|critical", "cluster": "...", "confidence_score": 0.0-1.0 }
+  ],
+  "insights": [
+    { "title": "...", "summary": "...", "severity": "low|medium|high|critical", "confidence_score": 0.0-1.0 }
+  ],
+  "hypotheses": [
+    { "title": "If we build X... (10 words max)", "description": "...", "expected_impact": "...", "value_score": 1-5, "effort_score": 1-5, "confidence_score": 0.0-1.0 }
+  ]
+}
+
+Rules:
+- friction_points: 3-8 items. insights: 3-6. hypotheses: 3-5.
+- value_score: 5=transformative, 1=marginal. effort_score: 5=months, 1=trivial.
+- Return ONLY the JSON object. No markdown fences.`,
+        },
+      ],
+    }),
+  });
+
+  const data = await response.json();
+  if (!response.ok || data.error) {
+    throw new Error(data.error?.message ?? `API error ${response.status}`);
+  }
+  const raw = (data.content?.[0]?.text ?? "").trim();
+  const text = raw.replace(/^```(?:json)?\n?/i, "").replace(/\n?```$/i, "").trim();
+  return JSON.parse(text);
+}
+
+// ---------------------------------------------------------------------------
+// Three-altitude explainer (reusable visual)
+// ---------------------------------------------------------------------------
+
+function AltitudeIntro() {
+  const rows: Array<{ label: string; sub: string }> = [
+    { label: "Goals", sub: "What you're measuring" },
+    { label: "Bets", sub: "What you're trying" },
+    { label: "Build", sub: "What you're making" },
+  ];
+  return (
+    <div className="border border-border rounded-sm p-3 space-y-1.5 bg-muted/20">
+      {rows.map((r) => (
+        <div key={r.label} className="flex items-center gap-3">
+          <span className="text-xs font-bold uppercase tracking-widest text-foreground w-12 shrink-0">
+            {r.label}
+          </span>
+          <span className="text-xs text-muted-foreground">{r.sub}</span>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Main component
+// ---------------------------------------------------------------------------
 
 export default function OrgSetup() {
   const { createOrg } = useOrg();
   const { signOut, user } = useAuth();
-  const [step, setStep] = useState(1);
-  const [loading, setLoading] = useState(false);
+
+  const [step, setStep] = useState<1 | 2 | 3>(1);
+
+  // Step 1 — workspace name
+  const [name, setName] = useState("");
+  const [createLoading, setCreateLoading] = useState(false);
   const [createError, setCreateError] = useState<string | null>(null);
   const [createdOrgId, setCreatedOrgId] = useState<string | null>(null);
 
-  // Step 1: Org name
-  const [name, setName] = useState("");
+  // Step 2 — hero Analyze moment
+  const [sourceName, setSourceName] = useState("");
+  const [sourceContent, setSourceContent] = useState("");
+  const [analyzing, setAnalyzing] = useState(false);
+  const [analyzeStep, setAnalyzeStep] = useState("");
+  const [analyzeError, setAnalyzeError] = useState<string | null>(null);
+  const [hypothesisCount, setHypothesisCount] = useState<number | null>(null);
 
-  // Step 2: Product areas
-  const [productAreas, setProductAreas] = useState<{ label: string }[]>([
-    { label: "" },
-    { label: "" },
-    { label: "" },
-  ]);
-
-  // Step 3: Outcome categories
-  const [categoryMode, setCategoryMode] = useState<"defaults" | "custom" | null>(null);
-  const [categories, setCategories] = useState<{ label: string }[]>(
-    DEFAULT_CATEGORIES.map((c) => ({ label: c.label })),
-  );
-  const useCustomCategories = categoryMode === "custom";
+  // Step 3 — invite
+  const [copied, setCopied] = useState(false);
 
   const inviteUrl = createdOrgId
     ? `https://buildauthorityos.com/auth?org=${encodeURIComponent(createdOrgId)}`
     : "";
 
-  const handleNext = () => setStep((s) => s + 1);
-  const handleBack = () => setStep((s) => s - 1);
+  // -------------------------------------------------------------------------
+  // Handlers
+  // -------------------------------------------------------------------------
 
-  const handleCreateOrg = async () => {
-    if (!name.trim() || !categoryMode) return;
-    setLoading(true);
+  const handleCreateWorkspace = async () => {
+    if (!name.trim()) return;
+    setCreateLoading(true);
     setCreateError(null);
-
-    const areas: ProductArea[] = productAreas
-      .filter((p) => p.label.trim())
-      .map((p, i) => ({
-        key: SLOT_KEYS[i],
-        label: p.label.trim(),
-      }));
-
-    const customCats: CustomCategory[] | undefined = useCustomCategories
-      ? categories
-          .filter((c) => c.label.trim())
-          .map((c) => ({
-            key: c.label.trim().toLowerCase().replace(/\s+/g, "_").replace(/[^a-z0-9_]/g, ""),
-            label: c.label.trim(),
-          }))
-      : undefined;
-
     try {
-      const orgId = await createOrg(
-        name.trim(),
-        areas.length > 0 ? areas : undefined,
-        customCats,
-      );
+      const orgId = await createOrg(name.trim());
       setCreatedOrgId(orgId);
-      setLoading(false);
-      setStep(4);
+      void trackEvent("onboarding_workspace_created", {
+        userId: user?.id ?? null,
+        metadata: { org_id: orgId, org_name: name.trim() },
+      });
+      setStep(2);
     } catch (err) {
-      const message = err instanceof Error ? err.message : "Organization creation failed. Please try again.";
+      const message =
+        err instanceof Error
+          ? err.message
+          : "Workspace creation failed. Please try again.";
       setCreateError(message);
       void trackEvent("organization_create_failed", {
         userId: user?.id ?? null,
         severity: "error",
-        metadata: {
-          message,
-          org_name: name.trim(),
-          step,
-        },
+        metadata: { message, org_name: name.trim() },
       });
-      setLoading(false);
+    } finally {
+      setCreateLoading(false);
     }
   };
 
-  const updateProductArea = (index: number, label: string) => {
-    setProductAreas((prev) =>
-      prev.map((p, i) => (i === index ? { label } : p)),
-    );
-  };
+  const handleAnalyze = async () => {
+    if (!createdOrgId || !user) return;
+    if (!sourceName.trim() || !sourceContent.trim()) return;
 
-  const addProductArea = () => {
-    if (productAreas.length < 7) {
-      setProductAreas((prev) => [...prev, { label: "" }]);
+    setAnalyzing(true);
+    setAnalyzeError(null);
+    setAnalyzeStep("Saving source...");
+
+    const { data: source, error: insertErr } = await supabase
+      .from("intel_sources")
+      .insert({
+        org_id: createdOrgId,
+        name: sourceName.trim(),
+        source_type: "text",
+        content: sourceContent.trim(),
+        processing_status: "analyzing",
+        uploaded_by: user.id,
+      })
+      .select()
+      .single();
+
+    if (insertErr || !source) {
+      setAnalyzeError(insertErr?.message ?? "Failed to save source");
+      setAnalyzing(false);
+      return;
     }
-  };
 
-  const removeProductArea = (index: number) => {
-    if (productAreas.length > 1) {
-      setProductAreas((prev) => prev.filter((_, i) => i !== index));
+    setAnalyzeStep("Extracting friction, insights, and hypotheses...");
+
+    let result;
+    try {
+      result = await analyzeSource(sourceContent.trim(), sourceName.trim());
+    } catch (err) {
+      await supabase
+        .from("intel_sources")
+        .update({ processing_status: "failed" })
+        .eq("id", source.id);
+      const message =
+        err instanceof Error ? err.message : "Analysis failed — please retry.";
+      setAnalyzeError(message);
+      void trackEvent("onboarding_analyze_failed", {
+        userId: user.id,
+        severity: "error",
+        metadata: { message, org_id: createdOrgId },
+      });
+      setAnalyzing(false);
+      return;
     }
+
+    setAnalyzeStep("Saving results...");
+
+    const sid = source.id;
+    await Promise.all([
+      result.friction_points.length > 0 &&
+        supabase.from("intel_friction_points").insert(
+          result.friction_points.map((fp) => ({
+            ...fp,
+            org_id: createdOrgId,
+            source_id: sid,
+          })),
+        ),
+      result.insights.length > 0 &&
+        supabase.from("intel_insights").insert(
+          result.insights.map((i) => ({
+            ...i,
+            org_id: createdOrgId,
+            source_id: sid,
+          })),
+        ),
+      result.hypotheses.length > 0 &&
+        supabase.from("intel_hypotheses").insert(
+          result.hypotheses.map((h) => ({
+            ...h,
+            org_id: createdOrgId,
+            source_id: sid,
+          })),
+        ),
+      supabase
+        .from("intel_sources")
+        .update({ processing_status: "complete" })
+        .eq("id", sid),
+    ]);
+
+    void trackEvent("onboarding_analyze_submitted", {
+      userId: user.id,
+      metadata: {
+        org_id: createdOrgId,
+        hypotheses: result.hypotheses.length,
+        friction_points: result.friction_points.length,
+        insights: result.insights.length,
+      },
+    });
+
+    setHypothesisCount(result.hypotheses.length);
+    setAnalyzing(false);
+    setStep(3);
   };
 
-  const updateCategory = (index: number, label: string) => {
-    setCategories((prev) =>
-      prev.map((c, i) => (i === index ? { label } : c)),
-    );
+  const handleSkipAnalyze = () => {
+    void trackEvent("onboarding_analyze_skipped", {
+      userId: user?.id ?? null,
+      metadata: { org_id: createdOrgId },
+    });
+    setStep(3);
   };
 
-  const addCategory = () => {
-    setCategories((prev) => [...prev, { label: "" }]);
+  const handleEnterWorkspace = () => {
+    // If they analyzed, send them to the Analyze tab to see their results.
+    // Otherwise, land them at the top altitude.
+    const destination = hypothesisCount !== null ? "/build/analyze" : "/goals";
+    window.location.replace(destination);
   };
 
-  const removeCategory = (index: number) => {
-    if (categories.length > 1) {
-      setCategories((prev) => prev.filter((_, i) => i !== index));
-    }
-  };
-
-  const [copied, setCopied] = useState(false);
   const copyInviteLink = () => {
     if (!inviteUrl) return;
     navigator.clipboard.writeText(inviteUrl);
@@ -133,28 +299,32 @@ export default function OrgSetup() {
     setTimeout(() => setCopied(false), 2000);
   };
 
-  const filledAreas = productAreas.filter((p) => p.label.trim()).length;
-  const hasValidCustomCategories = categories.some((c) => c.label.trim());
-  const canCreateOrg = !!name.trim() && !!categoryMode && (!useCustomCategories || hasValidCustomCategories);
+  // -------------------------------------------------------------------------
+  // Render
+  // -------------------------------------------------------------------------
+
+  const stepLabels: Record<1 | 2 | 3, string> = {
+    1: "Create your workspace",
+    2: "See it work",
+    3: "Invite your team",
+  };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background px-4 py-6 sm:px-6">
       <div className="w-full max-w-md">
-        <div className="mb-8 text-center">
+        {/* Header */}
+        <div className="mb-6 text-center">
           <h1 className="text-sm font-bold tracking-widest uppercase text-foreground">
             Build Authority
           </h1>
           <p className="text-xs text-muted-foreground mt-1">
-            {step === 1 && "Create Your Organization"}
-            {step === 2 && "Define Product Areas"}
-            {step === 3 && "Outcome Categories"}
-            {step === 4 && "Invite Your Team"}
+            {stepLabels[step]}
           </p>
         </div>
 
-        {/* Progress bar */}
+        {/* Progress */}
         <div className="flex gap-1 mb-6">
-          {[1, 2, 3, 4].map((s) => (
+          {[1, 2, 3].map((s) => (
             <div
               key={s}
               className={cn(
@@ -166,215 +336,157 @@ export default function OrgSetup() {
         </div>
 
         <div className="border rounded-md p-6">
-          {/* Step 1: Org Name */}
+          {/* ---------- Step 1: Workspace name ---------- */}
           {step === 1 && (
             <>
+              <p className="text-sm text-foreground font-medium mb-1">
+                What should we call your workspace?
+              </p>
               <p className="text-sm text-muted-foreground mb-4">
-                Create an organization to begin. You will be the Admin.
+                You'll be the Admin. Everything else can be set up later.
               </p>
               <div className="space-y-4">
+                <input
+                  type="text"
+                  required
+                  autoFocus
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  className="w-full border rounded-sm px-3 py-2 text-sm bg-background text-foreground focus:outline-none focus:ring-1 focus:ring-foreground"
+                  placeholder="Your company or team name"
+                  onKeyDown={(e) =>
+                    e.key === "Enter" && name.trim() && handleCreateWorkspace()
+                  }
+                />
+
+                <div>
+                  <p className="text-xs uppercase tracking-widest text-muted-foreground mb-2 font-semibold">
+                    How Build Authority works
+                  </p>
+                  <AltitudeIntro />
+                </div>
+
+                <button
+                  onClick={handleCreateWorkspace}
+                  disabled={!name.trim() || createLoading}
+                  className="w-full text-sm font-semibold text-background bg-foreground px-4 py-2.5 rounded-sm hover:bg-foreground/90 transition-colors disabled:opacity-50"
+                >
+                  {createLoading ? "Creating workspace..." : "Create workspace"}
+                </button>
+
+                {createError && (
+                  <p className="text-xs text-signal-red">{createError}</p>
+                )}
+              </div>
+            </>
+          )}
+
+          {/* ---------- Step 2: Analyze hero ---------- */}
+          {step === 2 && (
+            <>
+              <p className="text-sm text-foreground font-medium mb-1">
+                Turn a signal into priorities.
+              </p>
+              <p className="text-sm text-muted-foreground mb-4">
+                Paste a research synthesis, support transcript, competitor
+                memo, or strategic doc. We'll extract friction points,
+                insights, and scored hypotheses you can promote to the Roadmap.
+              </p>
+
+              <div className="space-y-3">
                 <div>
                   <label className="text-xs font-semibold text-muted-foreground block mb-1">
-                    Organization Name
+                    Source name
                   </label>
                   <input
                     type="text"
-                    required
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    className="w-full border rounded-sm px-3 py-2 text-sm bg-background text-foreground focus:outline-none focus:ring-1 focus:ring-foreground"
-                    placeholder="Your Company"
-                    onKeyDown={(e) => e.key === "Enter" && name.trim() && handleNext()}
+                    value={sourceName}
+                    onChange={(e) => setSourceName(e.target.value)}
+                    placeholder='e.g. "Q1 customer interview synthesis"'
+                    className="w-full border rounded-sm px-3 py-2 text-sm bg-background text-foreground focus:outline-none focus:ring-1 focus:ring-foreground placeholder:text-muted-foreground/40"
+                    disabled={analyzing}
                   />
                 </div>
+
+                <div>
+                  <label className="text-xs font-semibold text-muted-foreground block mb-1">
+                    Content
+                  </label>
+                  <textarea
+                    value={sourceContent}
+                    onChange={(e) => setSourceContent(e.target.value)}
+                    placeholder="Paste your source content here..."
+                    rows={8}
+                    className="w-full border rounded-sm px-3 py-2 text-sm bg-background text-foreground focus:outline-none focus:ring-1 focus:ring-foreground placeholder:text-muted-foreground/40 resize-y"
+                    disabled={analyzing}
+                  />
+                </div>
+
+                {analyzing && (
+                  <div className="flex items-center gap-2 py-1">
+                    <div className="w-3 h-3 border-2 border-foreground/30 border-t-foreground rounded-full animate-spin" />
+                    <span className="text-xs text-muted-foreground">
+                      {analyzeStep}
+                    </span>
+                  </div>
+                )}
+
+                {analyzeError && (
+                  <p className="text-xs text-signal-red">{analyzeError}</p>
+                )}
+
                 <button
-                  onClick={handleNext}
-                  disabled={!name.trim()}
+                  onClick={handleAnalyze}
+                  disabled={
+                    !sourceName.trim() || !sourceContent.trim() || analyzing
+                  }
                   className="w-full text-sm font-semibold text-background bg-foreground px-4 py-2.5 rounded-sm hover:bg-foreground/90 transition-colors disabled:opacity-50"
                 >
-                  Next
+                  {analyzing ? "Analyzing..." : "Analyze"}
+                </button>
+
+                <button
+                  onClick={handleSkipAnalyze}
+                  disabled={analyzing}
+                  className="w-full text-xs text-muted-foreground hover:text-foreground transition-colors py-1"
+                >
+                  Skip for now — I'll try this later
                 </button>
               </div>
             </>
           )}
 
-          {/* Step 2: Product Areas */}
-          {step === 2 && (
-            <>
-              <p className="text-sm text-muted-foreground mb-4">
-                Define your product areas. These organize your strategic bets. You can add 1 to 7.
-              </p>
-              <div className="space-y-3">
-                {productAreas.map((area, i) => (
-                  <div key={i} className="flex items-center gap-2">
-                    <span className="text-xs font-semibold text-muted-foreground w-5 shrink-0">
-                      {i + 1}.
-                    </span>
-                    <input
-                      type="text"
-                      value={area.label}
-                      onChange={(e) => updateProductArea(i, e.target.value)}
-                      className="flex-1 border rounded-sm px-3 py-2 text-sm bg-background text-foreground focus:outline-none focus:ring-1 focus:ring-foreground"
-                      placeholder={`Product area ${i + 1}`}
-                    />
-                    {productAreas.length > 1 && (
-                      <button
-                        onClick={() => removeProductArea(i)}
-                        className="text-muted-foreground hover:text-signal-red text-sm p-1 shrink-0"
-                      >
-                        ✕
-                      </button>
-                    )}
-                  </div>
-                ))}
-                {productAreas.length < 7 && (
-                  <button
-                    onClick={addProductArea}
-                    className="text-xs text-muted-foreground hover:text-foreground transition-colors"
-                  >
-                    + Add product area
-                  </button>
-                )}
-              </div>
-              <div className="flex flex-col sm:flex-row gap-3 mt-6">
-                <button
-                  onClick={handleBack}
-                  className="flex-1 text-sm font-semibold text-foreground border border-foreground px-4 py-2.5 rounded-sm hover:bg-foreground hover:text-background transition-colors"
-                >
-                  Back
-                </button>
-                <button
-                  onClick={handleNext}
-                  disabled={filledAreas === 0}
-                  className="flex-1 text-sm font-semibold text-background bg-foreground px-4 py-2.5 rounded-sm hover:bg-foreground/90 transition-colors disabled:opacity-50"
-                >
-                  Next
-                </button>
-              </div>
-            </>
-          )}
-
-          {/* Step 3: Outcome Categories */}
+          {/* ---------- Step 3: Invite + enter ---------- */}
           {step === 3 && (
             <>
-              <p className="text-sm text-muted-foreground mb-4">
-                Outcome categories classify what each bet is driving toward. Use defaults or customize.
+              <p className="text-sm text-foreground font-medium mb-1">
+                {name} is ready.
               </p>
-              <div className="flex gap-3 mb-4">
-                <button
-                  onClick={() => setCategoryMode("defaults")}
-                  className={cn(
-                    "text-sm font-semibold px-3 py-1.5 rounded-sm border transition-colors",
-                    categoryMode === "defaults"
-                      ? "bg-foreground text-background border-foreground"
-                      : "border-foreground text-foreground hover:bg-foreground hover:text-background",
-                  )}
-                >
-                  Use Defaults
-                </button>
-                <button
-                  onClick={() => setCategoryMode("custom")}
-                  className={cn(
-                    "text-sm font-semibold px-3 py-1.5 rounded-sm border transition-colors",
-                    categoryMode === "custom"
-                      ? "bg-foreground text-background border-foreground"
-                      : "border-foreground text-foreground hover:bg-foreground hover:text-background",
-                  )}
-                >
-                  Customize
-                </button>
-              </div>
-              {categoryMode === null && (
-                <p className="text-xs text-muted-foreground mb-3">
-                  Choose <span className="font-semibold">Use Defaults</span> or <span className="font-semibold">Customize</span> to continue.
-                </p>
-              )}
-              {useCustomCategories ? (
-                <div className="space-y-3">
-                  {categories.map((cat, i) => (
-                    <div key={i} className="flex items-center gap-2">
-                      <input
-                        type="text"
-                        value={cat.label}
-                        onChange={(e) => updateCategory(i, e.target.value)}
-                        className="flex-1 border rounded-sm px-3 py-2 text-sm bg-background text-foreground focus:outline-none focus:ring-1 focus:ring-foreground"
-                        placeholder={`Category ${i + 1}`}
-                      />
-                      {categories.length > 1 && (
-                        <button
-                          onClick={() => removeCategory(i)}
-                          className="text-muted-foreground hover:text-signal-red text-sm p-1 shrink-0"
-                        >
-                          ✕
-                        </button>
-                      )}
-                    </div>
-                  ))}
-                  <button
-                    onClick={addCategory}
-                    className="text-xs text-muted-foreground hover:text-foreground transition-colors"
-                  >
-                    + Add category
-                  </button>
+
+              {hypothesisCount !== null && hypothesisCount > 0 ? (
+                <div className="text-sm text-muted-foreground mb-4">
+                  <span className="text-foreground font-semibold">
+                    {hypothesisCount} hypothes
+                    {hypothesisCount === 1 ? "is" : "es"}
+                  </span>{" "}
+                  generated and ranked by V² score. Waiting for you in the
+                  Analyze tab.
                 </div>
               ) : (
-                <div className="space-y-1">
-                  {DEFAULT_CATEGORIES.map((c) => (
-                    <p
-                      key={c.key}
-                      className="text-sm text-foreground/80 py-1 px-2 bg-muted/30 rounded"
-                    >
-                      {c.label}
-                    </p>
-                  ))}
-                  <p className="text-xs text-muted-foreground mt-2">
-                    These can be changed later in settings.
-                  </p>
-                </div>
+                <p className="text-sm text-muted-foreground mb-4">
+                  Invite your team now, or jump in and get started.
+                </p>
               )}
-              <div className="flex flex-col sm:flex-row gap-3 mt-6">
-                <button
-                  onClick={handleBack}
-                  className="flex-1 text-sm font-semibold text-foreground border border-foreground px-4 py-2.5 rounded-sm hover:bg-foreground hover:text-background transition-colors"
-                >
-                  Back
-                </button>
-                <button
-                  onClick={handleCreateOrg}
-                  disabled={loading || !canCreateOrg}
-                  className={cn(
-                    "flex-1 text-sm font-semibold px-4 py-2.5 rounded-sm transition-colors",
-                    canCreateOrg && !loading
-                      ? "text-background bg-foreground hover:bg-foreground/90"
-                      : "text-muted-foreground bg-muted cursor-not-allowed",
-                  )}
-                >
-                  {loading ? "Creating..." : "Create Organization"}
-                </button>
-              </div>
-              {createError && <p className="text-xs text-signal-red mt-3">{createError}</p>}
-            </>
-          )}
 
-          {/* Step 4: Invite Team */}
-          {step === 4 && (
-            <>
-              <p className="text-sm text-foreground font-medium mb-1">
-                {name} is ready!
-              </p>
-              <p className="text-sm text-muted-foreground mb-4">
-                Share this link with your team to invite them.
-              </p>
               <div className="space-y-4">
                 <div>
                   <label className="text-xs font-semibold text-muted-foreground block mb-1">
-                    Invite Link
+                    Invite link
                   </label>
                   <div className="flex flex-col sm:flex-row gap-2">
                     <input
                       readOnly
                       value={inviteUrl}
-                      placeholder={createdOrgId ? "" : "Invite link will appear after org is created"}
                       className="flex-1 border rounded-sm px-3 py-2 text-sm bg-muted text-foreground min-w-0"
                     />
                     <button
@@ -386,18 +498,21 @@ export default function OrgSetup() {
                     </button>
                   </div>
                 </div>
+
                 <button
-                  onClick={() => window.location.replace("/")}
+                  onClick={handleEnterWorkspace}
                   className="w-full text-sm font-semibold text-background bg-foreground px-4 py-2.5 rounded-sm hover:bg-foreground/90 transition-colors"
                 >
-                  Go to Dashboard
+                  {hypothesisCount !== null
+                    ? "See your hypotheses"
+                    : "Enter workspace"}
                 </button>
               </div>
             </>
           )}
         </div>
 
-        {step < 4 && (
+        {step < 3 && (
           <button
             onClick={signOut}
             className="mt-4 w-full text-xs text-muted-foreground hover:text-foreground transition-colors py-2"
