@@ -1540,6 +1540,47 @@ export type Database = {
           },
         ]
       }
+      org_join_requests: {
+        Row: {
+          id: string
+          org_id: string
+          user_id: string
+          email: string
+          status: string
+          created_at: string
+          reviewed_at: string | null
+          reviewed_by: string | null
+        }
+        Insert: {
+          id?: string
+          org_id: string
+          user_id: string
+          email: string
+          status?: string
+          created_at?: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+        }
+        Update: {
+          id?: string
+          org_id?: string
+          user_id?: string
+          email?: string
+          status?: string
+          created_at?: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "org_join_requests_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       intel_hypotheses: {
         Row: {
           id: string
