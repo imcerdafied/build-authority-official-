@@ -61,16 +61,10 @@ interface Hypothesis {
 }
 
 // ---------------------------------------------------------------------------
-// Claude API analysis
+// Server-side analysis via /api/analyze (key never reaches the browser)
 // ---------------------------------------------------------------------------
 
-const ANTHROPIC_KEY = import.meta.env.VITE_ANTHROPIC_API_KEY;
-
-async function analyzeSource(
-  content: string,
-  sourceName: string,
-  pdfBase64?: string,
-): Promise<{
+type AnalysisResult = {
   friction_points: Array<{
     title: string;
     summary: string;
@@ -92,107 +86,24 @@ async function analyzeSource(
     effort_score: number;
     confidence_score: number;
   }>;
-}> {
-  const response = await fetch("https://api.anthropic.com/v1/messages", {
+};
+
+async function analyzeSource(
+  content: string,
+  sourceName: string,
+  pdfBase64?: string,
+): Promise<AnalysisResult> {
+  const response = await fetch("/api/analyze", {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "x-api-key": ANTHROPIC_KEY,
-      "anthropic-version": "2023-06-01",
-      "anthropic-dangerous-direct-browser-access": "true",
-    },
-    body: JSON.stringify({
-      model: "claude-haiku-4-5-20251001",
-      max_tokens: 4000,
-      system: `You are an expert product strategist. Analyze source documents to extract actionable intelligence for product teams.
-
-You MUST respond with ONLY valid JSON and nothing else — no preamble, no explanation, no markdown fences.`,
-      messages: [
-        {
-          role: "user",
-          content: pdfBase64
-            ? [
-                {
-                  type: "document" as const,
-                  source: {
-                    type: "base64" as const,
-                    media_type: "application/pdf" as const,
-                    data: pdfBase64,
-                  },
-                },
-                {
-                  type: "text" as const,
-                  text: `Analyze this PDF document named "${sourceName}" and extract product intelligence.
-
-Return a JSON object with exactly this structure:`,
-                },
-              ]
-            : `Analyze this source document and extract product intelligence.
-
-SOURCE: "${sourceName}"
-
-CONTENT:
-${content.slice(0, 8000)}
-
-Return a JSON object with exactly this structure:
-{
-  "friction_points": [
-    {
-      "title": "Brief title (8 words max)",
-      "summary": "What the friction is and why it matters (2-3 sentences)",
-      "severity": "low|medium|high|critical",
-      "cluster": "Theme or category this belongs to",
-      "confidence_score": 0.0-1.0
-    }
-  ],
-  "insights": [
-    {
-      "title": "Brief title (8 words max)",
-      "summary": "What was learned and what it signals (2-3 sentences)",
-      "severity": "low|medium|high|critical",
-      "confidence_score": 0.0-1.0
-    }
-  ],
-  "hypotheses": [
-    {
-      "title": "If we build X... (10 words max)",
-      "description": "Full hypothesis statement explaining what we'd build and why (2-3 sentences)",
-      "expected_impact": "Specific measurable outcome we'd expect to see",
-      "value_score": 1-5,
-      "effort_score": 1-5,
-      "confidence_score": 0.0-1.0
-    }
-  ]
-}
-
-Rules:
-- friction_points: 3-8 items, real pain points from the source material
-- insights: 3-6 items, patterns or opportunities observed
-- hypotheses: 3-5 items, actionable "if we build X" statements with realistic value/effort scores
-- value_score: 5=transformative, 4=significant, 3=meaningful, 2=minor, 1=marginal
-- effort_score: 5=very hard/months, 4=hard/weeks, 3=moderate, 2=easy/days, 1=trivial
-- confidence_score: how confident are you this is accurate given the source material
-- Return ONLY the JSON object. No other text.`,
-        },
-      ],
-    }),
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ content, sourceName, pdfBase64 }),
   });
 
   const data = await response.json();
-
-  // Surface API errors clearly
   if (!response.ok || data.error) {
-    const errMsg = data.error?.message ?? `API error ${response.status}`;
-    throw new Error(errMsg);
+    throw new Error(data.error ?? `Analysis failed (${response.status})`);
   }
-  if (!data.content?.[0]?.text) {
-    throw new Error(`Unexpected response shape: ${JSON.stringify(data).slice(0, 200)}`);
-  }
-
-  // Strip code fences in case Claude wraps the JSON
-  const raw = data.content[0].text.trim();
-  const text = raw.replace(/^```(?:json)?\n?/i, "").replace(/\n?```$/i, "").trim();
-  return JSON.parse(text);
+  return data as AnalysisResult;
 }
 
 // ---------------------------------------------------------------------------

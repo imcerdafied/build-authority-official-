@@ -5,10 +5,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
 import { trackEvent } from "@/lib/telemetry";
 
-const ANTHROPIC_KEY = import.meta.env.VITE_ANTHROPIC_API_KEY;
-
 // ---------------------------------------------------------------------------
-// Analyze helper — mirrors /build/analyze, text-only, lightweight error paths
+// Server-side analysis via /api/analyze (key never reaches the browser)
 // ---------------------------------------------------------------------------
 
 async function analyzeSource(
@@ -37,59 +35,17 @@ async function analyzeSource(
     confidence_score: number;
   }>;
 }> {
-  const response = await fetch("https://api.anthropic.com/v1/messages", {
+  const response = await fetch("/api/analyze", {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "x-api-key": ANTHROPIC_KEY,
-      "anthropic-version": "2023-06-01",
-      "anthropic-dangerous-direct-browser-access": "true",
-    },
-    body: JSON.stringify({
-      model: "claude-haiku-4-5-20251001",
-      max_tokens: 4000,
-      system: `You are an expert product strategist. Analyze source documents to extract actionable intelligence for product teams.
-
-You MUST respond with ONLY valid JSON and nothing else — no preamble, no explanation, no markdown fences.`,
-      messages: [
-        {
-          role: "user",
-          content: `Analyze this source document and extract product intelligence.
-
-SOURCE: "${sourceName}"
-
-CONTENT:
-${content.slice(0, 8000)}
-
-Return a JSON object with exactly this structure:
-{
-  "friction_points": [
-    { "title": "...", "summary": "...", "severity": "low|medium|high|critical", "cluster": "...", "confidence_score": 0.0-1.0 }
-  ],
-  "insights": [
-    { "title": "...", "summary": "...", "severity": "low|medium|high|critical", "confidence_score": 0.0-1.0 }
-  ],
-  "hypotheses": [
-    { "title": "If we build X... (10 words max)", "description": "...", "expected_impact": "...", "value_score": 1-5, "effort_score": 1-5, "confidence_score": 0.0-1.0 }
-  ]
-}
-
-Rules:
-- friction_points: 3-8 items. insights: 3-6. hypotheses: 3-5.
-- value_score: 5=transformative, 1=marginal. effort_score: 5=months, 1=trivial.
-- Return ONLY the JSON object. No markdown fences.`,
-        },
-      ],
-    }),
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ content, sourceName }),
   });
 
   const data = await response.json();
   if (!response.ok || data.error) {
-    throw new Error(data.error?.message ?? `API error ${response.status}`);
+    throw new Error(data.error ?? `Analysis failed (${response.status})`);
   }
-  const raw = (data.content?.[0]?.text ?? "").trim();
-  const text = raw.replace(/^```(?:json)?\n?/i, "").replace(/\n?```$/i, "").trim();
-  return JSON.parse(text);
+  return data;
 }
 
 // ---------------------------------------------------------------------------
