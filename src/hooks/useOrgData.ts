@@ -53,6 +53,8 @@ export interface DecisionComputed {
   created_by: string | null;
   activated_at: string | null;
   exposure_value: string | null;
+  linked_okr_id: string | null;
+  linked_okr_title: string | null;
   // Client-computed fields
   age_days: number;
   slice_remaining: number;
@@ -115,6 +117,8 @@ function computeDecisionFields(row: Record<string, unknown>): DecisionComputed {
     created_by: (row.created_by as string) ?? null,
     activated_at: (row.activated_at as string) ?? null,
     exposure_value: (row.exposure_value as string) ?? null,
+    linked_okr_id: (row.linked_okr_id as string) ?? null,
+    linked_okr_title: ((row.okrs as { title?: string } | null) ?? null)?.title ?? null,
     age_days: ageDays,
     slice_remaining: sliceRemaining,
     is_exceeded: isExceeded,
@@ -133,7 +137,7 @@ export function useDecisions() {
       if (!currentOrg) return [];
       const { data, error } = await supabase
         .from("decisions")
-        .select("id, org_id, title, owner, sponsor, owner_user_id, surface, solution_domain, impact_tier, outcome_target, outcome_category_key, expected_impact, exposure_value, trigger_signal, revenue_at_risk, status, risk_level, created_at, updated_at, outcome_category, current_delta, segment_impact, decision_health, blocked_reason, blocked_dependency_owner, slice_deadline_days, slice_due_at, activated_at, created_by, shipped_slice_date, measured_outcome_result, capacity_allocated, capacity_diverted, unplanned_interrupts, escalation_count, previous_exposure_value, state_changed_at, state_change_note, pod_configuration")
+        .select("id, org_id, title, owner, sponsor, owner_user_id, surface, solution_domain, impact_tier, outcome_target, outcome_category_key, expected_impact, exposure_value, trigger_signal, revenue_at_risk, status, risk_level, created_at, updated_at, outcome_category, current_delta, segment_impact, decision_health, blocked_reason, blocked_dependency_owner, slice_deadline_days, slice_due_at, activated_at, created_by, shipped_slice_date, measured_outcome_result, capacity_allocated, capacity_diverted, unplanned_interrupts, escalation_count, previous_exposure_value, state_changed_at, state_change_note, pod_configuration, linked_okr_id, okrs(id, title)")
         .eq("org_id", currentOrg.id)
         .order("created_at", { ascending: false });
       if (error) throw error;
@@ -152,6 +156,58 @@ export function useDecisions() {
       });
     },
     enabled: !!currentOrg,
+  });
+}
+
+export interface OKROption {
+  id: string;
+  title: string;
+  status: string;
+  quarter: string | null;
+}
+
+export function useOrgOKRs() {
+  const { currentOrg } = useOrg();
+  return useQuery<OKROption[]>({
+    queryKey: ["okrs", currentOrg?.id],
+    queryFn: async () => {
+      if (!currentOrg) return [];
+      const { data, error } = await supabase
+        .from("okrs")
+        .select("id, title, status, quarter")
+        .eq("org_id", currentOrg.id)
+        .neq("status", "cancelled")
+        .order("created_at", { ascending: false });
+      if (error) throw error;
+      return (data ?? []) as OKROption[];
+    },
+    enabled: !!currentOrg,
+  });
+}
+
+export function useCreateOKR() {
+  const qc = useQueryClient();
+  const { currentOrg } = useOrg();
+  const { user } = useAuth();
+  return useMutation({
+    mutationFn: async (input: { title: string; description?: string | null; quarter?: string | null }) => {
+      if (!currentOrg || !user) throw new Error("No org or user");
+      const { data, error } = await supabase
+        .from("okrs")
+        .insert({
+          org_id: currentOrg.id,
+          title: input.title,
+          description: input.description ?? null,
+          quarter: input.quarter ?? null,
+          created_by: user.id,
+          owner_id: user.id,
+        })
+        .select("id, title, status, quarter")
+        .single();
+      if (error) throw error;
+      return data as OKROption;
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["okrs", currentOrg?.id] }),
   });
 }
 

@@ -24,17 +24,9 @@ import OrgSetup from "@/components/OrgSetup";
 import DomainJoinPrompt from "@/components/DomainJoinPrompt";
 import NotFound from "./pages/NotFound";
 
-// Goals altitude
-import OKRList from "@/pages/goals/OKRList";
+// Goals: detail page kept as a deep-link target for the bet's goal chip.
+// /goals (list) and /goals/review are unmounted — Goals is no longer a section.
 import OKRDetail from "@/pages/goals/OKRDetail";
-import QuarterReview from "@/pages/goals/QuarterReview";
-
-// Build altitude
-import OutcomeList from "@/pages/build/OutcomeList";
-import OutcomeDetail from "@/pages/build/OutcomeDetail";
-import Roadmap from "@/pages/build/Roadmap";
-import Initiatives from "@/pages/build/Initiatives";
-import Analyze from "@/pages/build/Analyze";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -81,16 +73,16 @@ function AppContent() {
         <AuthGate>
           <AppLayout>
             <Routes>
-              {/* Redirect root and old home to Goals */}
-              <Route path="/" element={<Navigate to="/goals" replace />} />
-              <Route path="/home" element={<Navigate to="/goals" replace />} />
+              {/* Redirect root and old home to the single remaining altitude */}
+              <Route path="/" element={<Navigate to="/decisions" replace />} />
+              <Route path="/home" element={<Navigate to="/decisions" replace />} />
 
-              {/* Goals altitude */}
-              <Route path="/goals" element={<OKRList />} />
-              <Route path="/goals/review" element={<QuarterReview />} />
+              {/* Goal detail kept as a deep-link target reachable from a bet's goal chip */}
               <Route path="/goals/:okrId" element={<OKRDetail />} />
+              <Route path="/goals" element={<Navigate to="/decisions" replace />} />
+              <Route path="/goals/review" element={<Navigate to="/decisions" replace />} />
 
-              {/* Bets altitude (existing) */}
+              {/* Bets altitude */}
               <Route path="/decisions" element={<Decisions />} />
               <Route path="/loops" element={<Loops />} />
               <Route path="/review" element={<Review />} />
@@ -100,16 +92,12 @@ function AppContent() {
               <Route path="/ask" element={<Ask />} />
               <Route path="/how-it-works" element={<HowItWorks />} />
 
-              {/* Build altitude */}
-              <Route path="/build" element={<OutcomeList />} />
-              <Route path="/build/analyze" element={<Analyze />} />
-              <Route path="/build/roadmap" element={<Roadmap />} />
-              <Route path="/build/initiatives" element={<Initiatives />} />
-              <Route path="/build/:outcomeId" element={<OutcomeDetail />} />
+              {/* Build altitude removed — redirect any deep links back to bets */}
+              <Route path="/build/*" element={<Navigate to="/decisions" replace />} />
 
               {/* Utility routes */}
               <Route path="/closed-bets" element={<Navigate to="/decisions" replace />} />
-              <Route path="/altitude" element={<Navigate to="/goals" replace />} />
+              <Route path="/altitude" element={<Navigate to="/decisions" replace />} />
               <Route path="/team" element={<Team />} />
               <Route path="/feedback" element={<FeedbackAdmin />} />
               <Route path="/settings" element={<OrgSettings />} />

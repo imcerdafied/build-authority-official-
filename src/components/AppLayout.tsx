@@ -1,4 +1,4 @@
-import { ReactNode, useState, useMemo } from "react";
+import { ReactNode, useState } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "@/contexts/AuthContext";
@@ -25,36 +25,13 @@ const roleLabels: Record<string, string> = {
 
 const Sep = () => <span className="text-muted-foreground/30 mx-3 hidden md:inline">|</span>;
 
-const navLinkClass = "text-sm uppercase tracking-widest text-muted-foreground hover:text-foreground transition-colors font-medium min-h-[44px] min-w-[44px] flex items-center justify-center md:min-h-0 md:min-w-0 md:flex-initial";
-
-const altitudePillClass = "text-sm uppercase tracking-widest font-semibold px-3 py-1 rounded transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center md:min-h-0 md:min-w-0 md:flex-initial";
-
 const subNavLinkClass = "text-sm text-muted-foreground hover:text-foreground transition-colors font-medium px-2 py-1";
 
-type Altitude = "goals" | "bets" | "build";
-
-function getAltitude(pathname: string): Altitude {
-  if (pathname.startsWith("/goals")) return "goals";
-  if (pathname.startsWith("/build") || pathname.startsWith("/outcomes") || pathname.startsWith("/roadmap") || pathname.startsWith("/loops") || pathname.startsWith("/pods")) return "build";
-  return "bets";
-}
-
-const SUB_NAV: Record<Altitude, { label: string; to: string }[]> = {
-  goals: [],
-  bets: [
-    { label: "Bets", to: "/decisions" },
-    { label: "Review", to: "/review" },
-    { label: "Signals", to: "/signals" },
-  ],
-  build: [
-    { label: "Analyze", to: "/build/analyze" },
-    { label: "Initiatives", to: "/build/initiatives" },
-    { label: "Roadmap", to: "/build/roadmap" },
-    { label: "Pods", to: "/pods" },
-    { label: "Loops", to: "/loops" },
-    { label: "Outcomes", to: "/build" },
-  ],
-};
+const SUB_NAV: { label: string; to: string }[] = [
+  { label: "Bets", to: "/decisions" },
+  { label: "Review", to: "/review" },
+  { label: "Signals", to: "/signals" },
+];
 
 export default function AppLayout({ children }: { children: ReactNode }) {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -84,8 +61,7 @@ export default function AppLayout({ children }: { children: ReactNode }) {
   const location = useLocation();
   const closeMenu = () => setMenuOpen(false);
 
-  const currentAltitude = useMemo(() => getAltitude(location.pathname), [location.pathname]);
-  const subNavItems = SUB_NAV[currentAltitude];
+  const subNavItems = SUB_NAV;
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -93,7 +69,7 @@ export default function AppLayout({ children }: { children: ReactNode }) {
         <div className="flex flex-col md:flex-row md:flex-wrap md:items-center md:justify-between">
           <div className="flex items-center justify-between w-full md:w-auto">
             <div className="flex flex-col">
-              <Link to="/goals" className="flex items-center" onClick={closeMenu}>
+              <Link to="/decisions" className="flex items-center" onClick={closeMenu}>
                 <img src="/logo.svg" alt="Authority" className="h-6 md:h-8 w-auto" />
               </Link>
               <div className="leading-tight mt-0.5">
@@ -115,32 +91,7 @@ export default function AppLayout({ children }: { children: ReactNode }) {
             "md:flex md:items-center md:flex-1 md:justify-between",
             menuOpen ? "flex flex-col py-2 border-b" : "hidden md:flex"
           )}>
-            <div className="flex flex-col md:flex-row md:items-center">
-              <Sep />
-              <Link
-                to="/goals"
-                className={cn(altitudePillClass, currentAltitude === "goals" ? "text-foreground bg-foreground/5" : "text-muted-foreground hover:text-foreground")}
-                onClick={closeMenu}
-              >
-                Goals
-              </Link>
-              <Sep />
-              <Link
-                to="/decisions"
-                className={cn(altitudePillClass, currentAltitude === "bets" ? "text-foreground bg-foreground/5" : "text-muted-foreground hover:text-foreground")}
-                onClick={closeMenu}
-              >
-                Bets
-              </Link>
-              <Sep />
-              <Link
-                to="/build"
-                className={cn(altitudePillClass, currentAltitude === "build" ? "text-foreground bg-foreground/5" : "text-muted-foreground hover:text-foreground")}
-                onClick={closeMenu}
-              >
-                Build
-              </Link>
-            </div>
+            <div className="flex flex-col md:flex-row md:items-center" />
             <div className="flex flex-col md:flex-row md:items-center gap-1 md:gap-4 pt-2 md:pt-0 border-t md:border-t-0 mt-2 md:mt-0">
               <Sep />
               <DropdownMenu>
@@ -236,7 +187,7 @@ export default function AppLayout({ children }: { children: ReactNode }) {
 
       <main className={cn("flex-1 overflow-auto transition-all duration-300", chatOpen && "md:mr-96")}>
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-8 w-full">
-          <div className="eyebrow-mono mb-4">{`// ${currentAltitude.toUpperCase()}`}</div>
+          <div className="eyebrow-mono mb-4">// BETS</div>
           {children}
         </div>
       </main>

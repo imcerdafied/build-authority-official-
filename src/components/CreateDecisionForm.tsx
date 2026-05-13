@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useCreateDecision } from "@/hooks/useOrgData";
+import { useCreateDecision, useOrgOKRs, useCreateOKR } from "@/hooks/useOrgData";
 import { useOrg } from "@/contexts/OrgContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
@@ -74,6 +74,35 @@ export default function CreateDecisionForm({ onClose, navigateAfter = false }: {
 
   const [triggerSignal, setTriggerSignal] = useState("");
   const [revenueAtRisk, setRevenueAtRisk] = useState("");
+
+  const { data: okrs = [] } = useOrgOKRs();
+  const createOKR = useCreateOKR();
+  const [linkedOkrId, setLinkedOkrId] = useState("");
+  const [newGoalOpen, setNewGoalOpen] = useState(false);
+  const [newGoalTitle, setNewGoalTitle] = useState("");
+  const [newGoalQuarter, setNewGoalQuarter] = useState("");
+
+  const handleCreateGoal = async () => {
+    const titleClean = newGoalTitle.trim();
+    if (!titleClean) {
+      toast.error("Goal title is required.");
+      return;
+    }
+    try {
+      const okr = await createOKR.mutateAsync({
+        title: titleClean,
+        quarter: newGoalQuarter.trim() || null,
+      });
+      setLinkedOkrId(okr.id);
+      setNewGoalOpen(false);
+      setNewGoalTitle("");
+      setNewGoalQuarter("");
+      toast.success(`Goal created — "${okr.title}"`);
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : String(err);
+      toast.error("Failed to create goal.", { description: message });
+    }
+  };
 
   useEffect(() => {
     if (!productArea && productAreas.length > 0) {
@@ -452,6 +481,10 @@ export default function CreateDecisionForm({ onClose, navigateAfter = false }: {
 
   const createAllSuggestions = async () => {
     if (!strategySuggestions.length) return;
+    if (!linkedOkrId) {
+      toast.error("Pick a goal first — it applies to all imported bets.");
+      return;
+    }
     const sponsorForBatch = sponsor.trim() || strategySponsorHint || "TBD";
     let created = 0;
     let failed = 0;
@@ -477,6 +510,7 @@ export default function CreateDecisionForm({ onClose, navigateAfter = false }: {
           exposure_value: s.exposure_value || null,
           trigger_signal: s.trigger_signal || null,
           revenue_at_risk: s.revenue_at_risk || null,
+          linked_okr_id: linkedOkrId,
         } as any);
         created += 1;
       } catch {
@@ -515,6 +549,10 @@ export default function CreateDecisionForm({ onClose, navigateAfter = false }: {
       toast.error("Outcome category is required.");
       return;
     }
+    if (!linkedOkrId) {
+      toast.error("Goal is required — pick a goal or create one.");
+      return;
+    }
 
     try {
       const solutionDomain = resolveSolutionDomain(normalizedProductArea);
@@ -535,6 +573,7 @@ export default function CreateDecisionForm({ onClose, navigateAfter = false }: {
         exposure_value: exposureValue || null,
         trigger_signal: normalizedTriggerSignal,
         revenue_at_risk: revenueAtRisk || null,
+        linked_okr_id: linkedOkrId,
       };
 
       await createDecision.mutateAsync(payload);
@@ -654,6 +693,69 @@ export default function CreateDecisionForm({ onClose, navigateAfter = false }: {
         </div>
       </div>
       <form onSubmit={handleSubmit} className="space-y-3">
+        <div>
+          <label className="text-xs font-semibold text-muted-foreground block mb-1">Goal *</label>
+          <div className="flex gap-2">
+            <select
+              required
+              value={linkedOkrId}
+              onChange={(e) => setLinkedOkrId(e.target.value)}
+              className="flex-1 border rounded-sm px-3 py-2 text-sm bg-background focus:outline-none focus:ring-1 focus:ring-foreground"
+            >
+              <option value="" disabled>Select a goal…</option>
+              {okrs.map((o) => (
+                <option key={o.id} value={o.id}>
+                  {o.title}{o.quarter ? ` (${o.quarter})` : ""}
+                </option>
+              ))}
+            </select>
+            <button
+              type="button"
+              onClick={() => setNewGoalOpen(true)}
+              className="text-xs font-mono uppercase tracking-[0.05em] border border-foreground px-3 py-2 hover:opacity-[0.85] transition-opacity"
+            >
+              + New goal
+            </button>
+          </div>
+          {okrs.length === 0 && !newGoalOpen && (
+            <p className="text-xs text-muted-foreground mt-1">No goals yet — create one to register a bet.</p>
+          )}
+          {newGoalOpen && (
+            <div className="border border-gray-300 rounded-sm p-3 mt-2 bg-background space-y-2">
+              <p className="text-xs font-semibold text-muted-foreground">New goal</p>
+              <input
+                value={newGoalTitle}
+                onChange={(e) => setNewGoalTitle(e.target.value)}
+                placeholder="Goal title (e.g. Reach $5M ARR by EoY)"
+                autoFocus
+                className="w-full border rounded-sm px-3 py-2 text-sm bg-background focus:outline-none focus:ring-1 focus:ring-foreground"
+              />
+              <input
+                value={newGoalQuarter}
+                onChange={(e) => setNewGoalQuarter(e.target.value)}
+                placeholder="Quarter (optional, e.g. Q2 2026)"
+                className="w-full border rounded-sm px-3 py-2 text-sm bg-background focus:outline-none focus:ring-1 focus:ring-foreground"
+              />
+              <div className="flex gap-2 justify-end">
+                <button
+                  type="button"
+                  onClick={() => { setNewGoalOpen(false); setNewGoalTitle(""); setNewGoalQuarter(""); }}
+                  className="text-xs text-muted-foreground hover:text-foreground px-2 py-1"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  onClick={handleCreateGoal}
+                  disabled={createOKR.isPending}
+                  className="text-xs font-mono uppercase tracking-[0.05em] bg-foreground text-background px-3 py-1.5 hover:opacity-[0.85] transition-opacity disabled:opacity-50"
+                >
+                  {createOKR.isPending ? "Creating…" : "Create goal"}
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
           <div>
             <label className="text-xs font-semibold text-muted-foreground block mb-1">Title *</label>

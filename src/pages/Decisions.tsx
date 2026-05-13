@@ -8,6 +8,7 @@ import { useOrg } from "@/contexts/OrgContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
 import CreateDecisionForm from "@/components/CreateDecisionForm";
+import GoalChip from "@/components/GoalChip";
 import TagPill from "@/components/bets/TagPill";
 import SectionBlock from "@/components/bets/SectionBlock";
 import ExposureCallout from "@/components/bets/ExposureCallout";
@@ -1092,12 +1093,12 @@ function BetCard({
       <div className="px-4 md:px-5 py-3 border-b bg-black/90 text-white">
         <div className="flex flex-col xl:flex-row xl:items-center xl:justify-between gap-4">
           <div className="min-w-0 w-full xl:flex-[1.2]">
-            {d.linked_okr_title && (
-              <div className="text-xs text-white/50 mb-1 flex items-center gap-1">
-                <span className="w-1.5 h-1.5 rounded-full bg-teal-400 inline-block" />
-                GOAL: {d.linked_okr_title}
-              </div>
-            )}
+            <GoalChip
+              betId={d.id}
+              linkedOkrId={d.linked_okr_id}
+              linkedOkrTitle={d.linked_okr_title}
+              canEdit={canWrite}
+            />
             <div className="flex items-start gap-2 min-h-[44px]">
               <span className="text-lg font-semibold leading-snug !text-white/70">{index}.</span>
               <InlineEdit
