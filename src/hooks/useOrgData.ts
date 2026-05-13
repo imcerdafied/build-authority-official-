@@ -135,13 +135,50 @@ export function useDecisions() {
     queryKey: ["decisions", currentOrg?.id],
     queryFn: async () => {
       if (!currentOrg) return [];
-      const { data, error } = await supabase
+      const baseColumns = "id, org_id, title, owner, sponsor, owner_user_id, surface, solution_domain, impact_tier, outcome_target, outcome_category_key, expected_impact, exposure_value, trigger_signal, revenue_at_risk, status, risk_level, created_at, updated_at, outcome_category, current_delta, segment_impact, decision_health, blocked_reason, blocked_dependency_owner, slice_deadline_days, slice_due_at, activated_at, created_by, shipped_slice_date, measured_outcome_result, capacity_allocated, capacity_diverted, unplanned_interrupts, escalation_count, previous_exposure_value, state_changed_at, state_change_note, pod_configuration, linked_okr_id";
+
+      // Try the embedded join first; if the FK isn't visible to PostgREST
+      // (e.g. schema cache stale, FK missing) fall back to a separate okrs
+      // fetch so bets still render. The goal title denormalization is best-effort.
+      let rows: Record<string, unknown>[] = [];
+      const joined = await supabase
         .from("decisions")
-        .select("id, org_id, title, owner, sponsor, owner_user_id, surface, solution_domain, impact_tier, outcome_target, outcome_category_key, expected_impact, exposure_value, trigger_signal, revenue_at_risk, status, risk_level, created_at, updated_at, outcome_category, current_delta, segment_impact, decision_health, blocked_reason, blocked_dependency_owner, slice_deadline_days, slice_due_at, activated_at, created_by, shipped_slice_date, measured_outcome_result, capacity_allocated, capacity_diverted, unplanned_interrupts, escalation_count, previous_exposure_value, state_changed_at, state_change_note, pod_configuration, linked_okr_id, okrs(id, title)")
+        .select(`${baseColumns}, okrs(id, title)`)
         .eq("org_id", currentOrg.id)
         .order("created_at", { ascending: false });
-      if (error) throw error;
-      const rows = (data || []) as Record<string, unknown>[];
+
+      if (joined.error) {
+        console.warn("decisions+okrs embedded join failed; falling back:", joined.error);
+        const plain = await supabase
+          .from("decisions")
+          .select(baseColumns)
+          .eq("org_id", currentOrg.id)
+          .order("created_at", { ascending: false });
+        if (plain.error) throw plain.error;
+        const baseRows = (plain.data || []) as Record<string, unknown>[];
+        const okrIds = Array.from(new Set(baseRows
+          .map((r) => r.linked_okr_id as string | null)
+          .filter((x): x is string => !!x)));
+        const okrTitleById = new Map<string, string>();
+        if (okrIds.length > 0) {
+          const okrFetch = await supabase
+            .from("okrs")
+            .select("id, title")
+            .in("id", okrIds);
+          if (!okrFetch.error) {
+            for (const o of okrFetch.data ?? []) {
+              okrTitleById.set(o.id as string, (o as any).title as string);
+            }
+          }
+        }
+        rows = baseRows.map((r) => {
+          const id = r.linked_okr_id as string | null;
+          return { ...r, okrs: id && okrTitleById.has(id) ? { id, title: okrTitleById.get(id) } : null };
+        });
+      } else {
+        rows = (joined.data || []) as Record<string, unknown>[];
+      }
+
       const computed = rows.map(computeDecisionFields);
       const statusOrder = { defined: 0, activated: 1, proving_value: 2, scaling: 3, durable: 4, closed: 5 };
       const tierOrder = { High: 3, Medium: 2, Low: 1 };
