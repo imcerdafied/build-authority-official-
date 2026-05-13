@@ -7,7 +7,8 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider, useAuth } from "@/contexts/AuthContext";
 import { OrgProvider, useOrg } from "@/contexts/OrgContext";
 import AppLayout from "@/components/AppLayout";
-import Decisions from "@/pages/Decisions";
+import Bets from "@/pages/Bets";
+import BetDetail from "@/pages/BetDetail";
 import Loops from "@/pages/Loops";
 import Review from "@/pages/Review";
 import HowItWorks from "@/pages/HowItWorks";
@@ -73,17 +74,20 @@ function AppContent() {
         <AuthGate>
           <AppLayout>
             <Routes>
-              {/* Redirect root and old home to the single remaining altitude */}
-              <Route path="/" element={<Navigate to="/decisions" replace />} />
-              <Route path="/home" element={<Navigate to="/decisions" replace />} />
+              {/* Redirect root and old home to the bets portfolio */}
+              <Route path="/" element={<Navigate to="/bets" replace />} />
+              <Route path="/home" element={<Navigate to="/bets" replace />} />
 
               {/* Goal detail kept as a deep-link target reachable from a bet's goal chip */}
               <Route path="/goals/:okrId" element={<OKRDetail />} />
-              <Route path="/goals" element={<Navigate to="/decisions" replace />} />
-              <Route path="/goals/review" element={<Navigate to="/decisions" replace />} />
+              <Route path="/goals" element={<Navigate to="/bets" replace />} />
+              <Route path="/goals/review" element={<Navigate to="/bets" replace />} />
 
               {/* Bets altitude */}
-              <Route path="/decisions" element={<Decisions />} />
+              <Route path="/bets" element={<Bets />} />
+              <Route path="/bets/:id" element={<BetDetail />} />
+              {/* Legacy URL preserved as a redirect */}
+              <Route path="/decisions" element={<Navigate to="/bets" replace />} />
               <Route path="/loops" element={<Loops />} />
               <Route path="/review" element={<Review />} />
               <Route path="/signals" element={<Signals />} />
@@ -93,11 +97,11 @@ function AppContent() {
               <Route path="/how-it-works" element={<HowItWorks />} />
 
               {/* Build altitude removed — redirect any deep links back to bets */}
-              <Route path="/build/*" element={<Navigate to="/decisions" replace />} />
+              <Route path="/build/*" element={<Navigate to="/bets" replace />} />
 
               {/* Utility routes */}
-              <Route path="/closed-bets" element={<Navigate to="/decisions" replace />} />
-              <Route path="/altitude" element={<Navigate to="/decisions" replace />} />
+              <Route path="/closed-bets" element={<Navigate to="/bets" replace />} />
+              <Route path="/altitude" element={<Navigate to="/bets" replace />} />
               <Route path="/team" element={<Team />} />
               <Route path="/feedback" element={<FeedbackAdmin />} />
               <Route path="/settings" element={<OrgSettings />} />

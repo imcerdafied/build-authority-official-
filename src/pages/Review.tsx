@@ -119,8 +119,9 @@ export default function Review() {
   return (
     <div className="max-w-4xl mx-auto space-y-8 px-4 md:px-0">
       <div>
-        <h1 className="text-xl font-bold">Weekly Review</h1>
-        <p className="text-sm text-muted-foreground mt-1">{getWeekRange()}</p>
+        <div className="eyebrow-mono mb-3">// REVIEW</div>
+        <h1 className="text-[40px] font-black text-foreground leading-none tracking-tight">Weekly Review</h1>
+        <p className="text-base text-gray-700 mt-2">{getWeekRange()}</p>
       </div>
 
       <div className="bg-muted/30 border rounded-lg p-4 md:p-5 mb-8">

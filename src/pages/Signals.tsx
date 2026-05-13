@@ -34,17 +34,20 @@ export default function Signals() {
 
   return (
     <div>
-      <div className="mb-6 flex items-center justify-between">
-        <div>
-          <h1 className="text-xl font-bold">Signal Intake</h1>
-          <p className="text-sm text-muted-foreground mt-1">{signals.length} signals · {unlinked.length} unlinked</p>
+      <div className="mb-8">
+        <div className="eyebrow-mono mb-3">// SIGNALS</div>
+        <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4">
+          <div>
+            <h1 className="text-[40px] font-black text-foreground leading-none tracking-tight">Signal Intake</h1>
+            <p className="text-base text-gray-700 mt-2">{signals.length} signals · {unlinked.length} unlinked</p>
+          </div>
+          {canWrite && !showCreate && (
+            <button onClick={() => setShowCreate(true)}
+              className="font-mono text-sm uppercase tracking-[0.05em] border border-foreground text-foreground px-3 py-2 hover:opacity-[0.85] transition-opacity">
+              + Register Signal
+            </button>
+          )}
         </div>
-        {canWrite && !showCreate && (
-          <button onClick={() => setShowCreate(true)}
-            className="text-sm font-semibold text-foreground border border-foreground px-3 py-1.5 rounded-sm hover:bg-foreground hover:text-background transition-colors">
-            + Register Signal
-          </button>
-        )}
       </div>
 
       {showCreate && <CreateSignalForm onClose={() => setShowCreate(false)} />}

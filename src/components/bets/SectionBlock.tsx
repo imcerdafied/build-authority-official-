@@ -23,14 +23,14 @@ export default function SectionBlock({
       {collapsible ? (
         <button
           onClick={() => setOpen(!open)}
-          className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors"
+          className="flex items-center gap-1.5 eyebrow-mono hover:text-foreground transition-colors"
         >
           <span className="text-xs">{open ? "\u25BC" : "\u25B6"}</span>
-          {label}
+          {`// ${label.toUpperCase()}`}
         </button>
       ) : (
-        <span className="text-xs text-muted-foreground block">
-          {label}
+        <span className="eyebrow-mono block">
+          {`// ${label.toUpperCase()}`}
         </span>
       )}
       {open && <div>{children}</div>}

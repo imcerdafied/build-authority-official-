@@ -28,7 +28,7 @@ const Sep = () => <span className="text-muted-foreground/30 mx-3 hidden md:inlin
 const subNavLinkClass = "text-sm text-muted-foreground hover:text-foreground transition-colors font-medium px-2 py-1";
 
 const SUB_NAV: { label: string; to: string }[] = [
-  { label: "Bets", to: "/decisions" },
+  { label: "Bets", to: "/bets" },
   { label: "Review", to: "/review" },
   { label: "Signals", to: "/signals" },
 ];
@@ -69,7 +69,7 @@ export default function AppLayout({ children }: { children: ReactNode }) {
         <div className="flex flex-col md:flex-row md:flex-wrap md:items-center md:justify-between">
           <div className="flex items-center justify-between w-full md:w-auto">
             <div className="flex flex-col">
-              <Link to="/decisions" className="flex items-center" onClick={closeMenu}>
+              <Link to="/bets" className="flex items-center" onClick={closeMenu}>
                 <img src="/logo.svg" alt="Authority" className="h-6 md:h-8 w-auto" />
               </Link>
               <div className="leading-tight mt-0.5">
@@ -187,7 +187,6 @@ export default function AppLayout({ children }: { children: ReactNode }) {
 
       <main className={cn("flex-1 overflow-auto transition-all duration-300", chatOpen && "md:mr-96")}>
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-8 w-full">
-          <div className="eyebrow-mono mb-4">// BETS</div>
           {children}
         </div>
       </main>

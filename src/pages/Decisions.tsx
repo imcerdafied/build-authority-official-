@@ -77,7 +77,7 @@ const fieldLabels: Record<string, string> = {
   risk_level: "Risk",
 };
 
-const BET_CATEGORY_OPTIONS = [
+export const BET_CATEGORY_OPTIONS = [
   { key: "growth_revenue_expansion", label: "Growth (Revenue Expansion)" },
   { key: "retention_renewal_defense", label: "Retention (Renewal Defense)" },
   { key: "efficiency_cost_capital", label: "Efficiency (Cost & Capital)" },
@@ -261,7 +261,7 @@ function InlineEdit({
   );
 }
 
-const categoryLabels: Record<string, string> = {
+export const categoryLabels: Record<string, string> = {
   growth_revenue_expansion: "Growth (Revenue Expansion)",
   retention_renewal_defense: "Retention (Renewal Defense)",
   efficiency_cost_capital: "Efficiency (Cost & Capital)",
@@ -304,7 +304,7 @@ function relativeTime(dateStr: string): string {
   return new Date(dateStr).toLocaleDateString("en-US", { month: "short", day: "numeric" });
 }
 
-function staleness(updatedAt: string): { days: number; label: string; code: string | null; dotClass: string; textClass: string; pulse: boolean; isAmber: boolean; isRed: boolean } {
+export function staleness(updatedAt: string): { days: number; label: string; code: string | null; dotClass: string; textClass: string; pulse: boolean; isAmber: boolean; isRed: boolean } {
   const days = Math.floor((Date.now() - new Date(updatedAt).getTime()) / (1000 * 60 * 60 * 24));
   if (days <= 3) return { days, label: `Updated ${days}d ago`, code: null, dotClass: "bg-signal-green", textClass: "text-signal-green", pulse: false, isAmber: false, isRed: false };
   if (days <= 7) return { days, label: `${days}d since update`, code: null, dotClass: "bg-signal-amber", textClass: "text-signal-amber", pulse: false, isAmber: true, isRed: false };
@@ -319,7 +319,7 @@ function nudgeMailto(betTitle: string, days: number, owner: string, exposure: st
   return `mailto:?subject=${subject}&body=${body}`;
 }
 
-function isDecisionOwner(decision: any, user: any): boolean {
+export function isDecisionOwner(decision: any, user: any): boolean {
   if (!user) return false;
   if (decision?.owner_user_id) return decision.owner_user_id === user.id;
   return false;
@@ -1023,7 +1023,7 @@ function OwnerAccountSelect({
   );
 }
 
-function BetCard({
+export function BetCard({
   d,
   index,
   canWrite,

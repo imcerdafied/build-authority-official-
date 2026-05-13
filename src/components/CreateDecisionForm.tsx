@@ -530,7 +530,7 @@ export default function CreateDecisionForm({ onClose, navigateAfter = false }: {
       toast.success(`Created ${created} bet${created === 1 ? "" : "s"}.`);
     }
     onClose();
-    if (navigateAfter) navigate("/decisions");
+    if (navigateAfter) navigate("/bets");
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -582,12 +582,12 @@ export default function CreateDecisionForm({ onClose, navigateAfter = false }: {
         description: "Complete required fields to activate.",
         action: {
           label: "View bet",
-          onClick: () => navigate("/decisions"),
+          onClick: () => navigate("/bets"),
         },
       });
       onClose();
       if (navigateAfter) {
-        navigate("/decisions");
+        navigate("/bets");
       }
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : String(err);
