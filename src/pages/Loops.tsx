@@ -164,7 +164,7 @@ export default function Loops() {
               note: "What's the loop for this bet's current push?"
             },
             {
-              bet: "Build Authority — system of record for organizational decisions",
+              bet: "Authority — system of record for organizational decisions",
               title: "Conviva case study and renewal prep",
               status: "Iterating",
               shipped: "Q2 strategy review delivered",

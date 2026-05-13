@@ -3,7 +3,6 @@ import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "@/contexts/AuthContext";
 import { useOrg } from "@/contexts/OrgContext";
-import logo from "@/assets/logo.png";
 import { cn } from "@/lib/utils";
 import ChatAdvisor from "@/components/ChatAdvisor";
 import FeedbackButton from "@/components/FeedbackButton";
@@ -94,13 +93,10 @@ export default function AppLayout({ children }: { children: ReactNode }) {
         <div className="flex flex-col md:flex-row md:flex-wrap md:items-center md:justify-between">
           <div className="flex items-center justify-between w-full md:w-auto">
             <div className="flex flex-col">
-              <Link to="/goals" className="flex items-center gap-2.5" onClick={closeMenu}>
-                <img src={logo} alt="Build Authority" className="w-8 h-8" />
-                <span className="text-sm font-bold tracking-widest uppercase leading-tight">
-                  BUILD AUTHORITY
-                </span>
+              <Link to="/goals" className="flex items-center" onClick={closeMenu}>
+                <img src="/logo.svg" alt="Authority" className="h-6 md:h-8 w-auto" />
               </Link>
-              <div className="leading-tight mt-0.5 pl-[34px]">
+              <div className="leading-tight mt-0.5">
                 <WorkspaceSwitcher onCreateWorkspace={() => setCreateWorkspaceOpen(true)} />
               </div>
             </div>
@@ -240,6 +236,7 @@ export default function AppLayout({ children }: { children: ReactNode }) {
 
       <main className={cn("flex-1 overflow-auto transition-all duration-300", chatOpen && "md:mr-96")}>
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-8 w-full">
+          <div className="eyebrow-mono mb-4">{`// ${currentAltitude.toUpperCase()}`}</div>
           {children}
         </div>
       </main>

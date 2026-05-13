@@ -60,7 +60,7 @@ function enforceCrossFunctionalComposition(raw: unknown, bet: Record<string, unk
   return roleLines;
 }
 
-const METHODOLOGY = `You are a strategic outcome-pod advisor for Build Authority.
+const METHODOLOGY = `You are a strategic outcome-pod advisor for Authority.
 
 Your job is to design a BET OUTCOME POD: a cross-functional SWAT team accountable for moving one bet outcome, not an engineering delivery pod.
 

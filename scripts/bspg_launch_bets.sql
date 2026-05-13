@@ -121,7 +121,7 @@ legacy_titles AS (
   SELECT title FROM (
     VALUES
       ('BSPG defines the AI-native builder category'),
-      ('Build Authority becomes the strategy execution OS for enterprises'),
+      ('Authority becomes the strategy execution OS for enterprises'),
       ('OutcomeOS becomes the executive decision layer for AI product companies'),
       ('BSPG becomes the premium alternative to McKinsey for builders')
   ) AS v(title)
@@ -156,17 +156,17 @@ seed_rows AS (
         '2 clients adopt Builder Pods and publish case studies showing faster product delivery vs traditional consulting'
       ),
       (
-        'Build Authority becomes the strategy execution OS for enterprise product organizations',
+        'Authority becomes the strategy execution OS for enterprise product organizations',
         'Michael Cerda',
         'BSPG Leadership',
         'Strategy Execution OS',
         'S1',
         'platform_adoption',
-        '3 organizations managing strategic bets inside Build Authority',
+        '3 organizations managing strategic bets inside Authority',
         '50+ weekly active users across executive and pod leadership roles',
         '$2M annual software licensing opportunity',
         '$1M expected platform revenue',
-        'Executives run weekly strategy reviews using Build Authority dashboards'
+        'Executives run weekly strategy reviews using Authority dashboards'
       ),
       (
         'Strike Crew proves elite small builder teams outperform traditional consulting',
@@ -208,17 +208,17 @@ seed_rows AS (
         'First 10 paid customers or enterprise pilot agreement'
       ),
       (
-        'Build Authority becomes the central system connecting strategy, execution, and outcomes',
+        'Authority becomes the central system connecting strategy, execution, and outcomes',
         'Michael Cerda',
         'BSPG Leadership',
         'Strategy Execution OS',
         'S1',
         'platform_adoption',
-        'Organizations run quarterly strategic planning directly inside Build Authority',
+        'Organizations run quarterly strategic planning directly inside Authority',
         'Leadership teams track bets, pod execution, and outcomes in a single platform',
         '$3M enterprise platform opportunity',
         '$1M expected licensing pipeline',
-        'Executive teams conduct quarterly planning cycles entirely within Build Authority'
+        'Executive teams conduct quarterly planning cycles entirely within Authority'
       )
   ) AS t(
     title,
@@ -327,10 +327,10 @@ LEFT JOIN cats c
 WHERE d.org_id IN (SELECT id FROM target_org)
   AND d.title IN (
     'BSPG defines the AI-native builder organization category',
-    'Build Authority becomes the strategy execution OS for enterprise product organizations',
+    'Authority becomes the strategy execution OS for enterprise product organizations',
     'Strike Crew proves elite small builder teams outperform traditional consulting',
     'BSPG becomes the premium alternative to McKinsey for product and platform strategy',
     'Launch one BSPG studio product into paid adoption',
-    'Build Authority becomes the central system connecting strategy, execution, and outcomes'
+    'Authority becomes the central system connecting strategy, execution, and outcomes'
   )
 ORDER BY d.created_at ASC;

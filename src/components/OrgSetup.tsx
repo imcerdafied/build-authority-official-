@@ -287,7 +287,7 @@ export default function OrgSetup() {
         {/* Header */}
         <div className="mb-6 text-center">
           <h1 className="text-sm font-bold tracking-widest uppercase text-foreground">
-            Build Authority
+            Authority
           </h1>
           <p className="text-xs text-muted-foreground mt-1">
             {stepLabels[step]}
@@ -359,7 +359,7 @@ export default function OrgSetup() {
 
                 <div>
                   <p className="text-xs uppercase tracking-widest text-muted-foreground mb-2 font-semibold">
-                    How Build Authority works
+                    How Authority works
                   </p>
                   <AltitudeIntro />
                 </div>

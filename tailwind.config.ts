@@ -14,7 +14,8 @@ export default {
     },
     extend: {
       fontFamily: {
-        sans: ["Space Grotesk", "system-ui", "sans-serif"],
+        sans: ["Inter", "system-ui", "sans-serif"],
+        mono: ["'IBM Plex Mono'", "ui-monospace", "SFMono-Regular", "Menlo", "monospace"],
       },
       colors: {
         border: "hsl(var(--border))",
@@ -22,6 +23,13 @@ export default {
         ring: "hsl(var(--ring))",
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
+        gray: {
+          900: "hsl(var(--gray-900))",
+          700: "hsl(var(--gray-700))",
+          500: "hsl(var(--gray-500))",
+          300: "hsl(var(--gray-300))",
+          100: "hsl(var(--gray-100))",
+        },
         primary: {
           DEFAULT: "hsl(var(--primary))",
           foreground: "hsl(var(--primary-foreground))",

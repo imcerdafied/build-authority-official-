@@ -134,7 +134,7 @@ export default function DomainJoinPrompt({ onFallback }: { onFallback: () => voi
       <div className="w-full max-w-md">
         <div className="mb-6 text-center">
           <h1 className="text-sm font-bold tracking-widest uppercase text-foreground">
-            Build Authority
+            Authority
           </h1>
           <p className="text-xs text-muted-foreground mt-1">Join your team</p>
         </div>
@@ -144,7 +144,7 @@ export default function DomainJoinPrompt({ onFallback }: { onFallback: () => voi
             <>
               <div>
                 <p className="text-sm text-foreground font-medium mb-1">
-                  {matchedOrg.name} is already on Build Authority.
+                  {matchedOrg.name} is already on Authority.
                 </p>
                 <p className="text-sm text-muted-foreground">
                   Your email ({user?.email}) matches this workspace's domain. Ask an

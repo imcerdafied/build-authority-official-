@@ -1,7 +1,7 @@
 export default function HowItWorks() {
   return (
     <div className="w-full md:max-w-2xl md:mx-auto space-y-8">
-      <h1 className="text-xl font-bold">How Build Authority Works</h1>
+      <h1 className="text-xl font-bold">How Authority Works</h1>
 
       <section>
         <h2 className="text-xs font-semibold text-muted-foreground mb-2">The Model</h2>
@@ -70,7 +70,7 @@ export default function HowItWorks() {
       <section>
         <h2 className="text-xs font-semibold text-muted-foreground mb-2">Know When Execution Drifts from Strategy</h2>
         <p className="text-sm leading-relaxed text-muted-foreground">
-          Build Authority watches for misalignment between what you said matters and what&apos;s actually getting built.
+          Authority watches for misalignment between what you said matters and what&apos;s actually getting built.
         </p>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mt-3 text-sm">
           <div className="border rounded-md p-3">
@@ -101,7 +101,7 @@ export default function HowItWorks() {
           <span>Adaptation</span>
         </div>
         <p className="text-sm leading-relaxed text-muted-foreground">
-          Build Authority connects the full cycle. You allocate capital to strategic bets. You declare what outcomes those bets must deliver. You define how to measure success. You add the initiatives that will get you there. The system ranks them, monitors progress, detects when things drift, and tells you exactly what moved and why.
+          Authority connects the full cycle. You allocate capital to strategic bets. You declare what outcomes those bets must deliver. You define how to measure success. You add the initiatives that will get you there. The system ranks them, monitors progress, detects when things drift, and tells you exactly what moved and why.
         </p>
         <p className="text-sm leading-relaxed text-muted-foreground mt-3">
           This isn&apos;t a dashboard — it&apos;s a continuously aligned operating layer.

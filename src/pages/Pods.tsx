@@ -92,7 +92,7 @@ export default function Pods() {
           {/* Ghost example pod */}
           {[
             { name: "Growth Pod", bets: "TransitionOS B2B launch", status: "In Slice", note: "Who owns the B2B push?" },
-            { name: "Platform Pod", bets: "Build Authority product", status: "Building", note: "Who owns the product?" },
+            { name: "Platform Pod", bets: "Authority product", status: "Building", note: "Who owns the product?" },
           ].map((ghost, i) => (
             <div
               key={i}

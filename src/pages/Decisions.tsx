@@ -303,15 +303,15 @@ function relativeTime(dateStr: string): string {
   return new Date(dateStr).toLocaleDateString("en-US", { month: "short", day: "numeric" });
 }
 
-function staleness(updatedAt: string): { days: number; label: string; dotClass: string; textClass: string; pulse: boolean; isAmber: boolean; isRed: boolean } {
+function staleness(updatedAt: string): { days: number; label: string; code: string | null; dotClass: string; textClass: string; pulse: boolean; isAmber: boolean; isRed: boolean } {
   const days = Math.floor((Date.now() - new Date(updatedAt).getTime()) / (1000 * 60 * 60 * 24));
-  if (days <= 3) return { days, label: `Updated ${days}d ago`, dotClass: "bg-signal-green", textClass: "text-signal-green", pulse: false, isAmber: false, isRed: false };
-  if (days <= 7) return { days, label: `${days}d since update`, dotClass: "bg-signal-amber", textClass: "text-signal-amber", pulse: false, isAmber: true, isRed: false };
-  return { days, label: `No movement in ${days}d`, dotClass: "bg-signal-red", textClass: "text-signal-red", pulse: true, isAmber: false, isRed: true };
+  if (days <= 3) return { days, label: `Updated ${days}d ago`, code: null, dotClass: "bg-signal-green", textClass: "text-signal-green", pulse: false, isAmber: false, isRed: false };
+  if (days <= 7) return { days, label: `${days}d since update`, code: null, dotClass: "bg-signal-amber", textClass: "text-signal-amber", pulse: false, isAmber: true, isRed: false };
+  return { days, label: `No movement in ${days} day${days === 1 ? "" : "s"}`, code: "ERR_NO_MOVEMENT", dotClass: "bg-signal-red", textClass: "text-signal-red", pulse: true, isAmber: false, isRed: true };
 }
 
 function nudgeMailto(betTitle: string, days: number, owner: string, exposure: string): string {
-  const subject = encodeURIComponent(`Build Authority — ${betTitle} needs attention`);
+  const subject = encodeURIComponent(`Authority — ${betTitle} needs attention`);
   const body = encodeURIComponent(
     `${betTitle} has had no movement in ${days} days.\nOwner: ${owner}\nExposure: ${exposure}\n\nPlease update your bet at https://buildauthorityos.com`
   );
@@ -1230,10 +1230,20 @@ function BetCard({
         </div>
 
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 pt-1">
-          <span className={cn("text-xs flex items-center gap-1.5", stale.textClass, stale.pulse && "font-semibold")}>
-            <span className={cn("w-1.5 h-1.5 rounded-full inline-block", stale.dotClass, stale.pulse && "animate-pulse")} />
-            {stale.label}
-          </span>
+          {stale.code ? (
+            <span className="flex items-center gap-2">
+              <span className={cn("w-1.5 h-1.5 rounded-full inline-block shrink-0", stale.dotClass, stale.pulse && "animate-pulse")} />
+              <span className="flex flex-col leading-tight">
+                <span className="err-code">{stale.code}</span>
+                <span className="text-sm text-gray-700">{stale.label}</span>
+              </span>
+            </span>
+          ) : (
+            <span className={cn("text-xs flex items-center gap-1.5", stale.textClass, stale.pulse && "font-semibold")}>
+              <span className={cn("w-1.5 h-1.5 rounded-full inline-block", stale.dotClass, stale.pulse && "animate-pulse")} />
+              {stale.label}
+            </span>
+          )}
           {!canUpdateStatus && (
             <p className="text-xs text-muted-foreground sm:text-right">Only assigned owner or admin can update lifecycle.</p>
           )}

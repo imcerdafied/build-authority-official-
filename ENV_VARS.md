@@ -1,4 +1,4 @@
-# Build Authority — Required Environment Variables
+# Authority — Required Environment Variables
 
 ## Frontend (Vite)
 

@@ -3,7 +3,7 @@ import { useOrg } from "@/contexts/OrgContext";
 import { supabase } from "@/integrations/supabase/client";
 
 const WELCOME_MESSAGE =
-  "I'm the Build Authority Agent. I have full context on your 5 active bets — their exposure, activity, and interruptions. Ask me anything: which bet is most at risk, what a field means, why the constraint exists, or what a stale bet costs you.";
+  "I'm the Authority Agent. I have full context on your 5 active bets — their exposure, activity, and interruptions. Ask me anything: which bet is most at risk, what a field means, why the constraint exists, or what a stale bet costs you.";
 
 export default function ChatAdvisor({ chatOpen, setChatOpen }: { chatOpen: boolean; setChatOpen: (open: boolean) => void }) {
   const { currentOrg } = useOrg();
@@ -85,7 +85,7 @@ export default function ChatAdvisor({ chatOpen, setChatOpen }: { chatOpen: boole
         <div className="px-4 py-3 border-b flex-shrink-0 flex flex-col">
           <div className="flex items-start justify-between gap-2">
             <div className="flex-1 min-w-0">
-              <h2 className="text-sm font-semibold">Build Authority Agent</h2>
+              <h2 className="text-sm font-semibold">Authority Agent</h2>
               <p className="text-xs text-muted-foreground mt-0.5">
                 Ask about your bets, the program, or tradeoffs
               </p>

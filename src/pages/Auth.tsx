@@ -73,7 +73,7 @@ export default function Auth({ skipInviteCode }: AuthProps = {}) {
       <div className="w-full max-w-sm mx-auto px-4">
         <div className="mb-8 text-center">
           <h1 className="text-sm font-bold tracking-widest uppercase text-foreground">
-            Build Authority
+            Authority
           </h1>
           <p className="text-xs text-muted-foreground mt-1">
             Operating Layer

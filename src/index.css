@@ -1,7 +1,4 @@
-@import url('@fontsource/space-grotesk/400.css');
-@import url('@fontsource/space-grotesk/500.css');
-@import url('@fontsource/space-grotesk/600.css');
-@import url('@fontsource/space-grotesk/700.css');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800;900&family=IBM+Plex+Mono:wght@400;500&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -9,54 +6,62 @@
 
 @layer base {
   :root {
+    /* BSPG corporate palette — see public/logo.svg for the purple block */
     --background: 0 0% 100%;
-    --foreground: 220 20% 10%;
+    --foreground: 0 0% 4%;
 
     --card: 0 0% 100%;
-    --card-foreground: 220 20% 10%;
+    --card-foreground: 0 0% 4%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 220 20% 10%;
+    --popover-foreground: 0 0% 4%;
 
-    --primary: 220 20% 10%;
+    --primary: 0 0% 4%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 220 10% 96%;
-    --secondary-foreground: 220 20% 10%;
+    --secondary: 60 6% 96%;
+    --secondary-foreground: 0 0% 4%;
 
-    --muted: 220 10% 96%;
-    --muted-foreground: 220 10% 38%;
+    --muted: 0 0% 94%;
+    --muted-foreground: 0 0% 45%;
 
-    --accent: 220 10% 93%;
-    --accent-foreground: 220 20% 10%;
+    --accent: 249 60% 58%;
+    --accent-foreground: 0 0% 100%;
 
     --destructive: 0 72% 51%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 220 10% 90%;
-    --input: 220 10% 90%;
-    --ring: 220 20% 10%;
+    --border: 0 0% 83%;
+    --input: 0 0% 83%;
+    --ring: 249 60% 58%;
 
-    --radius: 0.375rem;
+    --radius: 0.5rem;
 
-    /* Authority-specific tokens */
-    --signal-amber: 38 92% 50%;
-    --signal-amber-foreground: 38 92% 12%;
+    /* BSPG grays as standalone tokens for direct use */
+    --gray-900: 0 0% 10%;
+    --gray-700: 0 0% 25%;
+    --gray-500: 0 0% 45%;
+    --gray-300: 0 0% 83%;
+    --gray-100: 0 0% 94%;
+
+    /* Authority-specific signal tokens */
+    --signal-amber: 32 95% 44%;
+    --signal-amber-foreground: 0 0% 100%;
     --signal-red: 0 72% 51%;
     --signal-red-foreground: 0 0% 100%;
-    --signal-green: 152 60% 40%;
+    --signal-green: 142 76% 36%;
     --signal-green-foreground: 0 0% 100%;
-    --surface-elevated: 220 10% 98%;
+    --surface-elevated: 60 6% 96%;
 
-    --sidebar-background: 220 20% 10%;
-    --sidebar-foreground: 220 10% 80%;
+    --sidebar-background: 0 0% 4%;
+    --sidebar-foreground: 0 0% 83%;
     --sidebar-primary: 0 0% 100%;
-    --sidebar-primary-foreground: 220 20% 10%;
-    --sidebar-accent: 220 15% 18%;
+    --sidebar-primary-foreground: 0 0% 4%;
+    --sidebar-accent: 0 0% 10%;
     --sidebar-accent-foreground: 0 0% 100%;
-    --sidebar-border: 220 15% 20%;
+    --sidebar-border: 0 0% 16%;
     --sidebar-ring: 0 0% 100%;
-    --sidebar-muted: 220 10% 46%;
+    --sidebar-muted: 0 0% 45%;
   }
 }
 
@@ -82,6 +87,16 @@
   }
   .label-upper {
     @apply text-[11px] font-semibold uppercase tracking-widest text-muted-foreground;
+  }
+
+  /* Monospace eyebrow used on dashboard section headers — e.g. "// BETS" */
+  .eyebrow-mono {
+    @apply font-mono text-xs uppercase tracking-widest text-gray-500;
+  }
+
+  /* Error-code style label for risk states — e.g. "ERR_NO_MOVEMENT" */
+  .err-code {
+    @apply font-mono text-xs text-signal-red;
   }
 
   .text-mono {

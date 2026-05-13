@@ -132,7 +132,7 @@ serve(async (req) => {
     <tbody>${betRows}</tbody>
   </table>
   <a href="https://buildauthorityos.com/decisions" style="display:inline-block;background:#1a1a1a;color:#fff;text-decoration:none;padding:10px 20px;border-radius:4px;font-size:13px;font-weight:500;margin-top:8px;">Review Your Bets</a>
-  <p style="color:#999;font-size:12px;margin-top:24px;">\u2014 Build Authority</p>
+  <p style="color:#999;font-size:12px;margin-top:24px;">\u2014 Authority</p>
 </body>
 </html>`;
 
@@ -144,7 +144,7 @@ serve(async (req) => {
             Authorization: `Bearer ${resendApiKey}`,
           },
           body: JSON.stringify({
-            from: "Build Authority <noreply@buildauthorityos.com>",
+            from: "Authority <noreply@buildauthorityos.com>",
             to: [profile.email],
             subject: `Weekly Bet Reminder \u2014 ${ownerBets.length} active bet${ownerBets.length > 1 ? "s" : ""}`,
             html,
