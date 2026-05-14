@@ -30,7 +30,6 @@ const subNavLinkClass = "text-sm text-muted-foreground hover:text-foreground tra
 const SUB_NAV: { label: string; to: string }[] = [
   { label: "Bets", to: "/bets" },
   { label: "Review", to: "/review" },
-  { label: "Signals", to: "/signals" },
 ];
 
 export default function AppLayout({ children }: { children: ReactNode }) {

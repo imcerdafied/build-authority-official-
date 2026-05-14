@@ -163,7 +163,7 @@ export default function BetDetail() {
       action: canWrite ? (
         <button
           onClick={() => setGoalPickerOpen(true)}
-          className="text-xs font-mono uppercase tracking-[0.05em] text-foreground hover:opacity-[0.85] transition-opacity"
+          className="text-sm font-medium text-foreground hover:underline transition-colors"
         >
           Assign goal →
         </button>
@@ -177,7 +177,7 @@ export default function BetDetail() {
       action: (
         <a
           href={nudgeMailto(decision.title ?? "Untitled", move.days, decision.owner ?? "")}
-          className="text-xs font-mono uppercase tracking-[0.05em] text-foreground hover:opacity-[0.85] transition-opacity"
+          className="text-sm font-medium text-foreground hover:underline transition-colors"
         >
           Nudge owner →
         </a>
@@ -193,7 +193,7 @@ export default function BetDetail() {
       {/* Back link — subtle, page-edge aligned */}
       <Link
         to="/bets"
-        className="text-xs font-mono uppercase tracking-[0.05em] text-muted-foreground hover:text-foreground transition-colors inline-flex items-center gap-1 mb-8"
+        className="text-sm text-muted-foreground hover:text-foreground transition-colors inline-flex items-center gap-1 mb-8"
       >
         ← All bets
       </Link>
@@ -408,7 +408,7 @@ export default function BetDetail() {
       )}
 
       {/* Sections */}
-      <Section label="TRIGGER SIGNAL">
+      <Section label="Trigger Signal">
         <InlineEdit
           value={decision.trigger_signal ?? ""}
           field="trigger_signal"
@@ -422,7 +422,7 @@ export default function BetDetail() {
         />
       </Section>
 
-      <Section label="OUTCOME TARGET">
+      <Section label="Outcome Target">
         <InlineEdit
           value={decision.outcome_target ?? ""}
           field="outcome_target"
@@ -436,7 +436,7 @@ export default function BetDetail() {
         />
       </Section>
 
-      <Section label="EXPECTED IMPACT">
+      <Section label="Expected Impact">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-8">
           <div>
             <p className="text-sm font-semibold text-green-700 mb-2">Upside</p>
@@ -483,16 +483,16 @@ export default function BetDetail() {
         </div>
       </Section>
 
-      <Section label="OUTCOME METRICS">
+      <Section label="Outcome Metrics">
         <MetricsSidebar betId={decision.id} canWrite={canWrite} />
       </Section>
 
-      <Section label="WHAT MOVED">
+      <Section label="What Moved">
         <DriftIndicators betId={decision.id} />
         <ScoreHistory betId={decision.id} />
       </Section>
 
-      <Section label="ACTIVITY">
+      <Section label="Activity">
         <ActivityFeed decisionId={decision.id} />
       </Section>
 
@@ -552,7 +552,7 @@ export default function BetDetail() {
 function MetaItem({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div className="flex flex-col">
-      <span className="font-mono text-[10px] uppercase tracking-[0.08em] text-muted-foreground mb-1">
+      <span className="text-xs font-medium text-muted-foreground mb-1">
         {label}
       </span>
       <div>{children}</div>
@@ -563,9 +563,9 @@ function MetaItem({ label, children }: { label: string; children: React.ReactNod
 function Section({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <section className="border-t border-gray-300 pt-8 mt-12" style={{ borderTopWidth: "0.5px" }}>
-      <p className="font-mono text-[11px] uppercase tracking-[0.08em] text-muted-foreground mb-4">
-        {`// ${label}`}
-      </p>
+      <h2 className="text-lg font-semibold text-foreground tracking-tight mb-4">
+        {label}
+      </h2>
       {children}
     </section>
   );
@@ -583,8 +583,8 @@ function ActivityFeed({ decisionId }: { decisionId: string }) {
     <ul className="space-y-3">
       {activity.map((entry: any) => (
         <li key={entry.id} className="grid grid-cols-[auto_1fr_auto] gap-4 items-baseline">
-          <span className="font-mono text-[11px] uppercase tracking-[0.08em] text-muted-foreground">
-            {entry.field_name}
+          <span className="text-xs font-medium text-muted-foreground capitalize">
+            {String(entry.field_name).replace(/_/g, " ")}
           </span>
           <span className="text-sm text-foreground truncate">
             {entry.old_value ? <span className="text-muted-foreground line-through">{entry.old_value}</span> : <span className="text-muted-foreground italic">empty</span>}
