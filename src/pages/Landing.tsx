@@ -1,17 +1,18 @@
+import { Fragment } from "react";
 import { Link } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
 
-// Mailto CTA inbox — swap this single constant to redirect inquiries.
+// Mailto CTA inbox. Swap this single constant to redirect inquiries.
 const CONTACT_EMAIL = "mc@bspg.build";
-const CONTACT_SUBJECT = "Authority — interested in an engagement";
+const CONTACT_SUBJECT = "Authority: interested in an engagement";
 const CONTACT_HREF = `mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(CONTACT_SUBJECT)}`;
 
-// === Nav ===
+// === Nav — full-width, logo at left edge, pill at right edge ===
 function LandingNav() {
   return (
     <nav
       aria-label="Primary"
-      className="max-w-6xl mx-auto px-6 py-6 flex items-center justify-between"
+      className="px-6 md:px-10 py-6 flex items-center justify-between"
     >
       <Link to="/" aria-label="Authority home" className="leading-none">
         <img src="/logo.svg" alt="Authority" className="h-7 w-auto" />
@@ -36,7 +37,7 @@ function LandingNav() {
         to="/auth"
         className="inline-flex items-center rounded-[2px] bg-foreground px-5 py-2 text-sm font-medium text-background hover:bg-foreground/90 transition-colors"
       >
-        Sign in
+        Client Login
       </Link>
     </nav>
   );
@@ -76,69 +77,60 @@ function Hero() {
         </div>
         <div className="mt-3 grid w-full max-w-3xl grid-cols-1 gap-2 text-xs text-muted-foreground md:grid-cols-2">
           <p>Bundled with every BSPG embedded team engagement.</p>
-          <p>Sample bet, the full loop, and what we mean by drift — below.</p>
+          <p>Sample bet, the loop, and what we mean by drift below.</p>
         </div>
       </div>
 
-      <DemoCard />
+      <FlowDiagram />
 
       <p className="mt-6 text-center text-xs text-muted-foreground max-w-2xl mx-auto px-4">
-        Every bet carries its owner, its outcome, its upside, its risk, and a live signal for whether it's actually moving.
+        Every bet carries its owner, its outcome, its upside, its risk, and a live signal for
+        whether it&apos;s actually moving.
       </p>
     </section>
   );
 }
 
-// === Hero demo ===
-function DemoCard() {
-  const decisionIn = `Should we go after platform pricing? Sales is asking. Engineering says 6 months. The board wants a Q3 story. Two enterprise customers just churned on per-seat. Notes are scattered across three docs and a Slack thread. Nobody owns it yet.`;
-
-  const recordOut = `# BET — Platform pricing expansion
-# Owner: [Name]
-# Sponsor: [Name]
-# Lifecycle: Defined
-# Outcome target:
-#   Move top-50 enterprise accounts to platform
-#   pricing by Q4 to defend the renewal base.
-# Upside: $12M+ expansion ARR
-# Risk:   $20–30M ARR over 24 months
-# Trigger: 2+ stalled renewals on per-seat`;
+// === Flow diagram replaces the messy-text demo ===
+function FlowDiagram() {
+  const nodes = [
+    { label: "GOALS", body: "What success means this year." },
+    { label: "STRATEGY", body: "How we get there given constraints." },
+    { label: "BETS", body: "Where leadership places its chips." },
+    { label: "OWNERSHIP", body: "Who is accountable for each one." },
+    { label: "KPIs", body: "How we know it is working." },
+  ];
 
   return (
-    <div
-      id="demo"
-      className="mt-16 mx-auto w-full max-w-[600px] bg-card border border-border rounded-[2px] p-4 md:p-6"
-      style={{ borderWidth: "0.5px" }}
-    >
-      <div className="flex flex-col sm:flex-row items-stretch gap-4 sm:gap-3">
-        {/* Decision In */}
-        <div className="flex-1 bg-muted rounded-lg p-5">
-          <p className="text-[11px] font-mono uppercase tracking-[0.08em] text-muted-foreground mb-3">
-            Decision in
-          </p>
-          <p className="text-sm text-foreground leading-relaxed">{decisionIn}</p>
-        </div>
-
-        {/* Arrow */}
-        <div className="flex items-center justify-center text-accent sm:px-1" aria-hidden="true">
-          <ArrowRight className="h-5 w-5 rotate-90 sm:rotate-0" />
-        </div>
-
-        {/* Durable Record Out */}
-        <div className="flex-1 bg-foreground rounded-lg p-5">
-          <p className="text-[11px] font-mono uppercase tracking-[0.08em] text-accent mb-3">
-            Durable record out
-          </p>
-          <pre className="font-mono text-[12px] leading-relaxed text-background/90 whitespace-pre-wrap break-words">
-            {recordOut}
-          </pre>
-        </div>
+    <div id="how-it-works" className="mt-16 mx-auto w-full max-w-5xl">
+      <div className="flex flex-col md:flex-row items-stretch md:items-stretch gap-3 md:gap-2">
+        {nodes.map((n, i) => (
+          <Fragment key={n.label}>
+            <div
+              className="flex-1 bg-card border border-border rounded-[2px] p-4 md:p-5 text-center"
+              style={{ borderWidth: "0.5px" }}
+            >
+              <p className="font-mono text-[11px] uppercase tracking-[0.08em] text-accent mb-2">
+                {n.label}
+              </p>
+              <p className="text-xs text-muted-foreground leading-relaxed">{n.body}</p>
+            </div>
+            {i < nodes.length - 1 && (
+              <div
+                className="flex items-center justify-center text-accent shrink-0"
+                aria-hidden="true"
+              >
+                <ArrowRight className="h-5 w-5 rotate-90 md:rotate-0" />
+              </div>
+            )}
+          </Fragment>
+        ))}
       </div>
     </div>
   );
 }
 
-// === Section helpers ===
+// === Section primitives ===
 function Section({
   id,
   variant = "default",
@@ -165,20 +157,25 @@ function SectionHeading({ children }: { children: React.ReactNode }) {
   );
 }
 
-// === The Drift ===
-const ERRORS = [
-  ["ERR_BET_DRIFT", "Strategic bets exist in decks but never show up in the work."],
-  ["ERR_NO_OWNERSHIP", "Decisions made in rooms nobody can point back to."],
-  ["ERR_VANITY_TRACKING", "Dashboards show activity, not whether the bet is moving."],
-  ["ERR_QUIET_KILL", "Bets die without explicit retirement. The org just stops talking about them."],
-] as const;
-
-const RESOLVED = [
-  ["01", "A durable, named record of every strategic bet."],
-  ["02", "Explicit owner and sponsor on every bet."],
-  ["03", "Lifecycle tracking with outcome targets and movement signals."],
-  ["04", "Explicit retirement, naming wins and losses."],
-] as const;
+// === Drift — single 2-column comparison, no code labels ===
+const COMPARISONS: Array<{ without: string; with: string }> = [
+  {
+    without: "Strategic bets exist in decks but never show up in the work.",
+    with: "A durable, named record of every strategic bet.",
+  },
+  {
+    without: "Decisions made in rooms nobody can point back to.",
+    with: "Explicit owner and sponsor on every bet.",
+  },
+  {
+    without: "Dashboards show activity, not whether the bet is moving.",
+    with: "Lifecycle tracking with outcome targets and movement signals.",
+  },
+  {
+    without: "Bets die without explicit retirement. The org just stops talking about them.",
+    with: "Explicit retirement that names wins and losses.",
+  },
+];
 
 function Drift() {
   return (
@@ -194,154 +191,59 @@ function Drift() {
       <div className="mt-12 grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-6">
         <div>
           <p className="text-[11px] font-mono uppercase tracking-[0.08em] text-muted-foreground mb-4">
-            Errors
+            Without Authority
           </p>
-          <div className="space-y-4">
-            {ERRORS.map(([code, desc]) => (
-              <div key={code} className="grid grid-cols-[auto_1fr] gap-4">
-                <span className="font-mono text-xs text-signal-red shrink-0 pt-0.5">{code}</span>
-                <span className="text-sm text-foreground leading-snug">{desc}</span>
-              </div>
+          <ul className="space-y-3 text-sm text-foreground leading-snug">
+            {COMPARISONS.map((c) => (
+              <li key={c.without} className="flex gap-3">
+                <span className="text-muted-foreground shrink-0">·</span>
+                <span>{c.without}</span>
+              </li>
             ))}
-          </div>
+          </ul>
         </div>
         <div>
           <p className="text-[11px] font-mono uppercase tracking-[0.08em] text-muted-foreground mb-4">
-            Resolved
+            With Authority
           </p>
-          <div className="space-y-4">
-            {RESOLVED.map(([n, desc]) => (
-              <div key={n} className="grid grid-cols-[auto_1fr] gap-4">
-                <span className="font-mono text-xs text-muted-foreground shrink-0 pt-0.5">{n}</span>
-                <span className="text-sm text-foreground leading-snug">{desc}</span>
-              </div>
+          <ul className="space-y-3 text-sm text-foreground leading-snug">
+            {COMPARISONS.map((c) => (
+              <li key={c.with} className="flex gap-3">
+                <span className="text-accent shrink-0">·</span>
+                <span>{c.with}</span>
+              </li>
             ))}
-          </div>
+          </ul>
         </div>
       </div>
     </Section>
   );
 }
 
-// === How It Works (the loop) ===
-const LOOP_STEPS = [
-  { call: "place_bets()", body: "Leadership names the 5–7 bets that matter this cycle. Each one gets a slot." },
-  { call: "frame_outcomes()", body: "Each bet gets a target, an owner, a sponsor, an upside, a risk." },
-  { call: "track_movement()", body: "Movement is logged. Stalls flag automatically. Decisions stay attached." },
-  { call: "close_loop()", body: "Bets retire with evidence. Wins and losses are named, not absorbed." },
-];
-
-function HowItWorks() {
-  return (
-    <Section id="how-it-works">
-      <SectionHeading>
-        Bets travel a loop, not a slide<span className="text-accent">.</span>
-      </SectionHeading>
-      <p className="mt-6 text-base text-muted-foreground leading-relaxed max-w-3xl">
-        Authority is the surface that closes the loop between leadership intent and execution
-        evidence. Each strategic bet moves through four steps — auditable, owned, named.
-      </p>
-
-      <div className="mt-12 grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-8">
-        {LOOP_STEPS.map((step) => (
-          <div key={step.call} className="grid grid-cols-[auto_1fr] gap-4">
-            <span className="font-mono text-sm text-accent shrink-0 pt-0.5">{step.call}</span>
-            <span className="text-base text-foreground leading-relaxed">{step.body}</span>
-          </div>
-        ))}
-      </div>
-    </Section>
-  );
-}
-
-// === What Authority Is ===
-const TENETS = [
-  {
-    n: "01",
-    title: "Decision log",
-    body:
-      "Every strategic bet gets a single, durable record. Title, owner, sponsor, category, outcome target, upside and risk exposure. Visible to leadership. Editable by the owner.",
-  },
-  {
-    n: "02",
-    title: "Lifecycle states",
-    body:
-      "Defined → Activated → Shipping → Closed → Retired. State transitions are timestamped and named. No bet quietly disappears.",
-  },
-  {
-    n: "03",
-    title: "Outcome anchoring",
-    body:
-      "Every bet has a measurable outcome target. Upside and risk are quantified in ARR, conversion, retention, or cost. Judged against the outcome, not against activity.",
-  },
-  {
-    n: "04",
-    title: "Movement tracking",
-    body:
-      "Authority watches whether each bet is actually moving. Stalls trigger nudges. Decisions and changes are logged. Leadership has live visibility into what's working.",
-  },
-];
-
-function WhatAuthorityIs() {
-  return (
-    <Section variant="card">
-      <SectionHeading>
-        Four properties that hold the system up<span className="text-accent">.</span>
-      </SectionHeading>
-
-      <div className="mt-12 grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-10">
-        {TENETS.map((t) => (
-          <div key={t.n}>
-            <div className="font-mono text-[11px] uppercase tracking-[0.08em] text-muted-foreground mb-2">
-              {t.n}
-            </div>
-            <h3 className="text-lg font-semibold text-foreground mb-2">{t.title}</h3>
-            <p className="text-sm text-muted-foreground leading-relaxed">{t.body}</p>
-          </div>
-        ))}
-      </div>
-    </Section>
-  );
-}
-
-// === Engagement ===
-function Engagement() {
+// === License to build — single column prose ===
+function LicenseToBuild() {
   return (
     <Section id="engagement">
       <SectionHeading>
-        Authority is the OS. BSPG is the operator<span className="text-accent">.</span>
+        Authority is the license to build<span className="text-accent">.</span>
       </SectionHeading>
-      <p className="mt-6 text-base text-muted-foreground leading-relaxed max-w-3xl">
-        Authority is not a SaaS subscription. It is the operating system that runs underneath every
-        BSPG embedded team engagement. We bring the software. We bring the operators. We make the
-        rigor real.
-      </p>
-
-      <div className="mt-12 grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-6">
-        <div>
-          <p className="text-[11px] font-mono uppercase tracking-[0.08em] text-muted-foreground mb-2">
-            Tools track
-          </p>
-          <p className="text-sm text-foreground leading-relaxed">
-            Traditional planning tools give your team a place to write strategic intent down. They do
-            not make intent durable. They do not surface drift. They do not connect to the work that ships.
-          </p>
-        </div>
-        <div>
-          <p className="text-[11px] font-mono uppercase tracking-[0.08em] text-muted-foreground mb-2">
-            We embed
-          </p>
-          <p className="text-sm text-foreground leading-relaxed">
-            Authority is the system of record. The BSPG embedded team is the operator that makes it
-            run. Bundled with every engagement — not licensed or sold standalone.
-          </p>
-        </div>
+      <div className="mt-6 max-w-3xl space-y-4 text-base text-muted-foreground leading-relaxed">
+        <p>
+          Strategy without rigor is theater. Authority gives every strategic bet a durable record,
+          an explicit owner, and a measurable outcome. When the record is real, the work that
+          follows is sanctioned.
+        </p>
+        <p>
+          Authority is not a SaaS subscription. It is the operating system that runs underneath
+          every BSPG embedded team engagement. We bring the software. We bring the operators. We
+          make the rigor real.
+        </p>
       </div>
     </Section>
   );
 }
 
-// === Sample Bet ===
+// === Sample bet ===
 function SampleBet() {
   return (
     <Section variant="card">
@@ -349,42 +251,57 @@ function SampleBet() {
         A bet, recorded<span className="text-accent">.</span>
       </SectionHeading>
       <p className="mt-6 text-base text-muted-foreground leading-relaxed max-w-3xl">
-        Every strategic bet lives as a single durable record. Here is what one looks like in Authority.
+        Every strategic bet lives as a single durable record. Here is what one looks like in
+        Authority.
       </p>
 
-      <div className="mt-12 rounded-[2px] overflow-hidden border border-border bg-background" style={{ borderWidth: "0.5px" }}>
-        {/* Dark header bar */}
+      <div
+        className="mt-12 rounded-[2px] overflow-hidden border border-border bg-background"
+        style={{ borderWidth: "0.5px" }}
+      >
         <div className="bg-foreground text-background px-6 py-5">
           <div className="text-xs text-background/50 mb-2 flex items-center gap-2">
             <span className="w-1.5 h-1.5 rounded-full bg-accent inline-block" />
-            GOAL: Defend the enterprise renewal base in 2026
+            GOAL: Defend Acme&apos;s enterprise renewal base in 2026
           </div>
           <p className="text-lg md:text-xl font-semibold leading-snug mb-4">
             1. Move top-50 enterprise accounts from per-seat to platform pricing.
           </p>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-sm">
             <Meta label="Category" value="Growth (Revenue Defense)" />
-            <Meta label="Owner" value="[Name]" />
-            <Meta label="Sponsor" value="[Name]" />
+            <Meta label="Owner" value="Peter Will" />
+            <Meta label="Sponsor" value="Bob Bitzchen" />
             <Meta label="Lifecycle" value={<Pill>Defined</Pill>} />
           </div>
         </div>
-        {/* Light body */}
         <div className="p-6 md:p-8 space-y-6">
           <div>
             <p className="font-mono text-[11px] uppercase tracking-[0.08em] text-muted-foreground mb-2">
               Outcome target
             </p>
-            <div className="rounded-[2px] border border-border bg-muted p-4" style={{ borderWidth: "0.5px" }}>
+            <div
+              className="rounded-[2px] border border-border bg-muted p-4"
+              style={{ borderWidth: "0.5px" }}
+            >
               <p className="text-sm leading-relaxed">
-                Move 50 of the top-50 enterprise accounts to platform pricing by end of Q4 2026 to
-                defend ~$74M in renewal-at-risk ARR.
+                Move 12 of the top 50 enterprise accounts to platform value and pricing by end of
+                Q4 &apos;26 to defend $350M in renewal-at-risk ARR.
               </p>
             </div>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <ExposurePanel tone="upside" label="Upside" value="$12M+ ARR" body="Platform pricing unlocks expansion across the top-50 over 24 months." />
-            <ExposurePanel tone="risk" label="Risk" value="$20–30M ARR" body="Renewal exposure if customers continue to price-anchor on per-seat math." />
+            <ExposurePanel
+              tone="upside"
+              label="Upside"
+              value="$65M+ ARR"
+              body="Platform value and pricing unlocks expansion across the top 50 over 24 months."
+            />
+            <ExposurePanel
+              tone="risk"
+              label="Risk"
+              value="$80M ARR"
+              body="Renewal exposure if customers continue to price-anchor on per-seat math."
+            />
           </div>
         </div>
       </div>
@@ -395,7 +312,9 @@ function SampleBet() {
 function Meta({ label, value }: { label: string; value: React.ReactNode }) {
   return (
     <div>
-      <p className="font-mono text-[10px] uppercase tracking-[0.08em] text-background/40 mb-1">{label}</p>
+      <p className="font-mono text-[10px] uppercase tracking-[0.08em] text-background/40 mb-1">
+        {label}
+      </p>
       <div className="text-background/90">{value}</div>
     </div>
   );
@@ -427,7 +346,9 @@ function ExposurePanel({
       : { bg: "bg-red-50", border: "border-red-200", text: "text-red-800", eyebrow: "text-red-700" };
   return (
     <div className={`rounded-[2px] ${colors.bg} ${colors.border} border p-4`} style={{ borderWidth: "0.5px" }}>
-      <p className={`font-mono text-[10px] uppercase tracking-[0.08em] ${colors.eyebrow} mb-1`}>{label}</p>
+      <p className={`font-mono text-[10px] uppercase tracking-[0.08em] ${colors.eyebrow} mb-1`}>
+        {label}
+      </p>
       <p className={`text-base font-semibold ${colors.text} leading-tight mb-1`}>{value}</p>
       <p className={`text-xs ${colors.text}/80 leading-relaxed`}>{body}</p>
     </div>
@@ -467,7 +388,7 @@ function FinalCta() {
 function Footer() {
   return (
     <footer className="border-t border-border bg-card" style={{ borderTopWidth: "0.5px" }}>
-      <div className="max-w-6xl mx-auto px-6 py-10 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+      <div className="px-6 md:px-10 py-10 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div className="flex items-center gap-3">
           <img src="/logo.svg" alt="Authority" className="h-5 w-auto opacity-80" />
           <span className="font-mono text-[11px] uppercase tracking-[0.08em] text-muted-foreground">
@@ -489,9 +410,7 @@ export default function Landing() {
       <Hero />
       <main className="flex-1">
         <Drift />
-        <HowItWorks />
-        <WhatAuthorityIs />
-        <Engagement />
+        <LicenseToBuild />
         <SampleBet />
         <FinalCta />
       </main>
