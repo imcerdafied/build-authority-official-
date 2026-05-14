@@ -22,7 +22,7 @@ import OrgSettings from "@/pages/OrgSettings";
 import Join from "@/pages/Join";
 import Auth from "@/pages/Auth";
 import Landing from "@/pages/Landing";
-import OrgSetup from "@/components/OrgSetup";
+import ContactForAccess from "@/components/ContactForAccess";
 import DomainJoinPrompt from "@/components/DomainJoinPrompt";
 import NotFound from "./pages/NotFound";
 
@@ -50,7 +50,7 @@ function LandingOrRedirect() {
 function AuthGate({ children }: { children: React.ReactNode }) {
   const { user, loading: authLoading } = useAuth();
   const { memberships, loading: orgLoading } = useOrg();
-  const [forceCreateOrg, setForceCreateOrg] = React.useState(false);
+  const [showAccessGate, setShowAccessGate] = React.useState(false);
 
   if (authLoading || orgLoading) {
     return (
@@ -63,12 +63,13 @@ function AuthGate({ children }: { children: React.ReactNode }) {
   if (!user) return <Auth />;
 
   // No memberships: try to match the user's email domain to an existing
-  // workspace before routing them to OrgSetup (which would duplicate the org).
-  // DomainJoinPrompt calls onFallback() if no domain match is found OR if the
-  // user explicitly chooses to create their own workspace.
+  // workspace before showing the access gate. DomainJoinPrompt calls
+  // onFallback() if no domain match is found OR if the user explicitly opts
+  // out. Either way, non-clients see the ContactForAccess screen — they
+  // cannot self-serve a workspace.
   if (memberships.length === 0) {
-    if (forceCreateOrg) return <OrgSetup />;
-    return <DomainJoinPrompt onFallback={() => setForceCreateOrg(true)} />;
+    if (showAccessGate) return <ContactForAccess />;
+    return <DomainJoinPrompt onFallback={() => setShowAccessGate(true)} />;
   }
 
   return <>{children}</>;

@@ -164,13 +164,13 @@ export default function DomainJoinPrompt({ onFallback }: { onFallback: () => voi
 
               <div className="pt-2 border-t border-border">
                 <p className="text-xs text-muted-foreground mb-2">
-                  Not looking to join this workspace?
+                  Not the right workspace?
                 </p>
                 <button
                   onClick={onFallback}
                   className="w-full text-xs text-muted-foreground hover:text-foreground transition-colors py-1"
                 >
-                  Create my own workspace instead
+                  Use a different email
                 </button>
               </div>
             </>
@@ -213,7 +213,7 @@ export default function DomainJoinPrompt({ onFallback }: { onFallback: () => voi
                 onClick={onFallback}
                 className="w-full text-sm font-semibold border border-foreground text-foreground px-4 py-2 rounded-sm hover:bg-foreground hover:text-background transition-colors"
               >
-                Create my own workspace instead
+                Use a different email
               </button>
             </>
           )}
