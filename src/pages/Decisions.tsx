@@ -85,7 +85,7 @@ export const BET_CATEGORY_OPTIONS = [
   { key: "strategic_positioning", label: "Strategic Positioning" },
 ] as const;
 
-function InlineEdit({
+export function InlineEdit({
   value,
   field,
   decisionId,
@@ -862,7 +862,7 @@ function PodConfigurationSection({
   );
 }
 
-function CategorySelect({
+export function CategorySelect({
   value,
   categories,
   decisionId,
@@ -943,7 +943,7 @@ function CategorySelect({
   );
 }
 
-function OwnerAccountSelect({
+export function OwnerAccountSelect({
   value,
   members,
   user,
