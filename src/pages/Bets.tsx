@@ -5,6 +5,7 @@ import { useOrg } from "@/contexts/OrgContext";
 import CreateDecisionForm from "@/components/CreateDecisionForm";
 import BetRow from "@/components/bets/BetRow";
 import { categoryLabels } from "@/pages/Decisions";
+import { aggregateMagnitudes, movementState } from "@/lib/bet-magnitude";
 import {
   BET_LIFECYCLE_LABELS,
   BET_LIFECYCLE_STATUSES,
@@ -17,6 +18,74 @@ import { cn } from "@/lib/utils";
 function formatDate(ts: string): string {
   if (!ts) return "—";
   return new Date(ts).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+}
+
+interface SummaryDecision {
+  exposure_value?: string | null;
+  revenue_at_risk?: string | null;
+  updated_at: string;
+  created_at: string;
+}
+
+function PortfolioSummary({ activeDecisions }: { activeDecisions: SummaryDecision[] }) {
+  const upside = aggregateMagnitudes(activeDecisions.map((d) => d.exposure_value ?? null));
+  const risk = aggregateMagnitudes(activeDecisions.map((d) => d.revenue_at_risk ?? null));
+  const stalled = activeDecisions.filter(
+    (d) => movementState(d.updated_at, d.created_at).tier === "red",
+  ).length;
+  const denom = activeDecisions.length;
+  const stalledMajority = denom > 0 && stalled / denom > 0.5;
+
+  const Col = ({
+    label,
+    children,
+  }: {
+    label: string;
+    children: React.ReactNode;
+  }) => (
+    <div className="flex flex-col">
+      <span className="font-mono text-[11px] uppercase tracking-[0.05em] text-gray-500 mb-1">{label}</span>
+      <span className="text-2xl font-semibold leading-tight">{children}</span>
+    </div>
+  );
+
+  const Magnitude = ({
+    agg,
+  }: {
+    agg: ReturnType<typeof aggregateMagnitudes>;
+  }) => {
+    if (agg.unquantifiedCount > 0) {
+      const skipped = agg.unquantifiedCount;
+      return (
+        <span
+          className="text-gray-500"
+          title={`${skipped} bet${skipped === 1 ? "" : "s"} could not be summed — value is non-numeric`}
+        >
+          Not aggregated
+        </span>
+      );
+    }
+    if (!agg.display) return <span className="text-gray-500">—</span>;
+    return <span className="text-foreground">{agg.display}</span>;
+  };
+
+  return (
+    <div className="border border-gray-300 rounded-lg p-5 mb-6">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-10">
+        <Col label="TOTAL UPSIDE">
+          <Magnitude agg={upside} />
+        </Col>
+        <Col label="TOTAL RISK">
+          <Magnitude agg={risk} />
+        </Col>
+        <Col label="STALLED">
+          <span className={stalledMajority ? "text-red-700" : "text-foreground"}>
+            {stalled} of {denom} {denom === 1 ? "bet" : "bets"}
+          </span>
+        </Col>
+      </div>
+    </div>
+  );
 }
 
 export default function Bets() {
@@ -73,7 +142,7 @@ export default function Bets() {
   return (
     <div>
       {/* Header */}
-      <div className="mb-8">
+      <div className="mb-6">
         <div className="eyebrow-mono mb-3">// BETS</div>
         <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4">
           <div>
@@ -82,45 +151,50 @@ export default function Bets() {
               {decisions.length} total · {activeDecisions.length} open · {closedCount} closed
             </p>
           </div>
-          <div className="flex flex-wrap items-center gap-2">
-            <select value={filterStatus} onChange={(e) => setFilter("status", e.target.value)} className={selectClass}>
-              <option value="">All Lifecycles</option>
-              {filterStatusOptions.map((s) => (
-                <option key={s} value={s}>{BET_LIFECYCLE_LABELS[s]}</option>
-              ))}
-            </select>
-            <select value={filterRisk} onChange={(e) => setFilter("risk", e.target.value)} className={selectClass}>
-              <option value="">All Risk Levels</option>
-              {riskLevelOptions.map((r) => (
-                <option key={r} value={r}>{BET_RISK_LABELS[r]}</option>
-              ))}
-            </select>
-            {productAreaOptions.length > 0 && (
-              <select value={filterDomain} onChange={(e) => setFilter("domain", e.target.value)} className={selectClass}>
-                <option value="">All Product Areas</option>
-                {productAreaOptions.map((area) => (
-                  <option key={area} value={area}>{area}</option>
-                ))}
-              </select>
-            )}
-            {filtersActive && (
-              <button
-                onClick={clearFilters}
-                className="text-xs font-mono uppercase tracking-[0.05em] text-gray-500 hover:text-foreground"
-              >
-                Clear
-              </button>
-            )}
-            {canWrite && !showCreate && (
-              <button
-                onClick={() => setShowCreate(true)}
-                className="font-mono text-sm uppercase tracking-[0.05em] border border-foreground text-foreground px-3 py-2 hover:opacity-[0.85] transition-opacity"
-              >
-                + Register Bet
-              </button>
-            )}
-          </div>
+          {canWrite && !showCreate && (
+            <button
+              onClick={() => setShowCreate(true)}
+              className="font-mono text-sm uppercase tracking-[0.05em] border border-foreground text-foreground px-3 py-2 hover:opacity-[0.85] transition-opacity"
+            >
+              + Register Bet
+            </button>
+          )}
         </div>
+      </div>
+
+      {/* Portfolio summary — aggregates across active bets */}
+      <PortfolioSummary activeDecisions={activeDecisions} />
+
+      {/* Filters */}
+      <div className="flex flex-wrap items-center gap-2 mb-6">
+        <select value={filterStatus} onChange={(e) => setFilter("status", e.target.value)} className={selectClass}>
+          <option value="">All Lifecycles</option>
+          {filterStatusOptions.map((s) => (
+            <option key={s} value={s}>{BET_LIFECYCLE_LABELS[s]}</option>
+          ))}
+        </select>
+        <select value={filterRisk} onChange={(e) => setFilter("risk", e.target.value)} className={selectClass}>
+          <option value="">All Risk Levels</option>
+          {riskLevelOptions.map((r) => (
+            <option key={r} value={r}>{BET_RISK_LABELS[r]}</option>
+          ))}
+        </select>
+        {productAreaOptions.length > 0 && (
+          <select value={filterDomain} onChange={(e) => setFilter("domain", e.target.value)} className={selectClass}>
+            <option value="">All Product Areas</option>
+            {productAreaOptions.map((area) => (
+              <option key={area} value={area}>{area}</option>
+            ))}
+          </select>
+        )}
+        {filtersActive && (
+          <button
+            onClick={clearFilters}
+            className="text-xs font-mono uppercase tracking-[0.05em] text-gray-500 hover:text-foreground"
+          >
+            Clear
+          </button>
+        )}
       </div>
 
       {showCreate && <CreateDecisionForm onClose={() => setShowCreate(false)} />}
