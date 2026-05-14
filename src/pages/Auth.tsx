@@ -36,7 +36,7 @@ export default function Auth({ skipInviteCode }: AuthProps = {}) {
       navigate(`/join/${joinOrgId}`, { replace: true });
       return;
     }
-    navigate("/", { replace: true });
+    navigate("/bets", { replace: true });
   }, [user, joinOrgId, navigate]);
 
   const handleGoogleSSO = async () => {

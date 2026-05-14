@@ -21,6 +21,7 @@ import CapabilityMap from "@/pages/CapabilityMap";
 import OrgSettings from "@/pages/OrgSettings";
 import Join from "@/pages/Join";
 import Auth from "@/pages/Auth";
+import Landing from "@/pages/Landing";
 import OrgSetup from "@/components/OrgSetup";
 import DomainJoinPrompt from "@/components/DomainJoinPrompt";
 import NotFound from "./pages/NotFound";
@@ -37,6 +38,14 @@ const queryClient = new QueryClient({
     },
   },
 });
+
+// Public landing for `/`. Logged-in users bounce straight to /bets.
+function LandingOrRedirect() {
+  const { user, loading } = useAuth();
+  if (loading) return null;
+  if (user) return <Navigate to="/bets" replace />;
+  return <Landing />;
+}
 
 function AuthGate({ children }: { children: React.ReactNode }) {
   const { user, loading: authLoading } = useAuth();
@@ -68,14 +77,14 @@ function AuthGate({ children }: { children: React.ReactNode }) {
 function AppContent() {
   return (
     <Routes>
+      {/* Public marketing page at the root */}
+      <Route path="/" element={<LandingOrRedirect />} />
       <Route path="/auth" element={<Auth />} />
       <Route path="/join/:orgId" element={<Join />} />
       <Route path="*" element={
         <AuthGate>
           <AppLayout>
             <Routes>
-              {/* Redirect root and old home to the bets portfolio */}
-              <Route path="/" element={<Navigate to="/bets" replace />} />
               <Route path="/home" element={<Navigate to="/bets" replace />} />
 
               {/* Goal detail kept as a deep-link target reachable from a bet's goal chip */}
