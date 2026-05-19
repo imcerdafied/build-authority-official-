@@ -712,39 +712,69 @@ function BetNavigator({
 function DecisionGate({ decision }: { decision: any }) {
   const ageDays = Math.max(
     0,
-    Math.floor((Date.now() - new Date(decision.created_at).getTime()) / 86400_000),
+    Math.floor((Date.now() - new Date(decision.created_at).getTime()) / 86_400_000),
   );
-  const deadlineDays = (decision.slice_deadline_days as number | null) ?? null;
-  const sliceRemaining =
-    (decision as any).slice_remaining ??
-    (deadlineDays != null ? deadlineDays - ageDays : null);
+  const sliceRemaining: number | null = (decision as any).slice_remaining ?? null;
+  const targetDate: string | null = decision.target_completion_date ?? null;
+  const targetRemaining =
+    targetDate != null
+      ? Math.floor((new Date(targetDate).getTime() - Date.now()) / 86_400_000)
+      : null;
+
+  // Pick the primary countdown:
+  //   1. Active review slice (means lifecycle has advanced past Defined)
+  //   2. Long-term target (for Defined bets with no review cycle yet)
+  //   3. Fall back to age since defined
+  type Countdown = {
+    days: number;
+    overdue: boolean;
+    headlineLabel: string;
+    secondary?: { label: string; value: string };
+  };
+
+  const fmt = (d: string) =>
+    new Date(d).toLocaleDateString("en-US", { month: "short", day: "numeric" });
+
+  let countdown: Countdown;
+  if (sliceRemaining != null) {
+    const overdue = sliceRemaining < 0;
+    const dateStr = fmt(decision.slice_due_at);
+    countdown = {
+      days: sliceRemaining,
+      overdue,
+      headlineLabel: overdue ? `past the ${dateStr} review` : `until ${dateStr} review`,
+      secondary:
+        targetDate != null && targetRemaining != null
+          ? {
+              label: "Target",
+              value: `${fmt(targetDate)} · ${adaptiveDistance(targetRemaining)}`,
+            }
+          : undefined,
+    };
+  } else if (targetRemaining != null && targetDate != null) {
+    const overdue = targetRemaining < 0;
+    const dateStr = fmt(targetDate);
+    countdown = {
+      days: targetRemaining,
+      overdue,
+      headlineLabel: overdue ? `past the ${dateStr} target` : `until ${dateStr} target`,
+    };
+  } else {
+    countdown = {
+      days: ageDays,
+      overdue: false,
+      headlineLabel: "since defined",
+    };
+  }
+
+  const headline = adaptiveDistance(Math.abs(countdown.days));
+  const headlineColor = countdown.overdue ? "text-signal-red" : "text-foreground";
 
   const triggerOneLine = (decision.trigger_signal ?? "")
     .split(/\n+/)
     .map((s: string) => s.trim())
     .filter(Boolean)
     .join(" · ");
-
-  // Adaptive units: days under 2 weeks, weeks under a quarter, months under
-  // a year, years after that. A "133d" countdown reads as forever; "4mo" or
-  // "Sept 30" is graspable in one glance.
-  const overdue = sliceRemaining != null && sliceRemaining < 0;
-  const distanceDays = sliceRemaining != null ? Math.abs(sliceRemaining) : ageDays;
-  const headline = adaptiveDistance(distanceDays);
-  const targetDate =
-    sliceRemaining != null
-      ? new Date(Date.now() + sliceRemaining * 86_400_000).toLocaleDateString("en-US", {
-          month: "short",
-          day: "numeric",
-        })
-      : null;
-  const headlineColor = overdue ? "text-signal-red" : "text-foreground";
-  const headlineLabel =
-    sliceRemaining != null
-      ? overdue
-        ? `past the ${targetDate} review`
-        : `until ${targetDate} review`
-      : "since defined";
 
   return (
     <div className="min-w-0">
@@ -754,10 +784,16 @@ function DecisionGate({ decision }: { decision: any }) {
       <p className={cn("text-3xl font-semibold tabular-nums tracking-tight mb-1", headlineColor)}>
         {headline}
       </p>
-      <p className="text-xs text-muted-foreground mb-3">{headlineLabel}</p>
-      <p className="text-sm text-foreground leading-snug">
-        {triggerOneLine || <span className="text-muted-foreground italic">No trigger set.</span>}
-      </p>
+      <p className="text-xs text-muted-foreground">{countdown.headlineLabel}</p>
+      {countdown.secondary && (
+        <p className="text-sm text-foreground mt-3">
+          <span className="text-muted-foreground">{countdown.secondary.label}: </span>
+          {countdown.secondary.value}
+        </p>
+      )}
+      {triggerOneLine && (
+        <p className="text-sm text-foreground leading-snug mt-3">{triggerOneLine}</p>
+      )}
     </div>
   );
 }

@@ -55,6 +55,7 @@ export interface DecisionComputed {
   exposure_value: string | null;
   linked_okr_id: string | null;
   linked_okr_title: string | null;
+  target_completion_date: string | null;
   // Client-computed fields
   age_days: number;
   slice_remaining: number;
@@ -119,6 +120,7 @@ function computeDecisionFields(row: Record<string, unknown>): DecisionComputed {
     exposure_value: (row.exposure_value as string) ?? null,
     linked_okr_id: (row.linked_okr_id as string) ?? null,
     linked_okr_title: ((row.okrs as { title?: string } | null) ?? null)?.title ?? null,
+    target_completion_date: (row.target_completion_date as string) ?? null,
     age_days: ageDays,
     slice_remaining: sliceRemaining,
     is_exceeded: isExceeded,
@@ -135,7 +137,7 @@ export function useDecisions() {
     queryKey: ["decisions", currentOrg?.id],
     queryFn: async () => {
       if (!currentOrg) return [];
-      const baseColumns = "id, org_id, title, owner, sponsor, owner_user_id, surface, solution_domain, impact_tier, outcome_target, outcome_category_key, expected_impact, exposure_value, trigger_signal, revenue_at_risk, status, risk_level, created_at, updated_at, outcome_category, current_delta, segment_impact, decision_health, blocked_reason, blocked_dependency_owner, slice_deadline_days, slice_due_at, activated_at, created_by, shipped_slice_date, measured_outcome_result, capacity_allocated, capacity_diverted, unplanned_interrupts, escalation_count, previous_exposure_value, state_changed_at, state_change_note, pod_configuration, linked_okr_id";
+      const baseColumns = "id, org_id, title, owner, sponsor, owner_user_id, surface, solution_domain, impact_tier, outcome_target, outcome_category_key, expected_impact, exposure_value, trigger_signal, revenue_at_risk, status, risk_level, created_at, updated_at, outcome_category, current_delta, segment_impact, decision_health, blocked_reason, blocked_dependency_owner, slice_deadline_days, slice_due_at, activated_at, created_by, shipped_slice_date, measured_outcome_result, capacity_allocated, capacity_diverted, unplanned_interrupts, escalation_count, previous_exposure_value, state_changed_at, state_change_note, pod_configuration, linked_okr_id, target_completion_date";
 
       // Try the embedded join first; if the FK isn't visible to PostgREST
       // (e.g. schema cache stale, FK missing) fall back to a separate okrs

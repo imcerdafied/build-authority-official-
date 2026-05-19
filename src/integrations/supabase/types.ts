@@ -653,6 +653,7 @@ export type Database = {
           state_changed_at: string | null
           status: Database["public"]["Enums"]["decision_status"] | null
           surface: string
+          target_completion_date: string | null
           title: string
           trigger_signal: string | null
           unplanned_interrupts: number | null
@@ -702,6 +703,7 @@ export type Database = {
           state_changed_at?: string | null
           status?: Database["public"]["Enums"]["decision_status"] | null
           surface: string
+          target_completion_date?: string | null
           title: string
           trigger_signal?: string | null
           unplanned_interrupts?: number | null
@@ -751,12 +753,20 @@ export type Database = {
           state_changed_at?: string | null
           status?: Database["public"]["Enums"]["decision_status"] | null
           surface?: string
+          target_completion_date?: string | null
           title?: string
           trigger_signal?: string | null
           unplanned_interrupts?: number | null
           updated_at?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "decisions_linked_okr_id_fkey"
+            columns: ["linked_okr_id"]
+            isOneToOne: false
+            referencedRelation: "okrs"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "decisions_org_id_fkey"
             columns: ["org_id"]
