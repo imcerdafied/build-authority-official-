@@ -280,7 +280,11 @@ export default function Bets() {
                       <div className="min-w-0">
                         <p className="text-sm font-medium truncate text-foreground">{d.title || "Untitled"}</p>
                         <p className="text-xs text-muted-foreground mt-0.5">
-                          {categoryLabels[(d.outcome_category_key ?? d.outcome_category) ?? ""] || "—"}
+                          {(() => {
+                            const k = (d.outcome_category_key ?? d.outcome_category) ?? "";
+                            if (!k) return "—";
+                            return categoryLabels[k] ?? k.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+                          })()}
                         </p>
                       </div>
                       <p className="text-xs text-muted-foreground shrink-0">Closed {formatDate(d.updated_at)}</p>

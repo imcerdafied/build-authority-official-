@@ -29,7 +29,10 @@ export default function BetRow({ d, index }: BetRowProps) {
   const style = LIFECYCLE_BUCKET_STYLE[bucket];
   const isAging = bucket === "activated" && d.is_aging;
   const categoryKey = d.outcome_category_key ?? d.outcome_category ?? "";
-  const category = categoryLabels[categoryKey] || categoryKey || "Uncategorized";
+  const category = categoryKey
+    ? categoryLabels[categoryKey] ??
+      categoryKey.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())
+    : "Uncategorized";
   const upside = extractMagnitude(d.exposure_value);
   const risk = extractMagnitude(d.revenue_at_risk);
   const move = movementState(d.updated_at, d.created_at);
