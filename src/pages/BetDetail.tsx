@@ -423,51 +423,62 @@ export default function BetDetail() {
           </div>
         </section>
 
-        {/* Trigger Signal — structured list if multi-line, paragraph otherwise */}
-        <Section id="trigger-signal" label="Trigger Signal">
-          {triggerLines.length > 1 ? (
-            <ul className="space-y-2">
-              {triggerLines.map((line, i) => (
-                <li key={i} className="flex items-start gap-3">
-                  <span
-                    className="mt-1 inline-block w-3 h-3 rounded-sm border border-gray-400 shrink-0"
-                    aria-hidden
-                  />
-                  <span className="text-base text-foreground leading-relaxed">{line}</span>
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <InlineEdit
-              value={decision.trigger_signal ?? ""}
-              field="trigger_signal"
-              decisionId={decision.id}
-              canEdit={canWrite}
-              onSave={handleInlineSave}
-              logActivity={logActivity}
-              className="text-base text-foreground leading-relaxed block"
-              placeholder="Add trigger signal…"
-              multiline
-            />
-          )}
-        </Section>
-
-        {/* Outcome Target — pulled-out paragraph */}
-        <Section id="outcome-target" label="Outcome Target">
-          <div className="max-w-2xl">
-            <InlineEdit
-              value={decision.outcome_target ?? ""}
-              field="outcome_target"
-              decisionId={decision.id}
-              canEdit={canWrite}
-              onSave={handleInlineSave}
-              logActivity={logActivity}
-              className="text-lg text-foreground leading-relaxed block"
-              placeholder="Add outcome target…"
-              multiline
-            />
+        {/* Context row — Trigger Signal and Outcome Target are reference-
+            grade metadata, not narrative. Pulled out of full Sections into
+            a compact two-column strip styled like the header fact strip so
+            they don't bury the more important Initiatives / Metrics below. */}
+        <section
+          className="border-t border-gray-300 py-6"
+          style={{ borderTopWidth: "0.5px" }}
+        >
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div className="min-w-0">
+              <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground mb-2">
+                Trigger Signal
+              </p>
+              {triggerLines.length > 1 ? (
+                <ul className="space-y-1.5">
+                  {triggerLines.map((line, i) => (
+                    <li key={i} className="grid grid-cols-[auto_1fr] gap-2.5 items-start">
+                      <span className="text-muted-foreground select-none mt-0.5" aria-hidden>
+                        ·
+                      </span>
+                      <span className="text-sm text-foreground leading-snug">{line}</span>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <InlineEdit
+                  value={decision.trigger_signal ?? ""}
+                  field="trigger_signal"
+                  decisionId={decision.id}
+                  canEdit={canWrite}
+                  onSave={handleInlineSave}
+                  logActivity={logActivity}
+                  className="text-sm text-foreground leading-snug block"
+                  placeholder="Add trigger signal…"
+                  multiline
+                />
+              )}
+            </div>
+            <div className="min-w-0">
+              <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground mb-2">
+                Outcome Target
+              </p>
+              <InlineEdit
+                value={decision.outcome_target ?? ""}
+                field="outcome_target"
+                decisionId={decision.id}
+                canEdit={canWrite}
+                onSave={handleInlineSave}
+                logActivity={logActivity}
+                className="text-sm text-foreground leading-snug block"
+                placeholder="Add outcome target…"
+                multiline
+              />
+            </div>
           </div>
-        </Section>
+        </section>
 
         {/* Outcome Metrics — only render when metrics exist. The Log rail
             (Add metric →) is the entry point when there are none. */}
