@@ -53,7 +53,9 @@ export default function BetRow({ d, index, showMagnitudes = true }: BetRowProps)
       )}
       style={{ borderBottomWidth: "0.5px" }}
     >
-      <div className="flex flex-col md:grid md:grid-cols-[auto_minmax(0,1fr)_220px_auto] md:items-center md:gap-6">
+      {/* Badge column is fixed at 7.5rem (120px) so the longest pill
+          (ACTIVATED) doesn't push the bet number right of shorter pills. */}
+      <div className="flex flex-col md:grid md:grid-cols-[7.5rem_minmax(0,1fr)_220px_auto] md:items-start md:gap-6">
         {/* 1. Lifecycle badge — normalized: same shape across all states, colored dot, mono uppercase. */}
         <div className="shrink-0 mb-3 md:mb-0 flex flex-col items-start gap-1">
           <span
@@ -74,7 +76,8 @@ export default function BetRow({ d, index, showMagnitudes = true }: BetRowProps)
           )}
         </div>
 
-        {/* 2. Title + meta — title may now wrap to 2 lines. Outcome target preview removed. */}
+        {/* 2. Title + meta + outcome preview. Title can wrap to 2 lines;
+              outcome target gets one line below for additional context. */}
         <div className="min-w-0 mb-3 md:mb-0">
           <p
             className="text-[18px] font-semibold text-foreground leading-snug overflow-hidden"
@@ -88,6 +91,14 @@ export default function BetRow({ d, index, showMagnitudes = true }: BetRowProps)
             {d.owner ? ` · ${d.owner}` : ""}
             {d.sponsor ? ` · ${d.sponsor}` : ""}
           </p>
+          {d.outcome_target && (
+            <p
+              className="text-sm text-foreground/80 mt-2 leading-snug overflow-hidden"
+              style={{ display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical" }}
+            >
+              {d.outcome_target}
+            </p>
+          )}
         </div>
 
         {/* 3. Right column: (optional) magnitudes + movement. 220px hard cap. */}
