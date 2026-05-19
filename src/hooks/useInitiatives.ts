@@ -31,6 +31,8 @@ export function useAddInitiative(betId: string | undefined) {
       value?: number;
       confidence?: number;
       effort?: number;
+      owner?: string | null;
+      status?: string | null;
     }) => {
       if (!betId) throw new Error("No betId");
       const { error } = await supabase.from("bet_initiatives").insert({
@@ -40,7 +42,9 @@ export function useAddInitiative(betId: string | undefined) {
         value: input.value ?? 5,
         confidence: input.confidence ?? 0.5,
         effort: Math.max(1, input.effort ?? 5),
-      });
+        owner: input.owner ?? null,
+        status: input.status ?? null,
+      } as any);
       if (error) throw error;
       await recalculateBetState(betId, "INITIATIVE_ADDED", supabase);
     },

@@ -215,6 +215,8 @@ export interface BetMetric {
   last_updated_at: string;
 }
 
+export type InitiativeStatus = "proposed" | "active" | "shipped" | "paused";
+
 export interface BetInitiative {
   id: string;
   bet_id: string;
@@ -229,6 +231,8 @@ export interface BetInitiative {
   last_score_delta: number;
   created_at: string;
   updated_at: string;
+  owner: string | null;
+  status: InitiativeStatus | null;
 }
 
 export interface BetFinding {

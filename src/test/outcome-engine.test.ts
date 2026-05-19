@@ -80,6 +80,8 @@ function makeInitiative(overrides: Partial<BetInitiative>): BetInitiative {
     last_score_delta: 0,
     created_at: "2026-01-01",
     updated_at: "2026-01-01",
+    owner: null,
+    status: null,
     ...overrides,
   };
 }

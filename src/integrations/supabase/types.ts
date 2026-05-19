@@ -94,8 +94,10 @@ export type Database = {
           id: string
           last_score_delta: number
           outcome_multiplier: number
+          owner: string | null
           roadmap_position: number
           score_v3: number
+          status: string | null
           updated_at: string | null
           value: number
         }
@@ -109,8 +111,10 @@ export type Database = {
           id?: string
           last_score_delta?: number
           outcome_multiplier?: number
+          owner?: string | null
           roadmap_position?: number
           score_v3?: number
+          status?: string | null
           updated_at?: string | null
           value?: number
         }
@@ -124,8 +128,10 @@ export type Database = {
           id?: string
           last_score_delta?: number
           outcome_multiplier?: number
+          owner?: string | null
           roadmap_position?: number
           score_v3?: number
+          status?: string | null
           updated_at?: string | null
           value?: number
         }

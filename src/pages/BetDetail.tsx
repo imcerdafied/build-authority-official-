@@ -28,6 +28,7 @@ import { extractMagnitude, movementState } from "@/lib/bet-magnitude";
 import MetricsSidebar from "@/components/MetricsSidebar";
 import DriftIndicators from "@/components/DriftIndicators";
 import ScoreHistory from "@/components/ScoreHistory";
+import KeyInitiativesSection from "@/components/bets/KeyInitiativesSection";
 import { cn } from "@/lib/utils";
 
 function nudgeMailto(betTitle: string, days: number, owner: string): string {
@@ -484,6 +485,12 @@ export default function BetDetail() {
             <ScoreHistory betId={decision.id} embedded />
           </Section>
         )}
+
+        {/* Key Initiatives — exec readout of what the team is doing in
+            service of this bet. Hides the RICE numerics that live elsewhere. */}
+        <Section id="key-initiatives" label="Key Initiatives">
+          <KeyInitiativesSection betId={decision.id} canWrite={canWrite} />
+        </Section>
 
         {/* Activity — collapsed by default if >5 */}
         <Section id="activity" label="Activity">
