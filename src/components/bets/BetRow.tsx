@@ -76,28 +76,20 @@ export default function BetRow({ d, index, showMagnitudes = true }: BetRowProps)
           )}
         </div>
 
-        {/* 2. Title + meta + outcome preview. Title can wrap to 2 lines;
-              outcome target gets one line below for additional context. */}
+        {/* 2. Title + meta + outcome preview. No ellipses: rows grow to fit
+              the full content rather than hiding it behind a clamp. */}
         <div className="min-w-0 mb-3 md:mb-0">
-          <p
-            className="text-[18px] font-semibold text-foreground leading-snug overflow-hidden"
-            style={{ display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical" }}
-          >
+          <p className="text-[18px] font-semibold text-foreground leading-snug">
             <span className="text-accent mr-1 font-mono tabular-nums">{index}.</span>
             {d.title || "Untitled"}
           </p>
-          <p className="text-sm text-muted-foreground mt-1 truncate">
+          <p className="text-sm text-muted-foreground mt-1">
             {category}
             {d.owner ? ` · ${d.owner}` : ""}
             {d.sponsor ? ` · ${d.sponsor}` : ""}
           </p>
           {d.outcome_target && (
-            <p
-              className="text-sm text-foreground/80 mt-2 leading-snug overflow-hidden"
-              style={{ display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical" }}
-            >
-              {d.outcome_target}
-            </p>
+            <p className="text-sm text-foreground/80 mt-2 leading-snug">{d.outcome_target}</p>
           )}
         </div>
 
@@ -108,7 +100,7 @@ export default function BetRow({ d, index, showMagnitudes = true }: BetRowProps)
               <div className="min-w-0">
                 <span className="font-mono text-[11px] uppercase tracking-[0.05em] text-muted-foreground">UPSIDE</span>
                 {upside ? (
-                  <p className="font-mono text-base font-medium text-signal-green tabular-nums truncate leading-tight">
+                  <p className="font-mono text-base font-medium text-signal-green tabular-nums leading-tight">
                     {upside.display}
                   </p>
                 ) : (
@@ -118,7 +110,7 @@ export default function BetRow({ d, index, showMagnitudes = true }: BetRowProps)
               <div className="min-w-0">
                 <span className="font-mono text-[11px] uppercase tracking-[0.05em] text-muted-foreground">RISK</span>
                 {risk ? (
-                  <p className="font-mono text-base font-medium text-signal-red tabular-nums truncate leading-tight">
+                  <p className="font-mono text-base font-medium text-signal-red tabular-nums leading-tight">
                     {risk.display}
                   </p>
                 ) : (

@@ -725,20 +725,25 @@ function DecisionGate({ decision }: { decision: any }) {
     .filter(Boolean)
     .join(" · ");
 
-  // Headline figure mirrors Upside/Risk visual weight: text-3xl semibold tabular.
+  // Adaptive units: days under 2 weeks, weeks under a quarter, months under
+  // a year, years after that. A "133d" countdown reads as forever; "4mo" or
+  // "Sept 30" is graspable in one glance.
   const overdue = sliceRemaining != null && sliceRemaining < 0;
-  const headline =
+  const distanceDays = sliceRemaining != null ? Math.abs(sliceRemaining) : ageDays;
+  const headline = adaptiveDistance(distanceDays);
+  const targetDate =
     sliceRemaining != null
-      ? overdue
-        ? `${Math.abs(sliceRemaining)}d`
-        : `${sliceRemaining}d`
-      : `${ageDays}d`;
+      ? new Date(Date.now() + sliceRemaining * 86_400_000).toLocaleDateString("en-US", {
+          month: "short",
+          day: "numeric",
+        })
+      : null;
   const headlineColor = overdue ? "text-signal-red" : "text-foreground";
   const headlineLabel =
     sliceRemaining != null
       ? overdue
-        ? "past the next review"
-        : "until the next review"
+        ? `past the ${targetDate} review`
+        : `until ${targetDate} review`
       : "since defined";
 
   return (
@@ -750,11 +755,21 @@ function DecisionGate({ decision }: { decision: any }) {
         {headline}
       </p>
       <p className="text-xs text-muted-foreground mb-3">{headlineLabel}</p>
-      <p className="text-sm text-foreground leading-snug line-clamp-2">
+      <p className="text-sm text-foreground leading-snug">
         {triggerOneLine || <span className="text-muted-foreground italic">No trigger set.</span>}
       </p>
     </div>
   );
+}
+
+function adaptiveDistance(days: number): string {
+  const abs = Math.abs(days);
+  if (abs === 0) return "today";
+  if (abs === 1) return "1d";
+  if (abs < 14) return `${abs}d`;
+  if (abs < 90) return `${Math.round(abs / 7)}w`;
+  if (abs < 365) return `${Math.round(abs / 30)}mo`;
+  return `${(abs / 365).toFixed(1)}y`;
 }
 
 function Magnitude({
