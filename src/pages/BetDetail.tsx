@@ -661,7 +661,9 @@ function BetNavigator({
                 className={cn("w-1.5 h-1.5 rounded-full inline-block shrink-0", dot)}
                 aria-hidden
               />
-              <span className="font-mono tabular-nums opacity-60">{i + 1}.</span>
+              <span className="font-mono tabular-nums opacity-60">
+                {b.bet_label ? `${b.bet_label}.` : `${i + 1}.`}
+              </span>
               <span className="truncate">{b.title || "Untitled"}</span>
             </Link>
           );

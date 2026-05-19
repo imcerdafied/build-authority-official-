@@ -80,7 +80,9 @@ export default function BetRow({ d, index, showMagnitudes = true }: BetRowProps)
               the full content rather than hiding it behind a clamp. */}
         <div className="min-w-0 mb-3 md:mb-0">
           <p className="text-[18px] font-semibold text-foreground leading-snug">
-            <span className="text-accent mr-1 font-mono tabular-nums">{index}.</span>
+            <span className="text-accent mr-1 font-mono tabular-nums">
+              {d.bet_label ? `${d.bet_label}.` : `${index}.`}
+            </span>
             {d.title || "Untitled"}
           </p>
           <p className="text-sm text-muted-foreground mt-1">

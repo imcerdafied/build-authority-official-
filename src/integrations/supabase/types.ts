@@ -611,6 +611,7 @@ export type Database = {
       decisions: {
         Row: {
           activated_at: string | null
+          bet_label: string | null
           blocked_dependency_owner: string | null
           blocked_reason: string | null
           capacity_allocated: number | null
@@ -661,6 +662,7 @@ export type Database = {
         }
         Insert: {
           activated_at?: string | null
+          bet_label?: string | null
           blocked_dependency_owner?: string | null
           blocked_reason?: string | null
           capacity_allocated?: number | null
@@ -711,6 +713,7 @@ export type Database = {
         }
         Update: {
           activated_at?: string | null
+          bet_label?: string | null
           blocked_dependency_owner?: string | null
           blocked_reason?: string | null
           capacity_allocated?: number | null
