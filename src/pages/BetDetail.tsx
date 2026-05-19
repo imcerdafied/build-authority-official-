@@ -594,7 +594,7 @@ function LifecyclePill({
 function FactItem({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div className="min-w-0">
-      <p className="font-mono text-[10px] uppercase tracking-[0.08em] text-muted-foreground mb-1">
+      <p className="font-mono text-[11px] uppercase tracking-[0.08em] text-muted-foreground mb-1">
         {`// ${label}`}
       </p>
       <div className="truncate">{children}</div>
@@ -615,7 +615,7 @@ function HealthBlock({
   if (move.tier === "red") {
     return (
       <div className="text-right md:min-w-[180px]">
-        <p className="font-mono text-[10px] uppercase tracking-[0.08em] text-muted-foreground mb-1">
+        <p className="font-mono text-[11px] uppercase tracking-[0.08em] text-muted-foreground mb-1">
           // HEALTH
         </p>
         <p className="font-mono text-xs text-red-700 mb-1">ERR_NO_MOVEMENT</p>
@@ -632,7 +632,7 @@ function HealthBlock({
   if (move.tier === "amber") {
     return (
       <div className="text-right md:min-w-[180px]">
-        <p className="font-mono text-[10px] uppercase tracking-[0.08em] text-muted-foreground mb-1">
+        <p className="font-mono text-[11px] uppercase tracking-[0.08em] text-muted-foreground mb-1">
           // HEALTH
         </p>
         <p className="text-sm text-foreground">Slowing · {move.days} days</p>
@@ -641,7 +641,7 @@ function HealthBlock({
   }
   return (
     <div className="text-right md:min-w-[180px]">
-      <p className="font-mono text-[10px] uppercase tracking-[0.08em] text-muted-foreground mb-1">
+      <p className="font-mono text-[11px] uppercase tracking-[0.08em] text-muted-foreground mb-1">
         // HEALTH
       </p>
       <p className="text-sm text-muted-foreground">{move.label || "Healthy"}</p>
@@ -656,33 +656,85 @@ function BetNavigator({
   activeOrdered: any[];
   currentId: string;
 }) {
+  const total = activeOrdered.length;
+  const currentIndex = activeOrdered.findIndex((b) => b.id === currentId);
+  const prev = currentIndex > 0 ? activeOrdered[currentIndex - 1] : null;
+  const next = currentIndex < total - 1 ? activeOrdered[currentIndex + 1] : null;
+
+  // ≤8 bets: render titled chips with truncation.
+  // >8: render compact prev/next pair with titles + numeric position.
+  if (total <= 8) {
+    return (
+      <nav
+        aria-label="Bet navigator"
+        className="flex items-center gap-1.5 overflow-x-auto pb-2 -mb-2"
+      >
+        {activeOrdered.map((b, i) => {
+          const isCurrent = b.id === currentId;
+          const bucket = lifecycleBucket(b.status);
+          const dot = LIFECYCLE_BUCKET_STYLE[bucket].dot;
+          return (
+            <Link
+              key={b.id}
+              to={`/bets/${b.id}`}
+              aria-current={isCurrent ? "page" : undefined}
+              title={b.title ?? `Bet ${i + 1}`}
+              className={cn(
+                "inline-flex items-center gap-1.5 px-2.5 py-1 rounded-[2px] text-xs transition-colors shrink-0 max-w-[180px]",
+                isCurrent
+                  ? "bg-foreground text-background font-medium"
+                  : "text-muted-foreground hover:text-foreground hover:bg-muted",
+              )}
+              style={{ border: "0.5px solid hsl(var(--border))" }}
+            >
+              <span
+                className={cn("w-1.5 h-1.5 rounded-full inline-block shrink-0", dot)}
+                aria-hidden
+              />
+              <span className="font-mono tabular-nums opacity-60">{i + 1}.</span>
+              <span className="truncate">{b.title || "Untitled"}</span>
+            </Link>
+          );
+        })}
+      </nav>
+    );
+  }
+
+  // >8 bets: prev/next pair with titles
   return (
     <nav
       aria-label="Bet navigator"
-      className="flex items-center gap-1 overflow-x-auto pb-2 -mb-2"
+      className="flex items-center justify-between gap-4 pb-2 -mb-2 text-sm"
     >
-      {activeOrdered.map((b, i) => {
-        const isCurrent = b.id === currentId;
-        const bucket = lifecycleBucket(b.status);
-        const dot = LIFECYCLE_BUCKET_STYLE[bucket].dot;
-        return (
+      <div className="flex items-center gap-2 min-w-0">
+        {prev ? (
           <Link
-            key={b.id}
-            to={`/bets/${b.id}`}
-            aria-current={isCurrent ? "page" : undefined}
-            title={b.title ?? `Bet ${i + 1}`}
-            className={cn(
-              "inline-flex items-center gap-1.5 px-2.5 py-1 rounded-sm text-xs font-medium border transition-colors shrink-0",
-              isCurrent
-                ? "border-foreground bg-foreground text-background"
-                : "border-gray-300 text-muted-foreground hover:text-foreground hover:border-gray-500",
-            )}
+            to={`/bets/${prev.id}`}
+            className="flex items-center gap-1.5 text-muted-foreground hover:text-foreground transition-colors min-w-0"
           >
-            <span className={cn("w-1.5 h-1.5 rounded-full inline-block", dot)} aria-hidden />
-            {i + 1}
+            <span aria-hidden>←</span>
+            <span className="truncate max-w-[200px]">{prev.title || "Untitled"}</span>
           </Link>
-        );
-      })}
+        ) : (
+          <span />
+        )}
+      </div>
+      <span className="font-mono text-xs text-muted-foreground tabular-nums shrink-0">
+        Bet {currentIndex + 1} of {total}
+      </span>
+      <div className="flex items-center gap-2 min-w-0 justify-end">
+        {next ? (
+          <Link
+            to={`/bets/${next.id}`}
+            className="flex items-center gap-1.5 text-muted-foreground hover:text-foreground transition-colors min-w-0"
+          >
+            <span className="truncate max-w-[200px]">{next.title || "Untitled"}</span>
+            <span aria-hidden>→</span>
+          </Link>
+        ) : (
+          <span />
+        )}
+      </div>
     </nav>
   );
 }
@@ -721,7 +773,7 @@ function DecisionGate({ decision }: { decision: any }) {
 
   return (
     <div className="min-w-0">
-      <p className="font-mono text-[10px] uppercase tracking-[0.08em] text-muted-foreground mb-2">
+      <p className="font-mono text-[11px] uppercase tracking-[0.08em] text-muted-foreground mb-2">
         // DECISION GATE
       </p>
       <p className={cn("text-3xl font-semibold tabular-nums tracking-tight mb-1", headlineColor)}>
@@ -749,7 +801,7 @@ function Magnitude({
   const figureColor = tone === "upside" ? "text-green-700" : "text-red-700";
   return (
     <div className="min-w-0">
-      <p className="font-mono text-[10px] uppercase tracking-[0.08em] text-muted-foreground mb-2">
+      <p className="font-mono text-[11px] uppercase tracking-[0.08em] text-muted-foreground mb-2">
         {`// ${label.toUpperCase()}`}
       </p>
       {figure ? (
@@ -890,50 +942,85 @@ function RailActions({
   onInlineSave: any;
   logActivity: any;
 }) {
+  // Lifecycle pipeline as ordered steps. Each click advances the bet to that
+  // state; the parent's pendingStatus modal confirms the change.
+  const LIFECYCLE_STEPS: BetLifecycleStatus[] = [
+    "defined",
+    "activated",
+    "proving_value",
+    "scaling",
+    "durable",
+    "closed",
+  ];
+  const currentStepIdx = LIFECYCLE_STEPS.indexOf(currentLifecycle);
+
   return (
     <>
-      <aside className="hidden lg:block sticky top-8 h-fit">
-        <p className="font-mono text-[10px] uppercase tracking-[0.08em] text-muted-foreground mb-4">
-          // ACTIONS
-        </p>
-        <div className="space-y-4">
-          {canUpdateStatus && (
-            <div>
-              <p className="text-sm font-medium text-foreground mb-1">Update lifecycle</p>
-              <select
-                aria-label="Update lifecycle"
-                value={currentLifecycle}
-                onChange={(e) => onLifecycleChange(e.target.value as BetLifecycleStatus)}
-                className="text-sm border border-gray-300 bg-background rounded-sm px-2 py-1.5 w-full cursor-pointer hover:bg-gray-100 focus:outline-none focus:ring-1 focus:ring-foreground"
-              >
-                {BET_LIFECYCLE_STATUSES.map((s) => (
-                  <option key={s} value={s}>
-                    {BET_LIFECYCLE_LABELS[s]}
-                  </option>
-                ))}
-              </select>
-            </div>
-          )}
-          <button
-            onClick={() => scrollToId("what-moved")}
-            className="block w-full text-left text-sm font-medium text-foreground hover:underline"
-            disabled={!canEdit}
-          >
-            Log movement →
-          </button>
-          <button
-            onClick={() => scrollToId("outcome-metrics")}
-            className="block w-full text-left text-sm font-medium text-foreground hover:underline"
-            disabled={!canEdit}
-          >
-            Add metric →
-          </button>
+      <aside className="hidden lg:block sticky top-8 h-fit space-y-8">
+        {/* // LIFECYCLE — vertical step list */}
+        <div>
+          <p className="font-mono text-[11px] uppercase tracking-[0.08em] text-muted-foreground mb-3">
+            // LIFECYCLE
+          </p>
+          <ol className="space-y-1">
+            {LIFECYCLE_STEPS.map((step, i) => {
+              const isCurrent = step === currentLifecycle;
+              const isPast = i < currentStepIdx;
+              return (
+                <li key={step}>
+                  <button
+                    type="button"
+                    onClick={() => onLifecycleChange(step)}
+                    disabled={!canUpdateStatus || isCurrent}
+                    aria-current={isCurrent ? "step" : undefined}
+                    className={cn(
+                      "w-full text-left text-sm px-2 py-1.5 rounded-[2px] flex items-center gap-2 transition-colors",
+                      isCurrent
+                        ? "bg-foreground text-background font-medium cursor-default"
+                        : isPast
+                          ? "text-muted-foreground hover:bg-muted hover:text-foreground"
+                          : "text-foreground hover:bg-muted",
+                      !canUpdateStatus && !isCurrent && "opacity-60 cursor-not-allowed",
+                    )}
+                  >
+                    <span className="font-mono text-[10px] tabular-nums opacity-60 w-4">
+                      {String(i + 1).padStart(2, "0")}
+                    </span>
+                    <span>{BET_LIFECYCLE_LABELS[step]}</span>
+                  </button>
+                </li>
+              );
+            })}
+          </ol>
+        </div>
+
+        {/* // LOG — quick navigation to logging sections */}
+        <div>
+          <p className="font-mono text-[11px] uppercase tracking-[0.08em] text-muted-foreground mb-3">
+            // LOG
+          </p>
+          <div className="space-y-1">
+            <button
+              onClick={() => scrollToId("what-moved")}
+              disabled={!canEdit}
+              className="block w-full text-left text-sm text-foreground hover:underline px-2 py-1.5"
+            >
+              Log movement →
+            </button>
+            <button
+              onClick={() => scrollToId("outcome-metrics")}
+              disabled={!canEdit}
+              className="block w-full text-left text-sm text-foreground hover:underline px-2 py-1.5"
+            >
+              Add metric →
+            </button>
+          </div>
         </div>
       </aside>
 
       {/* Mobile bottom bar */}
       <div
-        className="lg:hidden fixed bottom-0 left-0 right-0 bg-background border-t border-gray-300 px-4 py-3 flex items-center justify-around gap-3 z-10"
+        className="lg:hidden fixed bottom-0 left-0 right-0 bg-background border-t border-border px-4 py-3 flex items-center justify-around gap-3 z-10"
         style={{ borderTopWidth: "0.5px" }}
       >
         {canUpdateStatus && (
@@ -941,7 +1028,8 @@ function RailActions({
             aria-label="Update lifecycle"
             value={currentLifecycle}
             onChange={(e) => onLifecycleChange(e.target.value as BetLifecycleStatus)}
-            className="text-sm border border-gray-300 bg-background rounded-sm px-2 py-1 cursor-pointer"
+            className="text-sm border border-border bg-background rounded-[2px] px-2 py-1 cursor-pointer"
+            style={{ borderWidth: "0.5px" }}
           >
             {BET_LIFECYCLE_STATUSES.map((s) => (
               <option key={s} value={s}>

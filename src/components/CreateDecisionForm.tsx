@@ -605,37 +605,66 @@ export default function CreateDecisionForm({ onClose, navigateAfter = false }: {
     }
   };
 
+  const inputCls =
+    "w-full border border-border bg-background rounded-[2px] px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-0 transition-colors";
+  const labelCls = "text-xs font-medium text-foreground block mb-1.5";
+  const inputBorderStyle = { borderWidth: "0.5px" } as React.CSSProperties;
+
   return (
-    <div className="border rounded-md p-5 mb-6 bg-surface-elevated">
-      <div className="flex items-center justify-between mb-4">
-        <h2 className="text-xs font-semibold text-muted-foreground">Register High-Impact Bet</h2>
-        <button onClick={onClose} className="text-xs text-muted-foreground hover:text-foreground">Cancel</button>
+    <div
+      className="border-y border-border py-8 mb-8"
+      style={{ borderTopWidth: "0.5px", borderBottomWidth: "0.5px" }}
+    >
+      {/* Header */}
+      <div className="flex items-start justify-between mb-6">
+        <div>
+          <p className="font-mono text-[11px] uppercase tracking-[0.08em] text-muted-foreground mb-2">
+            // REGISTER BET
+          </p>
+          <h2 className="text-xl font-semibold text-foreground tracking-tight">
+            New high-impact bet
+          </h2>
+        </div>
+        <button
+          type="button"
+          onClick={onClose}
+          className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+        >
+          Cancel
+        </button>
       </div>
-      <div className="border rounded-sm p-3 mb-4 bg-background">
-        <p className="text-xs font-semibold text-muted-foreground mb-1">Bulk Strategy Import (Beta)</p>
-        <p className="text-xs text-muted-foreground mb-2">
-          Import one strategy source to map multiple bets, then create all mapped bets at once.
-        </p>
-        <div className="space-y-2">
+
+      {/* Bulk strategy import — collapsible section */}
+      <details className="mb-8 group">
+        <summary className="cursor-pointer list-none flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.08em] text-muted-foreground hover:text-foreground transition-colors mb-3">
+          <span className="group-open:rotate-90 transition-transform">▸</span>
+          {`// BULK STRATEGY IMPORT`}
+        </summary>
+        <div className="space-y-3 pl-4">
+          <p className="text-sm text-muted-foreground">
+            Import one strategy source to map multiple bets, then create all mapped bets at once.
+          </p>
           <textarea
             value={strategyText}
             onChange={(e) => setStrategyText(e.target.value)}
             rows={4}
-            placeholder="Paste strategy text, memo excerpt, or planning notes (optional if using URL/file)"
-            className="w-full border rounded-sm px-3 py-2 text-sm bg-background focus:outline-none focus:ring-1 focus:ring-foreground"
+            placeholder="Paste strategy text, memo excerpt, or planning notes"
+            className={inputCls}
+            style={inputBorderStyle}
           />
           <input
             type="url"
             value={strategyUrl}
             onChange={(e) => setStrategyUrl(e.target.value)}
-            placeholder="Optional source URL (Google Doc/public page)"
-            className="w-full border rounded-sm px-3 py-2 text-sm bg-background focus:outline-none focus:ring-1 focus:ring-foreground"
+            placeholder="Optional source URL (Google Doc, public page)"
+            className={inputCls}
+            style={inputBorderStyle}
           />
           <input
             type="file"
             accept=".txt,.md,.pdf,.docx,text/plain,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
             onChange={(e) => setStrategyFile(e.target.files?.[0] || null)}
-            className="w-full text-xs text-muted-foreground"
+            className="w-full text-xs text-muted-foreground file:mr-3 file:rounded-[2px] file:border file:border-border file:bg-background file:px-3 file:py-1.5 file:text-sm file:font-medium file:text-foreground hover:file:bg-muted"
           />
           <p className="text-xs text-muted-foreground">
             File upload is for batch mapping only, not for attaching to a single bet.
@@ -645,43 +674,56 @@ export default function CreateDecisionForm({ onClose, navigateAfter = false }: {
               type="button"
               onClick={analyzeStrategy}
               disabled={strategyLoading}
-              className="text-sm font-semibold text-foreground border border-foreground px-3 py-1.5 rounded-sm hover:bg-foreground hover:text-background transition-colors disabled:opacity-50"
+              className="inline-flex items-center rounded-[2px] border border-border bg-background text-foreground px-4 py-2 text-sm font-medium hover:bg-muted transition-colors disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+              style={inputBorderStyle}
             >
-              {strategyLoading ? "Analyzing..." : "Map Strategy"}
+              {strategyLoading ? "Analyzing…" : "Map strategy"}
             </button>
             {strategySuggestions.length > 0 && (
               <button
                 type="button"
                 onClick={createAllSuggestions}
                 disabled={createDecision.isPending}
-                className="text-sm font-semibold text-background bg-foreground px-3 py-1.5 rounded-sm hover:bg-foreground/90 transition-colors disabled:opacity-50"
+                className="inline-flex items-center rounded-[2px] bg-foreground text-background px-4 py-2 text-sm font-medium hover:opacity-[0.9] transition-opacity disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
               >
-                {createDecision.isPending ? "Creating..." : `Create ${strategySuggestions.length} Bet${strategySuggestions.length === 1 ? "" : "s"}`}
+                {createDecision.isPending
+                  ? "Creating…"
+                  : `Create ${strategySuggestions.length} bet${strategySuggestions.length === 1 ? "" : "s"}`}
               </button>
             )}
           </div>
-          {strategySummary && <p className="text-xs text-muted-foreground">{strategySummary}</p>}
+          {strategySummary && (
+            <p className="text-xs text-muted-foreground">{strategySummary}</p>
+          )}
           {strategyWarnings.length > 0 && (
             <div className="text-xs text-signal-amber space-y-0.5">
-              {strategyWarnings.map((w, i) => <p key={`${w}-${i}`}>• {w}</p>)}
+              {strategyWarnings.map((w, i) => (
+                <p key={`${w}-${i}`}>· {w}</p>
+              ))}
             </div>
           )}
           {strategySuggestions.length > 0 && (
-            <div className="space-y-2">
-              <p className="text-xs font-semibold text-muted-foreground">
-                Mapped Candidate Bets
-              </p>
+            <div className="space-y-2 pt-2">
+              <p className="text-xs font-medium text-foreground">Mapped candidate bets</p>
               {strategySuggestions.map((s, i) => (
-                <div key={`${s.title}-${i}`} className="border rounded-sm p-2">
-                  <p className="text-xs font-semibold">{s.title}</p>
-                  <p className="text-xs text-muted-foreground">{s.owner || "Owner missing"} · {s.product_area || "Product area missing"}</p>
-                  {s.expected_impact && <p className="text-xs text-muted-foreground mt-1">{s.expected_impact}</p>}
+                <div
+                  key={`${s.title}-${i}`}
+                  className="border border-border rounded-[2px] p-3"
+                  style={inputBorderStyle}
+                >
+                  <p className="text-sm font-medium text-foreground">{s.title}</p>
+                  <p className="text-xs text-muted-foreground mt-0.5">
+                    {s.owner || "Owner missing"} · {s.product_area || "Product area missing"}
+                  </p>
+                  {s.expected_impact && (
+                    <p className="text-xs text-muted-foreground mt-1">{s.expected_impact}</p>
+                  )}
                   <button
                     type="button"
                     onClick={() => applySuggestionToForm(s)}
-                    className="mt-2 text-xs font-semibold text-muted-foreground hover:text-foreground"
+                    className="mt-2 text-sm font-medium text-foreground hover:underline"
                   >
-                    Use In Form
+                    Use in form
                   </button>
                 </div>
               ))}
@@ -691,56 +733,74 @@ export default function CreateDecisionForm({ onClose, navigateAfter = false }: {
             </div>
           )}
         </div>
-      </div>
-      <form onSubmit={handleSubmit} className="space-y-3">
+      </details>
+
+      <form onSubmit={handleSubmit} className="space-y-5">
+        {/* Goal — required, with inline picker */}
         <div>
-          <label className="text-xs font-semibold text-muted-foreground block mb-1">Goal *</label>
+          <label className={labelCls}>Goal *</label>
           <div className="flex gap-2">
             <select
               required
               value={linkedOkrId}
               onChange={(e) => setLinkedOkrId(e.target.value)}
-              className="flex-1 border rounded-sm px-3 py-2 text-sm bg-background focus:outline-none focus:ring-1 focus:ring-foreground"
+              className={`flex-1 ${inputCls}`}
+              style={inputBorderStyle}
             >
-              <option value="" disabled>Select a goal…</option>
+              <option value="" disabled>
+                Select a goal…
+              </option>
               {okrs.map((o) => (
                 <option key={o.id} value={o.id}>
-                  {o.title}{o.quarter ? ` (${o.quarter})` : ""}
+                  {o.title}
+                  {o.quarter ? ` (${o.quarter})` : ""}
                 </option>
               ))}
             </select>
             <button
               type="button"
               onClick={() => setNewGoalOpen(true)}
-              className="text-xs font-mono uppercase tracking-[0.05em] border border-foreground px-3 py-2 hover:opacity-[0.85] transition-opacity"
+              className="inline-flex items-center rounded-[2px] border border-border bg-background text-foreground px-3 py-2 text-sm font-medium hover:bg-muted transition-colors"
+              style={inputBorderStyle}
             >
               + New goal
             </button>
           </div>
           {okrs.length === 0 && !newGoalOpen && (
-            <p className="text-xs text-muted-foreground mt-1">No goals yet — create one to register a bet.</p>
+            <p className="text-xs text-muted-foreground mt-1.5">
+              No goals yet. Create one to register a bet.
+            </p>
           )}
           {newGoalOpen && (
-            <div className="border border-gray-300 rounded-sm p-3 mt-2 bg-background space-y-2">
-              <p className="text-xs font-semibold text-muted-foreground">New goal</p>
+            <div
+              className="border border-border rounded-[2px] p-4 mt-3 bg-background space-y-3"
+              style={inputBorderStyle}
+            >
+              <p className="text-xs font-medium text-foreground">New goal</p>
               <input
                 value={newGoalTitle}
                 onChange={(e) => setNewGoalTitle(e.target.value)}
                 placeholder="Goal title (e.g. Reach $5M ARR by EoY)"
                 autoFocus
-                className="w-full border rounded-sm px-3 py-2 text-sm bg-background focus:outline-none focus:ring-1 focus:ring-foreground"
+                className={inputCls}
+                style={inputBorderStyle}
               />
               <input
                 value={newGoalQuarter}
                 onChange={(e) => setNewGoalQuarter(e.target.value)}
                 placeholder="Quarter (optional, e.g. Q2 2026)"
-                className="w-full border rounded-sm px-3 py-2 text-sm bg-background focus:outline-none focus:ring-1 focus:ring-foreground"
+                className={inputCls}
+                style={inputBorderStyle}
               />
               <div className="flex gap-2 justify-end">
                 <button
                   type="button"
-                  onClick={() => { setNewGoalOpen(false); setNewGoalTitle(""); setNewGoalQuarter(""); }}
-                  className="text-xs text-muted-foreground hover:text-foreground px-2 py-1"
+                  onClick={() => {
+                    setNewGoalOpen(false);
+                    setNewGoalTitle("");
+                    setNewGoalQuarter("");
+                  }}
+                  className="text-sm text-muted-foreground hover:text-foreground transition-colors"
                 >
                   Cancel
                 </button>
@@ -748,7 +808,7 @@ export default function CreateDecisionForm({ onClose, navigateAfter = false }: {
                   type="button"
                   onClick={handleCreateGoal}
                   disabled={createOKR.isPending}
-                  className="text-xs font-mono uppercase tracking-[0.05em] bg-foreground text-background px-3 py-1.5 hover:opacity-[0.85] transition-opacity disabled:opacity-50"
+                  className="inline-flex items-center rounded-[2px] bg-foreground text-background px-3 py-1.5 text-sm font-medium hover:opacity-[0.9] transition-opacity disabled:opacity-50"
                 >
                   {createOKR.isPending ? "Creating…" : "Create goal"}
                 </button>
@@ -756,33 +816,53 @@ export default function CreateDecisionForm({ onClose, navigateAfter = false }: {
             </div>
           )}
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+
+        {/* Title / Owner / Sponsor */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div>
-            <label className="text-xs font-semibold text-muted-foreground block mb-1">Title *</label>
-            <input required value={title} onChange={(e) => setTitle(e.target.value)}
-              className="w-full border rounded-sm px-3 py-2 text-sm bg-background focus:outline-none focus:ring-1 focus:ring-foreground" />
+            <label className={labelCls}>Title *</label>
+            <input
+              required
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              className={inputCls}
+              style={inputBorderStyle}
+            />
           </div>
           <div>
-            <label className="text-xs font-semibold text-muted-foreground block mb-1">Owner *</label>
-            <input required value={owner} onChange={(e) => setOwner(e.target.value)}
-              className="w-full border rounded-sm px-3 py-2 text-sm bg-background focus:outline-none focus:ring-1 focus:ring-foreground" />
+            <label className={labelCls}>Owner *</label>
+            <input
+              required
+              value={owner}
+              onChange={(e) => setOwner(e.target.value)}
+              className={inputCls}
+              style={inputBorderStyle}
+            />
           </div>
           <div>
-            <label className="text-xs font-semibold text-muted-foreground block mb-1">Sponsor *</label>
-            <input required value={sponsor} onChange={(e) => setSponsor(e.target.value)}
-              className="w-full border rounded-sm px-3 py-2 text-sm bg-background focus:outline-none focus:ring-1 focus:ring-foreground" />
+            <label className={labelCls}>Sponsor *</label>
+            <input
+              required
+              value={sponsor}
+              onChange={(e) => setSponsor(e.target.value)}
+              className={inputCls}
+              style={inputBorderStyle}
+            />
           </div>
         </div>
-        <div className="grid grid-cols-2 gap-3">
+
+        {/* Product area / Category */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label className="text-xs font-semibold text-muted-foreground block mb-1">Product Area *</label>
+            <label className={labelCls}>Product area *</label>
             <input
               required
               list="org-product-area-options"
               value={productArea}
               onChange={(e) => setProductArea(e.target.value)}
-              placeholder="Type product area (e.g. Registry Growth)"
-              className="w-full border rounded-sm px-3 py-2 text-sm bg-background focus:outline-none focus:ring-1 focus:ring-foreground"
+              placeholder="e.g. Registry Growth"
+              className={inputCls}
+              style={inputBorderStyle}
             />
             <datalist id="org-product-area-options">
               {productAreas.map((pa) => (
@@ -791,54 +871,102 @@ export default function CreateDecisionForm({ onClose, navigateAfter = false }: {
             </datalist>
           </div>
           <div>
-            <label className="text-xs font-semibold text-muted-foreground block mb-1">Outcome Category</label>
-            <select value={outcomeCategoryKey} onChange={(e) => setOutcomeCategoryKey(e.target.value)}
-              className="w-full border rounded-sm px-3 py-2 text-sm bg-background focus:outline-none focus:ring-1 focus:ring-foreground">
-              <option value="" disabled>Select…</option>
+            <label className={labelCls}>Outcome category</label>
+            <select
+              value={outcomeCategoryKey}
+              onChange={(e) => setOutcomeCategoryKey(e.target.value)}
+              className={inputCls}
+              style={inputBorderStyle}
+            >
+              <option value="" disabled>
+                Select…
+              </option>
               {outcomeCategories.map((c) => (
-                <option key={c.key} value={c.key}>{c.label}</option>
+                <option key={c.key} value={c.key}>
+                  {c.label}
+                </option>
               ))}
             </select>
             {outcomeCategoriesError && (
-              <p className="text-xs text-signal-amber mt-0.5">{outcomeCategoriesError}</p>
+              <p className="text-xs text-signal-amber mt-1">{outcomeCategoriesError}</p>
             )}
           </div>
         </div>
-        <div className="grid grid-cols-2 gap-3">
+
+        {/* Outcome target / Expected impact */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label className="text-xs font-semibold text-muted-foreground block mb-1">Outcome Target</label>
-            <input value={outcomeTarget} onChange={(e) => setOutcomeTarget(e.target.value)}
-              className="w-full border rounded-sm px-3 py-2 text-sm bg-background focus:outline-none focus:ring-1 focus:ring-foreground" />
+            <label className={labelCls}>Outcome target</label>
+            <input
+              value={outcomeTarget}
+              onChange={(e) => setOutcomeTarget(e.target.value)}
+              className={inputCls}
+              style={inputBorderStyle}
+            />
           </div>
           <div>
-            <label className="text-xs font-semibold text-muted-foreground block mb-1">Expected Impact</label>
-            <input value={expectedImpact} onChange={(e) => setExpectedImpact(e.target.value)} placeholder="e.g. +15% adoption"
-              className="w-full border rounded-sm px-3 py-2 text-sm bg-background focus:outline-none focus:ring-1 focus:ring-foreground" />
-          </div>
-        </div>
-        <div className="grid grid-cols-2 gap-3">
-          <div>
-            <label className="text-xs font-semibold text-muted-foreground block mb-1">Exposure Value</label>
-            <input value={exposureValue} onChange={(e) => setExposureValue(e.target.value)} placeholder="e.g. $2.1M ARR at risk"
-              className="w-full border rounded-sm px-3 py-2 text-sm bg-background focus:outline-none focus:ring-1 focus:ring-foreground" />
-          </div>
-          <div>
-            <label className="text-xs font-semibold text-muted-foreground block mb-1">Revenue at Risk</label>
-            <input value={revenueAtRisk} onChange={(e) => setRevenueAtRisk(e.target.value)} placeholder="$4.8M ARR"
-              className="w-full border rounded-sm px-3 py-2 text-sm bg-background focus:outline-none focus:ring-1 focus:ring-foreground" />
-          </div>
-        </div>
-        <div className="grid grid-cols-2 gap-3">
-          <div>
-            <label className="text-xs font-semibold text-muted-foreground block mb-1">Trigger Signal *</label>
-            <input required value={triggerSignal} onChange={(e) => setTriggerSignal(e.target.value)}
-              className="w-full border rounded-sm px-3 py-2 text-sm bg-background focus:outline-none focus:ring-1 focus:ring-foreground" />
+            <label className={labelCls}>Expected impact</label>
+            <input
+              value={expectedImpact}
+              onChange={(e) => setExpectedImpact(e.target.value)}
+              placeholder="e.g. +15% adoption"
+              className={inputCls}
+              style={inputBorderStyle}
+            />
           </div>
         </div>
-        <div className="flex justify-end pt-2">
-          <button type="submit" disabled={createDecision.isPending}
-            className="text-sm font-semibold text-background bg-foreground px-4 py-2 rounded-sm hover:bg-foreground/90 transition-colors disabled:opacity-50">
-            {createDecision.isPending ? "Registering..." : "Register Bet"}
+
+        {/* Upside / Risk */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label className={labelCls}>Upside exposure</label>
+            <input
+              value={exposureValue}
+              onChange={(e) => setExposureValue(e.target.value)}
+              placeholder="e.g. $2.1M ARR"
+              className={inputCls}
+              style={inputBorderStyle}
+            />
+          </div>
+          <div>
+            <label className={labelCls}>Risk exposure</label>
+            <input
+              value={revenueAtRisk}
+              onChange={(e) => setRevenueAtRisk(e.target.value)}
+              placeholder="e.g. $4.8M ARR"
+              className={inputCls}
+              style={inputBorderStyle}
+            />
+          </div>
+        </div>
+
+        {/* Trigger */}
+        <div>
+          <label className={labelCls}>Trigger signal *</label>
+          <input
+            required
+            value={triggerSignal}
+            onChange={(e) => setTriggerSignal(e.target.value)}
+            placeholder="The measurable event that says this bet is working"
+            className={inputCls}
+            style={inputBorderStyle}
+          />
+        </div>
+
+        <div className="flex justify-end pt-2 gap-3">
+          <button
+            type="button"
+            onClick={onClose}
+            className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+          >
+            Cancel
+          </button>
+          <button
+            type="submit"
+            disabled={createDecision.isPending}
+            className="inline-flex items-center rounded-[2px] bg-foreground text-background px-5 py-2 text-sm font-medium hover:opacity-[0.9] transition-opacity disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+          >
+            {createDecision.isPending ? "Registering…" : "Register bet"}
           </button>
         </div>
       </form>
