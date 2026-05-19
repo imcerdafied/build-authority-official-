@@ -83,6 +83,8 @@ function makeInitiative(overrides: Partial<BetInitiative>): BetInitiative {
     owner: null,
     owner_user_id: null,
     status: null,
+    title: null,
+    acceptance_signal: null,
     ...overrides,
   };
 }

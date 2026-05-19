@@ -234,6 +234,8 @@ export interface BetInitiative {
   owner: string | null;
   owner_user_id: string | null;
   status: InitiativeStatus | null;
+  title: string | null;
+  acceptance_signal: string | null;
 }
 
 export interface BetFinding {

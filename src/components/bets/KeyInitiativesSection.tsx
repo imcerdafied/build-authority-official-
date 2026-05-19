@@ -66,6 +66,7 @@ export default function KeyInitiativesSection({ betId, canWrite }: KeyInitiative
 
   const [adding, setAdding] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [expandedId, setExpandedId] = useState<string | null>(null);
 
   const memberById = useMemo(
     () => new Map(members.map((m) => [m.user_id, m])),
@@ -129,6 +130,8 @@ export default function KeyInitiativesSection({ betId, canWrite }: KeyInitiative
                 key={init.id}
                 initiative={init}
                 ownerLabel={resolveOwnerLabel(init, memberById)}
+                expanded={expandedId === init.id}
+                onToggle={() => setExpandedId(expandedId === init.id ? null : init.id)}
                 canWrite={canWrite}
                 onEdit={() => setEditingId(init.id)}
               />
@@ -171,42 +174,85 @@ export default function KeyInitiativesSection({ betId, canWrite }: KeyInitiative
 function InitiativeReadRow({
   initiative,
   ownerLabel,
+  expanded,
+  onToggle,
   canWrite,
   onEdit,
 }: {
   initiative: BetInitiative;
   ownerLabel: string | null;
+  expanded: boolean;
+  onToggle: () => void;
   canWrite: boolean;
   onEdit: () => void;
 }) {
   const status = normalizeStatus(initiative.status);
   const style = STATUS_STYLE[status];
+  // The headline prefers title; when title is null we fall back to the
+  // description so legacy rows still read sensibly.
+  const headline = initiative.title?.trim() || initiative.description;
+  const hasDetailBody = !!initiative.title?.trim() && !!initiative.description?.trim();
+  const hasAcceptance = !!initiative.acceptance_signal?.trim();
+  const hasDetail = hasDetailBody || hasAcceptance;
+
   return (
-    <li className="grid grid-cols-[auto_1fr_auto] gap-3 items-start py-2">
-      <span
-        className={cn(
-          "inline-flex items-center gap-1.5 rounded-sm px-2 py-0.5 mt-0.5 shrink-0",
-          "font-mono text-[10px] uppercase tracking-[0.05em]",
-          style.pill,
-        )}
-      >
-        <span className={cn("w-1 h-1 rounded-full inline-block shrink-0", style.dot)} aria-hidden />
-        {STATUS_LABEL[status]}
-      </span>
-      <div className="min-w-0">
-        <p className="text-sm text-foreground leading-snug">{initiative.description}</p>
-        {ownerLabel && (
-          <p className="text-xs text-muted-foreground mt-0.5">{ownerLabel}</p>
+    <li className="py-2 border-b border-border last:border-b-0" style={{ borderBottomWidth: "0.5px" }}>
+      <div className="grid grid-cols-[auto_1fr_auto] gap-3 items-start">
+        <span
+          className={cn(
+            "inline-flex items-center gap-1.5 rounded-sm px-2 py-0.5 mt-0.5 shrink-0",
+            "font-mono text-[10px] uppercase tracking-[0.05em]",
+            style.pill,
+          )}
+        >
+          <span className={cn("w-1 h-1 rounded-full inline-block shrink-0", style.dot)} aria-hidden />
+          {STATUS_LABEL[status]}
+        </span>
+        <div className="min-w-0">
+          <p className="text-sm font-medium text-foreground leading-snug">{headline}</p>
+          {ownerLabel && (
+            <p className="text-xs text-muted-foreground mt-0.5">{ownerLabel}</p>
+          )}
+          {hasDetail && (
+            <button
+              type="button"
+              onClick={onToggle}
+              aria-expanded={expanded}
+              className="mt-1.5 text-xs font-medium text-accent hover:underline"
+            >
+              {expanded ? "Hide details" : "Show details"}
+            </button>
+          )}
+        </div>
+        {canWrite && (
+          <button
+            type="button"
+            onClick={onEdit}
+            className="text-xs text-muted-foreground hover:text-foreground transition-colors shrink-0"
+          >
+            Edit
+          </button>
         )}
       </div>
-      {canWrite && (
-        <button
-          type="button"
-          onClick={onEdit}
-          className="text-xs text-muted-foreground hover:text-foreground transition-colors shrink-0"
-        >
-          Edit
-        </button>
+
+      {expanded && hasDetail && (
+        <div className="mt-3 ml-[5.5rem] space-y-3 max-w-2xl">
+          {hasDetailBody && (
+            <p className="text-sm text-foreground leading-relaxed whitespace-pre-line">
+              {initiative.description}
+            </p>
+          )}
+          {hasAcceptance && (
+            <div>
+              <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground mb-1">
+                Acceptance
+              </p>
+              <p className="text-sm text-foreground leading-relaxed whitespace-pre-line">
+                {initiative.acceptance_signal}
+              </p>
+            </div>
+          )}
+        </div>
       )}
     </li>
   );
@@ -226,7 +272,9 @@ function InitiativeEditRow({
   initiative: BetInitiative;
   members: OrgMember[];
   onSave: (updates: {
+    title: string | null;
     description: string;
+    acceptance_signal: string | null;
     owner: string | null;
     owner_user_id: string | null;
     status: InitiativeStatus;
@@ -236,7 +284,9 @@ function InitiativeEditRow({
   saving: boolean;
   deleting: boolean;
 }) {
+  const [title, setTitle] = useState(initiative.title ?? "");
   const [description, setDescription] = useState(initiative.description);
+  const [acceptance, setAcceptance] = useState(initiative.acceptance_signal ?? "");
   // Owner mode is "custom" only when the saved owner is a free-text snapshot
   // with no FK — every member-backed initiative defaults to the member picker.
   const initialMode: "member" | "custom" = initiative.owner_user_id || !initiative.owner ? "member" : "custom";
@@ -249,14 +299,17 @@ function InitiativeEditRow({
   const [confirmDelete, setConfirmDelete] = useState(false);
 
   const submit = async () => {
-    const trimmed = description.trim();
-    if (!trimmed) {
-      toast.error("Description is required.");
+    const trimmedDescription = description.trim();
+    const trimmedTitle = title.trim();
+    if (!trimmedTitle && !trimmedDescription) {
+      toast.error("Title or description is required.");
       return;
     }
     const ownerFields = resolveOwnerFields(ownerMode, ownerUserId, ownerCustom, members);
     await onSave({
-      description: trimmed,
+      title: trimmedTitle || null,
+      description: trimmedDescription,
+      acceptance_signal: acceptance.trim() || null,
       ...ownerFields,
       status,
     });
@@ -264,11 +317,24 @@ function InitiativeEditRow({
 
   return (
     <li className="border border-border rounded-[2px] p-3 space-y-3 bg-muted/30" style={{ borderWidth: "0.5px" }}>
+      <input
+        value={title}
+        onChange={(e) => setTitle(e.target.value)}
+        placeholder="Initiative title"
+        className="w-full text-sm font-medium border border-gray-300 rounded-sm px-2 py-1.5 bg-background focus:outline-none focus:ring-1 focus:ring-foreground"
+      />
       <textarea
         value={description}
         onChange={(e) => setDescription(e.target.value)}
+        rows={3}
+        placeholder="Description (what the team is doing)"
+        className="w-full text-sm border border-gray-300 rounded-sm px-2 py-1.5 bg-background focus:outline-none focus:ring-1 focus:ring-foreground"
+      />
+      <textarea
+        value={acceptance}
+        onChange={(e) => setAcceptance(e.target.value)}
         rows={2}
-        placeholder="What is the team doing?"
+        placeholder="Acceptance signal (the measurable thing that closes this)"
         className="w-full text-sm border border-gray-300 rounded-sm px-2 py-1.5 bg-background focus:outline-none focus:ring-1 focus:ring-foreground"
       />
       <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
@@ -353,7 +419,9 @@ function InitiativeAddRow({
 }: {
   members: OrgMember[];
   onSave: (payload: {
+    title: string | null;
     description: string;
+    acceptance_signal: string | null;
     owner: string | null;
     owner_user_id: string | null;
     status: InitiativeStatus;
@@ -361,25 +429,32 @@ function InitiativeAddRow({
   onCancel: () => void;
   saving: boolean;
 }) {
+  const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
+  const [acceptance, setAcceptance] = useState("");
   const [ownerMode, setOwnerMode] = useState<"member" | "custom">("member");
   const [ownerUserId, setOwnerUserId] = useState<string>("");
   const [ownerCustom, setOwnerCustom] = useState<string>("");
   const [status, setStatus] = useState<InitiativeStatus>("active");
 
   const submit = async () => {
-    const trimmed = description.trim();
-    if (!trimmed) {
-      toast.error("Description is required.");
+    const trimmedDescription = description.trim();
+    const trimmedTitle = title.trim();
+    if (!trimmedTitle && !trimmedDescription) {
+      toast.error("Title or description is required.");
       return;
     }
     const ownerFields = resolveOwnerFields(ownerMode, ownerUserId, ownerCustom, members);
     await onSave({
-      description: trimmed,
+      title: trimmedTitle || null,
+      description: trimmedDescription,
+      acceptance_signal: acceptance.trim() || null,
       ...ownerFields,
       status,
     });
+    setTitle("");
     setDescription("");
+    setAcceptance("");
     setOwnerMode("member");
     setOwnerUserId("");
     setOwnerCustom("");
@@ -388,12 +463,25 @@ function InitiativeAddRow({
 
   return (
     <div className="mt-4 border border-border rounded-[2px] p-3 space-y-3 bg-muted/30" style={{ borderWidth: "0.5px" }}>
+      <input
+        value={title}
+        onChange={(e) => setTitle(e.target.value)}
+        autoFocus
+        placeholder="Initiative title"
+        className="w-full text-sm font-medium border border-gray-300 rounded-sm px-2 py-1.5 bg-background focus:outline-none focus:ring-1 focus:ring-foreground"
+      />
       <textarea
         value={description}
         onChange={(e) => setDescription(e.target.value)}
+        rows={3}
+        placeholder="Description (what the team is doing)"
+        className="w-full text-sm border border-gray-300 rounded-sm px-2 py-1.5 bg-background focus:outline-none focus:ring-1 focus:ring-foreground"
+      />
+      <textarea
+        value={acceptance}
+        onChange={(e) => setAcceptance(e.target.value)}
         rows={2}
-        autoFocus
-        placeholder="What is the team doing in service of this bet?"
+        placeholder="Acceptance signal (the measurable thing that closes this)"
         className="w-full text-sm border border-gray-300 rounded-sm px-2 py-1.5 bg-background focus:outline-none focus:ring-1 focus:ring-foreground"
       />
       <div className="grid grid-cols-1 md:grid-cols-2 gap-2">

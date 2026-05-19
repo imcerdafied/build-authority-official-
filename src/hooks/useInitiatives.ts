@@ -34,6 +34,8 @@ export function useAddInitiative(betId: string | undefined) {
       owner?: string | null;
       owner_user_id?: string | null;
       status?: string | null;
+      title?: string | null;
+      acceptance_signal?: string | null;
     }) => {
       if (!betId) throw new Error("No betId");
       const { error } = await supabase.from("bet_initiatives").insert({
@@ -46,6 +48,8 @@ export function useAddInitiative(betId: string | undefined) {
         owner: input.owner ?? null,
         owner_user_id: input.owner_user_id ?? null,
         status: input.status ?? null,
+        title: input.title ?? null,
+        acceptance_signal: input.acceptance_signal ?? null,
       } as any);
       if (error) throw error;
       await recalculateBetState(betId, "INITIATIVE_ADDED", supabase);

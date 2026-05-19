@@ -85,6 +85,7 @@ export type Database = {
       }
       bet_initiatives: {
         Row: {
+          acceptance_signal: string | null
           aligned_outcomes: Json
           bet_id: string
           confidence: number
@@ -99,10 +100,12 @@ export type Database = {
           roadmap_position: number
           score_v3: number
           status: string | null
+          title: string | null
           updated_at: string | null
           value: number
         }
         Insert: {
+          acceptance_signal?: string | null
           aligned_outcomes?: Json
           bet_id: string
           confidence?: number
@@ -117,10 +120,12 @@ export type Database = {
           roadmap_position?: number
           score_v3?: number
           status?: string | null
+          title?: string | null
           updated_at?: string | null
           value?: number
         }
         Update: {
+          acceptance_signal?: string | null
           aligned_outcomes?: Json
           bet_id?: string
           confidence?: number
@@ -135,6 +140,7 @@ export type Database = {
           roadmap_position?: number
           score_v3?: number
           status?: string | null
+          title?: string | null
           updated_at?: string | null
           value?: number
         }
