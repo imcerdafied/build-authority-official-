@@ -28,6 +28,38 @@ export const BET_RISK_LABELS: Record<BetRiskLevel, string> = {
   at_risk: "At Risk",
 };
 
+// Visual buckets for the lifecycle dimension. Canonical map — must match across
+// every surface that renders a lifecycle pill (BetRow, BetDetail, BetNavigator,
+// Sample Bet on the landing page). Do not redeclare locally.
+export type LifecycleBucket = "defined" | "activated" | "shipping" | "closed";
+
+export function lifecycleBucket(status: string | null | undefined): LifecycleBucket {
+  if (status === "defined") return "defined";
+  if (status === "activated") return "activated";
+  if (status === "closed") return "closed";
+  // proving_value | scaling | durable
+  return "shipping";
+}
+
+export const LIFECYCLE_BUCKET_LABEL: Record<LifecycleBucket, string> = {
+  defined: "Defined",
+  activated: "Activated",
+  shipping: "Shipping",
+  closed: "Closed",
+};
+
+// Single source of truth for lifecycle color treatment. The one purple in the
+// in-app palette lives here on Shipping.
+export const LIFECYCLE_BUCKET_STYLE: Record<
+  LifecycleBucket,
+  { bg: string; text: string; dot: string }
+> = {
+  defined: { bg: "bg-gray-100", text: "text-gray-700", dot: "bg-gray-500" },
+  activated: { bg: "bg-amber-100", text: "text-amber-800", dot: "bg-amber-500" },
+  shipping: { bg: "bg-accent/15", text: "text-accent", dot: "bg-accent" },
+  closed: { bg: "bg-green-100", text: "text-green-800", dot: "bg-green-500" },
+};
+
 export function isBetLifecycleStatus(value: string): value is BetLifecycleStatus {
   return (BET_LIFECYCLE_STATUSES as readonly string[]).includes(value);
 }

@@ -1,6 +1,7 @@
 import { ReactNode, useState } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
+import { Menu } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useOrg } from "@/contexts/OrgContext";
 import { cn } from "@/lib/utils";
@@ -23,14 +24,24 @@ const roleLabels: Record<string, string> = {
   viewer: "Viewer",
 };
 
-const Sep = () => <span className="text-muted-foreground/30 mx-3 hidden md:inline">|</span>;
-
-const subNavLinkClass = "text-sm text-muted-foreground hover:text-foreground transition-colors font-medium px-2 py-1";
-
 const SUB_NAV: { label: string; to: string }[] = [
   { label: "Bets", to: "/bets" },
   { label: "Review", to: "/review" },
 ];
+
+function displayName(user: any): string {
+  return (
+    user?.user_metadata?.full_name ||
+    user?.user_metadata?.name ||
+    user?.email?.split("@")[0] ||
+    "User"
+  );
+}
+
+function initial(user: any): string {
+  const name = displayName(user);
+  return (name?.[0] ?? "?").toUpperCase();
+}
 
 export default function AppLayout({ children }: { children: ReactNode }) {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -40,7 +51,10 @@ export default function AppLayout({ children }: { children: ReactNode }) {
   const { currentOrg, currentRole } = useOrg();
   const navigate = useNavigate();
 
-  const lastViewed = typeof window !== "undefined" ? (localStorage.getItem("feedback_last_viewed") || "1970-01-01") : "1970-01-01";
+  const lastViewed =
+    typeof window !== "undefined"
+      ? localStorage.getItem("feedback_last_viewed") || "1970-01-01"
+      : "1970-01-01";
   const { data: unreadCount } = useQuery({
     queryKey: ["unread_feedback", currentOrg?.id, lastViewed],
     queryFn: async () => {
@@ -60,132 +74,196 @@ export default function AppLayout({ children }: { children: ReactNode }) {
   const location = useLocation();
   const closeMenu = () => setMenuOpen(false);
 
-  const subNavItems = SUB_NAV;
-
   return (
     <div className="min-h-screen flex flex-col">
-      <header className="border-b px-4 lg:px-6 py-4">
-        <div className="flex flex-col md:flex-row md:flex-wrap md:items-center md:justify-between">
-          <div className="flex items-center justify-between w-full md:w-auto">
-            <div className="flex flex-col">
-              <Link to="/bets" className="flex items-center" onClick={closeMenu}>
-                <img src="/logo.svg" alt="Authority" className="h-6 md:h-8 w-auto" />
-              </Link>
-              <div className="leading-tight mt-0.5">
-                <WorkspaceSwitcher onCreateWorkspace={() => setCreateWorkspaceOpen(true)} />
-              </div>
+      {/* Single header row: wordmark + workspace switcher (left) · sub-nav (center) · profile (right) */}
+      <header
+        className="border-b border-border bg-background"
+        style={{ borderBottomWidth: "0.5px" }}
+      >
+        <div className="max-w-6xl mx-auto px-4 lg:px-6 py-3 flex items-center gap-6">
+          {/* Left cluster: logo + workspace switcher inline */}
+          <div className="flex items-center gap-4 min-w-0">
+            <Link to="/bets" className="flex items-center shrink-0" onClick={closeMenu}>
+              <img src="/logo.svg" alt="Authority" className="h-6 w-auto" />
+            </Link>
+            <span
+              className="w-px h-5 bg-border hidden md:inline-block"
+              aria-hidden
+            />
+            <div className="hidden md:block min-w-0">
+              <WorkspaceSwitcher onCreateWorkspace={() => setCreateWorkspaceOpen(true)} />
             </div>
-            <button
-              onClick={() => setMenuOpen(!menuOpen)}
-              className="md:hidden p-2 -mr-2 min-h-[44px] min-w-[44px] flex flex-col items-center justify-center gap-1"
-              aria-label="Toggle menu"
-            >
-              <span className="w-5 h-0.5 bg-foreground block" />
-              <span className="w-5 h-0.5 bg-foreground block" />
-              <span className="w-5 h-0.5 bg-foreground block" />
-            </button>
           </div>
 
-          <nav className={cn(
-            "md:flex md:items-center md:flex-1 md:justify-between",
-            menuOpen ? "flex flex-col py-2 border-b" : "hidden md:flex"
-          )}>
-            <div className="flex flex-col md:flex-row md:items-center" />
-            <div className="flex flex-col md:flex-row md:items-center gap-1 md:gap-4 pt-2 md:pt-0 border-t md:border-t-0 mt-2 md:mt-0">
-              <Sep />
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <button
-                    className="text-xs text-muted-foreground hover:text-foreground transition-colors flex items-center gap-2 min-h-[44px] md:min-h-0"
-                    aria-label="Profile menu"
+          {/* Sub-nav as inline text links — Bets / Review */}
+          <nav
+            aria-label="Sections"
+            className="hidden md:flex items-center gap-6 flex-1"
+          >
+            {SUB_NAV.map((item) => (
+              <Link
+                key={item.to}
+                to={item.to}
+                className={cn(
+                  "text-sm transition-colors",
+                  location.pathname === item.to ||
+                    (item.to === "/bets" && location.pathname.startsWith("/bets"))
+                    ? "text-foreground font-medium"
+                    : "text-muted-foreground hover:text-foreground font-medium",
+                )}
+                onClick={closeMenu}
+              >
+                {item.label}
+              </Link>
+            ))}
+          </nav>
+
+          {/* Mobile menu button */}
+          <button
+            onClick={() => setMenuOpen(!menuOpen)}
+            className="md:hidden p-2 -mr-2 ml-auto min-h-[44px] min-w-[44px] flex items-center justify-center"
+            aria-label="Toggle menu"
+          >
+            <Menu className="w-5 h-5" />
+          </button>
+
+          {/* Right: profile dropdown */}
+          <div className="hidden md:flex items-center">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <button
+                  className="text-sm text-muted-foreground hover:text-foreground transition-colors flex items-center gap-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 rounded-sm"
+                  aria-label="Profile menu"
+                >
+                  <span className="w-7 h-7 rounded-full bg-muted border border-border flex items-center justify-center text-xs font-medium text-foreground shrink-0">
+                    {initial(user)}
+                  </span>
+                  <span className="truncate max-w-[140px] hidden lg:inline text-foreground font-medium">
+                    {displayName(user)}
+                  </span>
+                  {unreadCount != null && unreadCount > 0 && (
+                    <span className="w-2 h-2 rounded-full bg-signal-red inline-block" />
+                  )}
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-56">
+                <div className="px-2 py-1.5">
+                  <p className="text-sm font-medium truncate">{displayName(user)}</p>
+                  <p className="text-xs text-muted-foreground truncate mt-0.5">
+                    {user?.email}
+                  </p>
+                  {currentRole && (
+                    <p className="text-xs text-muted-foreground mt-0.5">
+                      {roleLabels[currentRole] || currentRole}
+                    </p>
+                  )}
+                </div>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem
+                  onSelect={() => {
+                    closeMenu();
+                    navigate("/team");
+                  }}
+                  className="text-sm cursor-pointer"
+                >
+                  Team
+                </DropdownMenuItem>
+                {currentRole === "admin" && (
+                  <DropdownMenuItem
+                    onSelect={() => {
+                      closeMenu();
+                      navigate("/feedback");
+                    }}
+                    className="text-sm cursor-pointer flex items-center justify-between"
                   >
-                    <span className="w-6 h-6 rounded-full bg-foreground/10 border border-foreground/20 flex items-center justify-center text-[10px] font-bold uppercase text-foreground shrink-0">
-                      {user?.email?.[0] ?? "?"}
-                    </span>
-                    <span className="truncate max-w-[140px] hidden md:inline">{user?.email}</span>
+                    <span>Feedback</span>
                     {unreadCount != null && unreadCount > 0 && (
                       <span className="w-2 h-2 rounded-full bg-signal-red inline-block" />
                     )}
-                  </button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-56">
-                  <div className="px-2 py-1.5">
-                    <p className="text-xs font-medium truncate">{user?.email}</p>
-                    {currentRole && (
-                      <p className="text-xs text-muted-foreground mt-0.5">
-                        {roleLabels[currentRole] || currentRole}
-                      </p>
-                    )}
-                  </div>
-                  <DropdownMenuSeparator />
+                  </DropdownMenuItem>
+                )}
+                {currentRole === "admin" && (
                   <DropdownMenuItem
-                    onSelect={() => { closeMenu(); navigate("/team"); }}
+                    onSelect={() => {
+                      closeMenu();
+                      navigate("/settings");
+                    }}
                     className="text-sm cursor-pointer"
                   >
-                    Team
+                    Settings
                   </DropdownMenuItem>
-                  {currentRole === "admin" && (
-                    <DropdownMenuItem
-                      onSelect={() => { closeMenu(); navigate("/feedback"); }}
-                      className="text-sm cursor-pointer flex items-center justify-between"
-                    >
-                      <span>Feedback</span>
-                      {unreadCount != null && unreadCount > 0 && (
-                        <span className="w-2 h-2 rounded-full bg-signal-red inline-block" />
-                      )}
-                    </DropdownMenuItem>
-                  )}
-                  {currentRole === "admin" && (
-                    <DropdownMenuItem
-                      onSelect={() => { closeMenu(); navigate("/settings"); }}
-                      className="text-sm cursor-pointer"
-                    >
-                      Settings
-                    </DropdownMenuItem>
-                  )}
-                  <DropdownMenuItem
-                    onSelect={() => { closeMenu(); setCreateWorkspaceOpen(true); }}
-                    className="text-sm cursor-pointer"
-                  >
-                    Create Workspace
-                  </DropdownMenuItem>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem
-                    onSelect={() => { closeMenu(); signOut(); }}
-                    className="text-sm cursor-pointer text-muted-foreground"
-                  >
-                    Sign Out
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </div>
-          </nav>
+                )}
+                <DropdownMenuItem
+                  onSelect={() => {
+                    closeMenu();
+                    setCreateWorkspaceOpen(true);
+                  }}
+                  className="text-sm cursor-pointer"
+                >
+                  Create Workspace
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem
+                  onSelect={() => {
+                    closeMenu();
+                    signOut();
+                  }}
+                  className="text-sm cursor-pointer text-muted-foreground"
+                >
+                  Sign Out
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
         </div>
+
+        {/* Mobile menu drawer */}
+        {menuOpen && (
+          <div
+            className="md:hidden border-t border-border px-4 py-3 space-y-3"
+            style={{ borderTopWidth: "0.5px" }}
+          >
+            <WorkspaceSwitcher onCreateWorkspace={() => setCreateWorkspaceOpen(true)} />
+            <div className="flex flex-col gap-2">
+              {SUB_NAV.map((item) => (
+                <Link
+                  key={item.to}
+                  to={item.to}
+                  className={cn(
+                    "text-sm py-1",
+                    location.pathname === item.to ||
+                      (item.to === "/bets" && location.pathname.startsWith("/bets"))
+                      ? "text-foreground font-medium"
+                      : "text-muted-foreground font-medium",
+                  )}
+                  onClick={closeMenu}
+                >
+                  {item.label}
+                </Link>
+              ))}
+            </div>
+            <div className="pt-2 border-t border-border" style={{ borderTopWidth: "0.5px" }}>
+              <p className="text-sm font-medium">{displayName(user)}</p>
+              <p className="text-xs text-muted-foreground">{user?.email}</p>
+              <button
+                onClick={() => signOut()}
+                className="text-sm text-muted-foreground hover:text-foreground mt-2"
+              >
+                Sign out
+              </button>
+            </div>
+          </div>
+        )}
       </header>
 
-      {/* Sub-navigation for the current altitude */}
-      {subNavItems.length > 0 && (
-        <div className="border-b px-4 lg:px-6 py-2 flex items-center gap-1 overflow-x-auto">
-          {subNavItems.map((item) => (
-            <Link
-              key={item.to}
-              to={item.to}
-              className={cn(
-                subNavLinkClass,
-                location.pathname === item.to
-                  ? "text-foreground font-semibold"
-                  : ""
-              )}
-              onClick={closeMenu}
-            >
-              {item.label}
-            </Link>
-          ))}
-        </div>
-      )}
-
-      <main className={cn("flex-1 overflow-auto transition-all duration-300", chatOpen && "md:mr-96")}>
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-8 w-full">
+      <main
+        className={cn(
+          "flex-1 overflow-auto transition-all duration-300",
+          chatOpen && "md:mr-96",
+        )}
+      >
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-10 w-full">
           {children}
         </div>
       </main>

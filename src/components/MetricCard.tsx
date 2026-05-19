@@ -13,7 +13,7 @@ interface MetricCardProps {
 export default function MetricCard({ label, value, sub, alert, danger, children }: MetricCardProps) {
   return (
     <div className={cn(
-      "border rounded-md p-4",
+      "border rounded-[2px] p-4",
       danger ? "border-signal-red/40 bg-signal-red/5" :
       alert ? "border-signal-amber/40 bg-signal-amber/5" : "border-border"
     )}>

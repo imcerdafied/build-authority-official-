@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { useDecisions, useDecisionRisks } from "@/hooks/useOrgData";
 import { useOrg } from "@/contexts/OrgContext";
+import { ChevronDown, ChevronRight } from "lucide-react";
 import CreateDecisionForm from "@/components/CreateDecisionForm";
 import BetRow from "@/components/bets/BetRow";
 import { categoryLabels } from "@/pages/Decisions";
@@ -44,8 +45,10 @@ function PortfolioSummary({ activeDecisions }: { activeDecisions: SummaryDecisio
     children: React.ReactNode;
   }) => (
     <div className="flex flex-col">
-      <span className="font-mono text-[11px] uppercase tracking-[0.05em] text-gray-500 mb-1">{label}</span>
-      <span className="text-2xl font-semibold leading-tight">{children}</span>
+      <span className="font-mono text-[11px] uppercase tracking-[0.05em] text-muted-foreground mb-1">
+        {`// ${label}`}
+      </span>
+      <span className="text-2xl font-semibold tabular-nums tracking-tight leading-tight">{children}</span>
     </div>
   );
 
@@ -70,7 +73,10 @@ function PortfolioSummary({ activeDecisions }: { activeDecisions: SummaryDecisio
   };
 
   return (
-    <div className="border border-gray-300 rounded-lg p-5 mb-6">
+    <div
+      className="border-y border-border py-6 mb-6"
+      style={{ borderTopWidth: "0.5px", borderBottomWidth: "0.5px" }}
+    >
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-10">
         <Col label="TOTAL UPSIDE">
           <Magnitude agg={upside} />
@@ -142,21 +148,20 @@ export default function Bets() {
   return (
     <div>
       {/* Header */}
-      <div className="mb-6">
-        <div className="eyebrow-mono mb-3">// BETS</div>
+      <div className="mb-8">
         <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4">
           <div>
-            <h1 className="text-[40px] font-black text-foreground leading-none tracking-tight">Bets</h1>
-            <p className="text-base text-gray-700 mt-2">
+            <h1 className="text-3xl md:text-4xl font-semibold text-foreground leading-tight tracking-tight">Bets</h1>
+            <p className="text-sm text-muted-foreground mt-2 tabular-nums">
               {decisions.length} total · {activeDecisions.length} open · {closedCount} closed
             </p>
           </div>
           {canWrite && !showCreate && (
             <button
               onClick={() => setShowCreate(true)}
-              className="font-mono text-sm uppercase tracking-[0.05em] border border-foreground text-foreground px-3 py-2 hover:opacity-[0.85] transition-opacity"
+              className="inline-flex items-center rounded-[2px] bg-foreground text-background px-4 py-2 text-sm font-medium hover:opacity-[0.9] transition-opacity focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
             >
-              + Register Bet
+              + Register bet
             </button>
           )}
         </div>
@@ -190,46 +195,55 @@ export default function Bets() {
         {filtersActive && (
           <button
             onClick={clearFilters}
-            className="text-xs font-mono uppercase tracking-[0.05em] text-gray-500 hover:text-foreground"
+            className="text-sm text-muted-foreground hover:text-foreground transition-colors"
           >
-            Clear
+            Clear filters
           </button>
         )}
       </div>
 
       {showCreate && <CreateDecisionForm onClose={() => setShowCreate(false)} />}
 
-      {/* Zero-bet empty state */}
+      {/* Zero-bet empty state — single line, no centered card */}
       {isEmpty && !showCreate ? (
-        <div className="border border-gray-300 rounded-lg px-8 py-12 text-center max-w-xl mx-auto">
-          <p className="text-lg font-semibold text-foreground">No bets yet</p>
-          <p className="text-sm text-gray-700 mt-3 leading-relaxed">
-            Bets are the strategic decisions your team is making to move toward your goals.
+        <div
+          className="border-y border-border py-6"
+          style={{ borderTopWidth: "0.5px", borderBottomWidth: "0.5px" }}
+        >
+          <p className="text-sm text-muted-foreground">
+            No bets yet.{" "}
+            {canWrite && (
+              <button
+                onClick={() => setShowCreate(true)}
+                className="text-foreground font-medium hover:underline"
+              >
+                + Register your first bet
+              </button>
+            )}
           </p>
-          {canWrite && (
-            <button
-              onClick={() => setShowCreate(true)}
-              className="mt-6 font-mono text-sm uppercase tracking-[0.05em] bg-foreground text-background px-5 py-2.5 hover:opacity-[0.85] transition-opacity"
-            >
-              Create your first bet
-            </button>
-          )}
         </div>
       ) : (
         <>
-          {/* Filter-empty state */}
           {filteredDecisions.length === 0 && filtersActive ? (
-            <div className="border border-gray-300 rounded-lg px-6 py-10 text-center">
-              <p className="text-sm text-gray-500">No bets match these filters.</p>
-              <button
-                onClick={clearFilters}
-                className="mt-3 text-xs font-mono uppercase tracking-[0.05em] text-foreground hover:opacity-[0.85] underline-offset-4 underline"
-              >
-                Clear filters
-              </button>
+            <div
+              className="border-y border-border py-6"
+              style={{ borderTopWidth: "0.5px", borderBottomWidth: "0.5px" }}
+            >
+              <p className="text-sm text-muted-foreground">
+                No bets match these filters.{" "}
+                <button
+                  onClick={clearFilters}
+                  className="text-foreground font-medium hover:underline"
+                >
+                  Clear filters
+                </button>
+              </p>
             </div>
           ) : (
-            <div className="space-y-6">
+            <div
+              className="border-t border-border"
+              style={{ borderTopWidth: "0.5px" }}
+            >
               {filteredDecisions.map((d, index) => (
                 <BetRow key={d.id} d={d as any} index={index + 1} />
               ))}
@@ -238,34 +252,38 @@ export default function Bets() {
 
           {/* Closed bets — collapsible */}
           {closedCount > 0 && (
-            <section className="border-t border-gray-300 pt-6 mt-10">
+            <section
+              className="border-t border-border pt-6 mt-10"
+              style={{ borderTopWidth: "0.5px" }}
+            >
               <button
                 onClick={() => setClosedBetsOpen(!closedBetsOpen)}
                 aria-expanded={closedBetsOpen}
-                className="flex items-center gap-2 eyebrow-mono hover:text-foreground transition-colors"
+                className="flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.05em] text-muted-foreground hover:text-foreground transition-colors"
               >
-                <span>{closedBetsOpen ? "▼" : "▶"}</span>
+                {closedBetsOpen ? <ChevronDown className="w-3 h-3" /> : <ChevronRight className="w-3 h-3" />}
                 {`// CLOSED BETS (${closedCount})`}
               </button>
               {closedBetsOpen && (
-                <div className="mt-4 space-y-2">
+                <div className="mt-4">
                   {closedDecisions.map((d) => (
                     <a
                       key={d.id}
                       href={`/bets/${d.id}`}
                       className={cn(
-                        "block border border-gray-300 rounded-md px-4 py-3",
+                        "block border-b border-border px-2 py-3",
                         "flex flex-col md:flex-row md:items-center md:justify-between gap-2",
-                        "hover:bg-gray-100 transition-colors",
+                        "hover:bg-muted transition-colors",
                       )}
+                      style={{ borderBottomWidth: "0.5px" }}
                     >
                       <div className="min-w-0">
-                        <p className="text-sm font-medium truncate">{d.title || "Untitled"}</p>
-                        <p className="text-xs text-gray-500 mt-0.5">
+                        <p className="text-sm font-medium truncate text-foreground">{d.title || "Untitled"}</p>
+                        <p className="text-xs text-muted-foreground mt-0.5">
                           {categoryLabels[(d.outcome_category_key ?? d.outcome_category) ?? ""] || "—"}
                         </p>
                       </div>
-                      <p className="text-xs text-gray-500 shrink-0">Closed {formatDate(d.updated_at)}</p>
+                      <p className="text-xs text-muted-foreground shrink-0">Closed {formatDate(d.updated_at)}</p>
                     </a>
                   ))}
                 </div>

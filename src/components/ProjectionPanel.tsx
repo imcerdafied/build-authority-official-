@@ -94,7 +94,7 @@ export default function ProjectionPanel({
 
   return (
     <div className="mt-4 pt-4 border-t">
-      <div className="mt-2 border rounded-md p-3 bg-muted/20">
+      <div className="mt-2 border rounded-[2px] p-3 bg-muted/20">
         <p className="text-xs font-semibold text-muted-foreground mb-2">
           Authority vs Monitoring: {horizonMonths}-Month Exposure
         </p>
@@ -102,7 +102,7 @@ export default function ProjectionPanel({
           Existential positioning in the AI era: become the decision authority layer, or remain a monitoring surface.
         </p>
 
-        <div className="mt-3 rounded-lg border bg-background/70 p-4">
+        <div className="mt-3 rounded-[2px] border bg-background/70 p-4">
           <p className="text-xs text-muted-foreground">Renewal Exposure at Risk</p>
           <p className="text-4xl md:text-5xl font-semibold leading-none mt-1 text-signal-red">
             {downsideValue === null ? "—" : `−${formatMillions(Math.abs(downsideValue))}`}

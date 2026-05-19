@@ -1,13 +1,12 @@
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
+import { contactHref } from "@/lib/contact";
 
 // Shown when an authenticated user has no workspace membership and their email
 // domain does not match any existing workspace. Replaces the prior self-serve
 // OrgSetup screen so non-clients cannot mint workspaces themselves.
 
-const CONTACT_EMAIL = "mc@bspg.build";
-const CONTACT_SUBJECT = "Authority: requesting access";
-const CONTACT_HREF = `mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(CONTACT_SUBJECT)}`;
+const CONTACT_HREF = contactHref("Authority: requesting access");
 
 export default function ContactForAccess() {
   const { user } = useAuth();

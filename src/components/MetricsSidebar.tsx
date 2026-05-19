@@ -9,6 +9,12 @@ import type { BetMetric } from "@/lib/types";
 interface MetricsSidebarProps {
   betId: string;
   canWrite: boolean;
+  /**
+   * When true, the component renders without its own heading and outer
+   * container chrome — assumes a parent Section is providing the eyebrow,
+   * hairline, and padding. Use this from BetDetail.
+   */
+  embedded?: boolean;
 }
 
 const STATUS_COLORS: Record<BetMetric["status"], string> = {
@@ -48,7 +54,7 @@ function MetricSkeleton() {
   );
 }
 
-export default function MetricsSidebar({ betId, canWrite }: MetricsSidebarProps) {
+export default function MetricsSidebar({ betId, canWrite, embedded = false }: MetricsSidebarProps) {
   const { data: metrics = [], isLoading } = useMetrics(betId);
   const { data: initiatives = [] } = useInitiatives(betId);
   const addMetric = useAddMetric(betId);
@@ -67,11 +73,15 @@ export default function MetricsSidebar({ betId, canWrite }: MetricsSidebarProps)
     });
   }
 
+  const outerClass = embedded ? "" : "px-4 md:px-6 py-4 border-t";
+
   if (isLoading) {
     return (
-      <div className="px-4 md:px-6 py-3 border-t">
-        <span className="text-xs text-muted-foreground">Outcome Metrics</span>
-        <div className="mt-2 space-y-2.5">
+      <div className={outerClass}>
+        {!embedded && (
+          <span className="text-xs text-muted-foreground">Outcome Metrics</span>
+        )}
+        <div className={embedded ? "space-y-2.5" : "mt-2 space-y-2.5"}>
           <MetricSkeleton />
           <MetricSkeleton />
         </div>
@@ -80,8 +90,23 @@ export default function MetricsSidebar({ betId, canWrite }: MetricsSidebarProps)
   }
 
   if (metrics.length === 0 && !showAdd) {
+    if (embedded) {
+      return (
+        <p className="text-sm text-muted-foreground">
+          No metrics tracked yet.{" "}
+          {canWrite && (
+            <button
+              onClick={() => setShowAdd(true)}
+              className="text-foreground font-medium hover:underline"
+            >
+              + Add metric
+            </button>
+          )}
+        </p>
+      );
+    }
     return (
-      <div className="px-4 md:px-6 py-3 border-t">
+      <div className={outerClass}>
         <div className="flex items-center justify-between">
           <span className="text-xs text-muted-foreground">Outcome Metrics</span>
           {canWrite && (
@@ -98,20 +123,32 @@ export default function MetricsSidebar({ betId, canWrite }: MetricsSidebarProps)
   }
 
   return (
-    <div className="px-4 md:px-6 py-4 border-t">
-      <div className="flex items-center justify-between mb-3">
-        <span className="text-xs font-semibold text-muted-foreground">
-          Outcome Metrics ({metrics.length})
-        </span>
-        {canWrite && !showAdd && (
+    <div className={outerClass}>
+      {!embedded && (
+        <div className="flex items-center justify-between mb-3">
+          <span className="text-xs font-semibold text-muted-foreground">
+            Outcome Metrics ({metrics.length})
+          </span>
+          {canWrite && !showAdd && (
+            <button
+              onClick={() => setShowAdd(true)}
+              className="text-xs font-semibold text-muted-foreground hover:text-foreground transition-colors"
+            >
+              + Add Metric
+            </button>
+          )}
+        </div>
+      )}
+      {embedded && canWrite && !showAdd && (
+        <div className="flex justify-end mb-3">
           <button
             onClick={() => setShowAdd(true)}
-            className="text-xs font-semibold text-muted-foreground hover:text-foreground transition-colors"
+            className="text-sm font-medium text-foreground hover:underline"
           >
-            + Add Metric
+            + Add metric
           </button>
-        )}
-      </div>
+        </div>
+      )}
 
       {showAdd && (
         <AddMetricForm

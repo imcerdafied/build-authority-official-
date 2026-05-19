@@ -139,7 +139,7 @@ export default function DomainJoinPrompt({ onFallback }: { onFallback: () => voi
           <p className="text-xs text-muted-foreground mt-1">Join your team</p>
         </div>
 
-        <div className="border rounded-md p-6 space-y-4">
+        <div className="border rounded-[2px] p-6 space-y-4">
           {requestStatus === "none" && (
             <>
               <div>

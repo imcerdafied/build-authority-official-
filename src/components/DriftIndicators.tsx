@@ -5,6 +5,8 @@ import type { DriftFlag } from "@/lib/types";
 
 interface DriftIndicatorsProps {
   betId: string;
+  /** When true, render without the outer container chrome (no border-t, no px). */
+  embedded?: boolean;
 }
 
 const DRIFT_CONFIG: Record<
@@ -34,7 +36,7 @@ const DRIFT_CONFIG: Record<
   },
 };
 
-export default function DriftIndicators({ betId }: DriftIndicatorsProps) {
+export default function DriftIndicators({ betId, embedded = false }: DriftIndicatorsProps) {
   const { driftFlags, isLoading } = useDrift(betId);
   const [dismissed, setDismissed] = useState<Set<string>>(new Set());
 
@@ -48,7 +50,14 @@ export default function DriftIndicators({ betId }: DriftIndicatorsProps) {
   if (isLoading || visible.length === 0) return null;
 
   return (
-    <div className="px-4 md:px-6 py-3 border-t space-y-1.5" role="alert" aria-label="Drift warnings">
+    <div
+      className={cn(
+        "space-y-1.5",
+        embedded ? "" : "px-4 md:px-6 py-3 border-t",
+      )}
+      role="alert"
+      aria-label="Drift warnings"
+    >
       {visible.map((flag) => {
         const config = DRIFT_CONFIG[flag.type];
         const key = `${flag.type}-${flag.detected_at}`;

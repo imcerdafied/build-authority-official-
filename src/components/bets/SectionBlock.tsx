@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { ChevronDown, ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface SectionBlockProps {
@@ -25,7 +26,7 @@ export default function SectionBlock({
           onClick={() => setOpen(!open)}
           className="flex items-center gap-1.5 eyebrow-mono hover:text-foreground transition-colors"
         >
-          <span className="text-xs">{open ? "\u25BC" : "\u25B6"}</span>
+          {open ? <ChevronDown className="w-3 h-3" /> : <ChevronRight className="w-3 h-3" />}
           {`// ${label.toUpperCase()}`}
         </button>
       ) : (

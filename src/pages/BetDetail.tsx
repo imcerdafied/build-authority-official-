@@ -20,6 +20,10 @@ import {
   BET_LIFECYCLE_LABELS,
   BET_LIFECYCLE_STATUSES,
   type BetLifecycleStatus,
+  type LifecycleBucket,
+  LIFECYCLE_BUCKET_LABEL,
+  LIFECYCLE_BUCKET_STYLE,
+  lifecycleBucket,
   isClosedBetLifecycle,
 } from "@/lib/bet-status";
 import { extractMagnitude, movementState } from "@/lib/bet-magnitude";
@@ -27,27 +31,6 @@ import MetricsSidebar from "@/components/MetricsSidebar";
 import DriftIndicators from "@/components/DriftIndicators";
 import ScoreHistory from "@/components/ScoreHistory";
 import { cn } from "@/lib/utils";
-
-// --- Lifecycle bucket + pill ---
-type LifecycleBucket = "defined" | "activated" | "shipping" | "closed";
-function bucketForStatus(status: string): LifecycleBucket {
-  if (status === "defined") return "defined";
-  if (status === "activated") return "activated";
-  if (status === "closed") return "closed";
-  return "shipping";
-}
-const bucketLabel: Record<LifecycleBucket, string> = {
-  defined: "Defined",
-  activated: "Activated",
-  shipping: "Shipping",
-  closed: "Closed",
-};
-const bucketStyle: Record<LifecycleBucket, { bg: string; text: string; dot: string }> = {
-  defined: { bg: "bg-gray-100", text: "text-gray-700", dot: "bg-gray-500" },
-  activated: { bg: "bg-amber-100", text: "text-amber-800", dot: "bg-amber-500" },
-  shipping: { bg: "bg-green-100", text: "text-green-800", dot: "bg-green-500" },
-  closed: { bg: "bg-gray-200", text: "text-gray-500", dot: "bg-gray-400" },
-};
 
 function nudgeMailto(betTitle: string, days: number, owner: string): string {
   const subject = encodeURIComponent(`Authority: ${betTitle} needs attention`);
@@ -216,8 +199,8 @@ export default function BetDetail() {
     );
   }
 
-  const lifecycleBucket = bucketForStatus(decision.status);
-  const pillStyle = bucketStyle[lifecycleBucket];
+  const bucket = lifecycleBucket(decision.status);
+  const pillStyle = LIFECYCLE_BUCKET_STYLE[bucket];
   const move = movementState(decision.updated_at, decision.created_at);
   const upside = extractMagnitude(decision.exposure_value);
   const risk = extractMagnitude(decision.revenue_at_risk);
@@ -246,7 +229,7 @@ export default function BetDetail() {
             >
               ← All bets · {indexLabel}
             </Link>
-            <LifecyclePill bucket={lifecycleBucket} label={bucketLabel[lifecycleBucket]} style={pillStyle} />
+            <LifecyclePill bucket={bucket} label={LIFECYCLE_BUCKET_LABEL[bucket]} style={pillStyle} />
           </div>
 
           <h1 className="mb-6">
@@ -499,17 +482,7 @@ export default function BetDetail() {
 
         {/* Outcome Metrics */}
         <Section id="outcome-metrics" label="OUTCOME METRICS">
-          {metrics.length > 0 ? (
-            <SuppressInternalHeading>
-              <MetricsSidebar betId={decision.id} canWrite={canWrite} />
-            </SuppressInternalHeading>
-          ) : (
-            <EmptyLine
-              text="No metrics tracked yet."
-              actionLabel={canWrite ? "+ Add metric" : undefined}
-              onAction={() => scrollToId("outcome-metrics")}
-            />
-          )}
+          <MetricsSidebar betId={decision.id} canWrite={canWrite} embedded />
         </Section>
 
         {/* What Moved — drift + score history combined */}
@@ -517,10 +490,10 @@ export default function BetDetail() {
           {driftFlags.length === 0 && scoreEntries.length === 0 ? (
             <EmptyLine text="No movement logged yet." />
           ) : (
-            <SuppressInternalHeading>
-              <DriftIndicators betId={decision.id} />
-              <ScoreHistory betId={decision.id} />
-            </SuppressInternalHeading>
+            <>
+              <DriftIndicators betId={decision.id} embedded />
+              <ScoreHistory betId={decision.id} embedded />
+            </>
           )}
         </Section>
 
@@ -690,8 +663,8 @@ function BetNavigator({
     >
       {activeOrdered.map((b, i) => {
         const isCurrent = b.id === currentId;
-        const bucket = bucketForStatus(b.status);
-        const dot = bucketStyle[bucket].dot;
+        const bucket = lifecycleBucket(b.status);
+        const dot = LIFECYCLE_BUCKET_STYLE[bucket].dot;
         return (
           <Link
             key={b.id}
@@ -730,24 +703,34 @@ function DecisionGate({ decision }: { decision: any }) {
     .filter(Boolean)
     .join(" · ");
 
+  // Headline figure mirrors Upside/Risk visual weight: text-3xl semibold tabular.
+  const overdue = sliceRemaining != null && sliceRemaining < 0;
+  const headline =
+    sliceRemaining != null
+      ? overdue
+        ? `${Math.abs(sliceRemaining)}d`
+        : `${sliceRemaining}d`
+      : `${ageDays}d`;
+  const headlineColor = overdue ? "text-signal-red" : "text-foreground";
+  const headlineLabel =
+    sliceRemaining != null
+      ? overdue
+        ? "overdue on slice"
+        : "remaining on slice"
+      : "since defined";
+
   return (
     <div className="min-w-0">
       <p className="font-mono text-[10px] uppercase tracking-[0.08em] text-muted-foreground mb-2">
         // DECISION GATE
       </p>
-      <p className="text-base text-foreground leading-snug mb-2">
+      <p className={cn("text-3xl font-semibold tabular-nums tracking-tight mb-1", headlineColor)}>
+        {headline}
+      </p>
+      <p className="text-xs text-muted-foreground mb-3">{headlineLabel}</p>
+      <p className="text-sm text-foreground leading-snug line-clamp-2">
         {triggerOneLine || <span className="text-muted-foreground italic">No trigger set.</span>}
       </p>
-      {sliceRemaining != null && (
-        <p className="text-sm text-muted-foreground">
-          {sliceRemaining >= 0
-            ? `${sliceRemaining} days remaining`
-            : `${Math.abs(sliceRemaining)} days overdue`}
-        </p>
-      )}
-      {sliceRemaining == null && (
-        <p className="text-sm text-muted-foreground">{ageDays} days since defined</p>
-      )}
     </div>
   );
 }
@@ -770,7 +753,7 @@ function Magnitude({
         {`// ${label.toUpperCase()}`}
       </p>
       {figure ? (
-        <p className={cn("text-3xl font-semibold tracking-tight mb-2", figureColor)}>{figure}</p>
+        <p className={cn("text-3xl font-semibold tabular-nums tracking-tight mb-2", figureColor)}>{figure}</p>
       ) : (
         <p className="text-sm text-muted-foreground italic mb-2">Not quantified</p>
       )}
@@ -827,17 +810,6 @@ function EmptyLine({
         </>
       )}
     </p>
-  );
-}
-
-// Wrapper that nukes the duplicate H1/H2/section-header rendered inside embedded
-// widgets (MetricsSidebar / DriftIndicators / ScoreHistory). We strip their first
-// heading-like element via CSS rather than rewriting the component.
-function SuppressInternalHeading({ children }: { children: React.ReactNode }) {
-  return (
-    <div className="[&_h1]:hidden [&_h2]:hidden [&_h3]:hidden [&_:first-child>p:first-child]:hidden">
-      {children}
-    </div>
   );
 }
 

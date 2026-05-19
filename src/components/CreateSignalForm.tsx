@@ -37,7 +37,7 @@ export default function CreateSignalForm({ onClose }: { onClose: () => void }) {
   };
 
   return (
-    <div className="border rounded-md p-5 mb-6 bg-surface-elevated">
+    <div className="border rounded-[2px] p-5 mb-6 bg-surface-elevated">
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-xs font-semibold text-muted-foreground">Register Signal</h2>
         <button onClick={onClose} className="text-xs text-muted-foreground hover:text-foreground">Cancel</button>

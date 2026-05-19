@@ -6,6 +6,8 @@ import type { ScoreHistoryEntry } from "@/lib/types";
 
 interface ScoreHistoryProps {
   betId: string;
+  /** When true, render without the outer container chrome (no border-t, no px). */
+  embedded?: boolean;
 }
 
 function relativeTime(dateStr: string): string {
@@ -105,7 +107,7 @@ function HistorySkeleton() {
   );
 }
 
-export default function ScoreHistory({ betId }: ScoreHistoryProps) {
+export default function ScoreHistory({ betId, embedded = false }: ScoreHistoryProps) {
   const { data: history = [], isLoading } = useScoreHistory(betId);
   const { data: initiatives = [] } = useInitiatives(betId);
   const [open, setOpen] = useState(false);
@@ -125,13 +127,15 @@ export default function ScoreHistory({ betId }: ScoreHistoryProps) {
 
   const groups = useMemo(() => groupByRecalc(filtered), [filtered]);
 
+  const outerClass = embedded ? "" : "px-4 md:px-6 py-3 border-t";
+
   // Skeleton loading state
   if (isLoading) {
     return (
-      <div className="px-4 md:px-6 py-3 border-t">
-        <span className="text-xs text-muted-foreground">
-          What Moved
-        </span>
+      <div className={outerClass}>
+        {!embedded && (
+          <span className="text-xs text-muted-foreground">What Moved</span>
+        )}
         <HistorySkeleton />
       </div>
     );
@@ -139,11 +143,10 @@ export default function ScoreHistory({ betId }: ScoreHistoryProps) {
 
   // Empty state
   if (history.length === 0) {
+    if (embedded) return null; // parent renders the EmptyLine
     return (
-      <div className="px-4 md:px-6 py-3 border-t">
-        <span className="text-xs text-muted-foreground">
-          What Moved
-        </span>
+      <div className={outerClass}>
+        <span className="text-xs text-muted-foreground">What Moved</span>
         <p className="text-xs text-muted-foreground/60 mt-1.5">
           Score movements will appear here as you add and edit initiatives and
           metrics.
@@ -153,17 +156,19 @@ export default function ScoreHistory({ betId }: ScoreHistoryProps) {
   }
 
   return (
-    <div className="px-4 md:px-6 py-3 border-t">
-      <button
-        onClick={() => setOpen(!open)}
-        className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors"
-        aria-expanded={open}
-      >
-        <span className="text-xs" aria-hidden="true">{open ? "▼" : "▶"}</span>
-        What Moved ({history.length})
-      </button>
+    <div className={outerClass}>
+      {!embedded && (
+        <button
+          onClick={() => setOpen(!open)}
+          className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors"
+          aria-expanded={open}
+        >
+          <span className="text-xs" aria-hidden="true">{open ? "▼" : "▶"}</span>
+          What Moved ({history.length})
+        </button>
+      )}
 
-      {open && (
+      {(embedded || open) && (
         <div role="region" aria-label="Score history">
           {/* Filter pills */}
           <div className="flex items-center gap-1.5 mt-2 mb-2" role="group" aria-label="Filter score history">

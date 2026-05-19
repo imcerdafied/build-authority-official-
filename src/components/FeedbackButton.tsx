@@ -64,7 +64,7 @@ export default function FeedbackButton() {
       {open && (
         <form
           onSubmit={handleSubmit}
-          className="absolute bottom-12 left-0 w-80 bg-background border rounded-lg shadow-xl p-4 z-50"
+          className="absolute bottom-12 left-0 w-80 bg-background border rounded-[2px] shadow-xl p-4 z-50"
         >
           <h3 className="text-sm font-semibold mb-3">Share Feedback</h3>
           <div className="flex gap-2 mb-3">

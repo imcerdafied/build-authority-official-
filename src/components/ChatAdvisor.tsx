@@ -105,13 +105,13 @@ export default function ChatAdvisor({ chatOpen, setChatOpen }: { chatOpen: boole
           {messages.map((m, i) =>
             m.role === "user" ? (
               <div key={i} className="flex justify-end">
-                <div className="bg-foreground text-background rounded-lg px-3 py-2 text-sm ml-12 max-w-[85%]">
+                <div className="bg-foreground text-background rounded-[2px] px-3 py-2 text-sm ml-12 max-w-[85%]">
                   {m.content}
                 </div>
               </div>
             ) : (
               <div key={i} className="flex justify-start">
-                <div className="bg-muted rounded-lg px-3 py-2 text-sm mr-8 whitespace-pre-wrap max-w-[85%]">
+                <div className="bg-muted rounded-[2px] px-3 py-2 text-sm mr-8 whitespace-pre-wrap max-w-[85%]">
                   {m.content}
                 </div>
               </div>
@@ -148,12 +148,12 @@ export default function ChatAdvisor({ chatOpen, setChatOpen }: { chatOpen: boole
               onKeyDown={handleKeyDown}
               placeholder="Ask anything about your bets..."
               disabled={loading}
-              className="text-sm border rounded-lg px-3 py-2 flex-1 bg-background disabled:opacity-50"
+              className="text-sm border rounded-[2px] px-3 py-2 flex-1 bg-background disabled:opacity-50"
             />
             <button
               onClick={handleSend}
               disabled={loading || !input.trim() || !currentOrg?.id}
-              className="ml-2 px-3 py-2 bg-foreground text-background rounded-lg text-sm font-medium disabled:opacity-50"
+              className="ml-2 px-3 py-2 bg-foreground text-background rounded-[2px] text-sm font-medium disabled:opacity-50"
             >
               Send
             </button>

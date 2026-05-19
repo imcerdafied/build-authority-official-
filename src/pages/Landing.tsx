@@ -1,11 +1,9 @@
 import { Fragment } from "react";
 import { Link } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
+import { contactHref } from "@/lib/contact";
 
-// Mailto CTA inbox. Swap this single constant to redirect inquiries.
-const CONTACT_EMAIL = "mc@bspg.build";
-const CONTACT_SUBJECT = "Authority: interested in an engagement";
-const CONTACT_HREF = `mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(CONTACT_SUBJECT)}`;
+const CONTACT_HREF = contactHref("Authority: interested in an engagement");
 
 // === Nav — full-width, logo at left edge, pill at right edge ===
 function LandingNav() {
@@ -18,9 +16,24 @@ function LandingNav() {
         <img src="/logo.svg" alt="Authority" className="h-7 w-auto" />
       </Link>
 
+      <div className="hidden md:flex items-center gap-8">
+        <a
+          href="#how-it-works"
+          className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+        >
+          How it works
+        </a>
+        <a
+          href="#engagement"
+          className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+        >
+          Engagement
+        </a>
+      </div>
+
       <Link
         to="/auth"
-        className="inline-flex items-center rounded-[2px] bg-foreground px-5 py-2 text-sm font-medium text-background hover:bg-foreground/90 transition-colors"
+        className="inline-flex items-center rounded-[2px] bg-foreground px-5 py-2 text-sm font-medium text-background hover:bg-foreground/90 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
       >
         Client Login
       </Link>
@@ -48,14 +61,14 @@ function Hero() {
         <div className="mt-10 grid w-full max-w-3xl grid-cols-1 gap-3 md:grid-cols-2">
           <a
             href={CONTACT_HREF}
-            className="inline-flex items-center justify-center gap-2 rounded-[2px] bg-foreground px-5 py-3 text-sm font-medium text-background hover:bg-foreground/90 transition-colors"
+            className="inline-flex items-center justify-center gap-2 rounded-[2px] bg-foreground px-5 py-3 text-sm font-medium text-background hover:bg-foreground/90 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
           >
             Start the conversation
             <ArrowRight className="h-4 w-4" />
           </a>
           <a
             href="#how-it-works"
-            className="inline-flex items-center justify-center gap-2 rounded-[2px] border border-border bg-card px-5 py-3 text-sm font-medium text-foreground hover:bg-muted transition-colors"
+            className="inline-flex items-center justify-center gap-2 rounded-[2px] border border-border bg-card px-5 py-3 text-sm font-medium text-foreground hover:bg-muted transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
           >
             See how it works
           </a>
@@ -297,7 +310,7 @@ function SampleBet() {
 function Meta({ label, value }: { label: string; value: React.ReactNode }) {
   return (
     <div>
-      <p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-background/40 mb-1">
+      <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-background/60 mb-1">
         {label}
       </p>
       <div className="text-background/90">{value}</div>
@@ -307,7 +320,7 @@ function Meta({ label, value }: { label: string; value: React.ReactNode }) {
 
 function Pill({ children }: { children: React.ReactNode }) {
   return (
-    <span className="inline-flex items-center text-[10px] font-semibold uppercase tracking-[0.05em] bg-gray-100 text-gray-700 px-2 py-0.5 rounded-sm">
+    <span className="inline-flex items-center text-[11px] font-semibold uppercase tracking-[0.05em] bg-muted text-muted-foreground border border-border px-2 py-0.5 rounded-[2px]">
       <span className="w-1.5 h-1.5 rounded-full bg-gray-500 inline-block mr-1.5" />
       {children}
     </span>
@@ -327,15 +340,18 @@ function ExposurePanel({
 }) {
   const colors =
     tone === "upside"
-      ? { bg: "bg-green-50", border: "border-green-200", text: "text-green-800", eyebrow: "text-green-700" }
-      : { bg: "bg-red-50", border: "border-red-200", text: "text-red-800", eyebrow: "text-red-700" };
+      ? { bg: "bg-signal-green/10", border: "border-signal-green/30", text: "text-signal-green" }
+      : { bg: "bg-signal-red/10", border: "border-signal-red/30", text: "text-signal-red" };
   return (
-    <div className={`rounded-[2px] ${colors.bg} ${colors.border} border p-4`} style={{ borderWidth: "0.5px" }}>
-      <p className={`text-[10px] font-semibold uppercase tracking-[0.08em] ${colors.eyebrow} mb-1`}>
+    <div
+      className={`rounded-[2px] ${colors.bg} ${colors.border} border p-4`}
+      style={{ borderWidth: "0.5px" }}
+    >
+      <p className={`text-[11px] font-semibold uppercase tracking-[0.08em] ${colors.text} mb-1`}>
         {label}
       </p>
       <p className={`text-base font-semibold ${colors.text} leading-tight mb-1`}>{value}</p>
-      <p className={`text-xs ${colors.text}/80 leading-relaxed`}>{body}</p>
+      <p className="text-xs text-foreground/80 leading-relaxed">{body}</p>
     </div>
   );
 }
@@ -358,7 +374,7 @@ function FinalCta() {
         <div className="mt-10 flex flex-wrap items-center gap-3">
           <a
             href={CONTACT_HREF}
-            className="inline-flex items-center justify-center gap-2 rounded-[2px] bg-foreground px-5 py-3 text-sm font-medium text-background hover:bg-foreground/90 transition-colors"
+            className="inline-flex items-center justify-center gap-2 rounded-[2px] bg-foreground px-5 py-3 text-sm font-medium text-background hover:bg-foreground/90 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
           >
             Start the conversation
             <ArrowRight className="h-4 w-4" />

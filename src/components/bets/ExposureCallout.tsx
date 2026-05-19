@@ -24,7 +24,7 @@ export default function ExposureCallout({ label, variant, children, className }:
   const styles = variantStyles[variant];
 
   return (
-    <div className={cn("border rounded-md p-3", styles.wrapper, className)}>
+    <div className={cn("border rounded-[2px] p-3", styles.wrapper, className)}>
       <span className={cn("text-xs block mb-1", styles.label)}>
         {label}
       </span>
