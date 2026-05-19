@@ -232,6 +232,7 @@ export interface BetInitiative {
   created_at: string;
   updated_at: string;
   owner: string | null;
+  owner_user_id: string | null;
   status: InitiativeStatus | null;
 }
 

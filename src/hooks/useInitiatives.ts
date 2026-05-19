@@ -32,6 +32,7 @@ export function useAddInitiative(betId: string | undefined) {
       confidence?: number;
       effort?: number;
       owner?: string | null;
+      owner_user_id?: string | null;
       status?: string | null;
     }) => {
       if (!betId) throw new Error("No betId");
@@ -43,6 +44,7 @@ export function useAddInitiative(betId: string | undefined) {
         confidence: input.confidence ?? 0.5,
         effort: Math.max(1, input.effort ?? 5),
         owner: input.owner ?? null,
+        owner_user_id: input.owner_user_id ?? null,
         status: input.status ?? null,
       } as any);
       if (error) throw error;

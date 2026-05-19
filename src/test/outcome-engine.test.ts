@@ -81,6 +81,7 @@ function makeInitiative(overrides: Partial<BetInitiative>): BetInitiative {
     created_at: "2026-01-01",
     updated_at: "2026-01-01",
     owner: null,
+    owner_user_id: null,
     status: null,
     ...overrides,
   };

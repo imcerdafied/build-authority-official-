@@ -95,6 +95,7 @@ export type Database = {
           last_score_delta: number
           outcome_multiplier: number
           owner: string | null
+          owner_user_id: string | null
           roadmap_position: number
           score_v3: number
           status: string | null
@@ -112,6 +113,7 @@ export type Database = {
           last_score_delta?: number
           outcome_multiplier?: number
           owner?: string | null
+          owner_user_id?: string | null
           roadmap_position?: number
           score_v3?: number
           status?: string | null
@@ -129,6 +131,7 @@ export type Database = {
           last_score_delta?: number
           outcome_multiplier?: number
           owner?: string | null
+          owner_user_id?: string | null
           roadmap_position?: number
           score_v3?: number
           status?: string | null
