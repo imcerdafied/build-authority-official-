@@ -20,8 +20,6 @@ import {
   BET_LIFECYCLE_LABELS,
   BET_LIFECYCLE_STATUSES,
   type BetLifecycleStatus,
-  type LifecycleBucket,
-  LIFECYCLE_BUCKET_LABEL,
   LIFECYCLE_BUCKET_STYLE,
   lifecycleBucket,
   isClosedBetLifecycle,
@@ -199,13 +197,9 @@ export default function BetDetail() {
     );
   }
 
-  const bucket = lifecycleBucket(decision.status);
-  const pillStyle = LIFECYCLE_BUCKET_STYLE[bucket];
   const move = movementState(decision.updated_at, decision.created_at);
   const upside = extractMagnitude(decision.exposure_value);
   const risk = extractMagnitude(decision.revenue_at_risk);
-  const totalActive = activeOrdered.length || 1;
-  const indexLabel = activeIndex >= 0 ? `Bet ${activeIndex + 1} of ${totalActive}` : "Bet";
 
   const triggerLines = (decision.trigger_signal ?? "")
     .split(/\n+/)
@@ -220,18 +214,10 @@ export default function BetDetail() {
           <BetNavigator activeOrdered={activeOrdered} currentId={decision.id} />
         )}
 
-        {/* Header block */}
+        {/* Header block — the navigator chip strip above and the lifecycle
+            rail on the right already show "which bet" and "what lifecycle".
+            No need to repeat with a breadcrumb + inline pill here. */}
         <header className="mt-6 mb-10">
-          <div className="flex items-center justify-between gap-4 mb-6">
-            <Link
-              to="/bets"
-              className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-            >
-              ← All bets · {indexLabel}
-            </Link>
-            <LifecyclePill bucket={bucket} label={LIFECYCLE_BUCKET_LABEL[bucket]} style={pillStyle} />
-          </div>
-
           <h1 className="mb-6">
             <InlineEdit
               value={decision.title ?? ""}
@@ -486,22 +472,22 @@ export default function BetDetail() {
           </div>
         </Section>
 
-        {/* Outcome Metrics */}
-        <Section id="outcome-metrics" label="Outcome Metrics">
-          <MetricsSidebar betId={decision.id} canWrite={canWrite} embedded />
-        </Section>
+        {/* Outcome Metrics — only render when metrics exist. The Log rail
+            (Add metric →) is the entry point when there are none. */}
+        {metrics.length > 0 && (
+          <Section id="outcome-metrics" label="Outcome Metrics">
+            <MetricsSidebar betId={decision.id} canWrite={canWrite} embedded />
+          </Section>
+        )}
 
-        {/* What Moved — drift + score history combined */}
-        <Section id="what-moved" label="What Moved">
-          {driftFlags.length === 0 && scoreEntries.length === 0 ? (
-            <EmptyLine text="No movement logged yet." />
-          ) : (
-            <>
-              <DriftIndicators betId={decision.id} embedded />
-              <ScoreHistory betId={decision.id} embedded />
-            </>
-          )}
-        </Section>
+        {/* What Moved — same treatment: hide entirely when there's no
+            drift and no score history. Log rail handles entry. */}
+        {(driftFlags.length > 0 || scoreEntries.length > 0) && (
+          <Section id="what-moved" label="What Moved">
+            <DriftIndicators betId={decision.id} embedded />
+            <ScoreHistory betId={decision.id} embedded />
+          </Section>
+        )}
 
         {/* Activity — collapsed by default if >5 */}
         <Section id="activity" label="Activity">
@@ -573,37 +559,15 @@ export default function BetDetail() {
 
 // === Sub-components ===
 
-function LifecyclePill({
-  bucket,
-  label,
-  style,
-}: {
-  bucket: LifecycleBucket;
-  label: string;
-  style: { bg: string; text: string; dot: string };
-}) {
-  return (
-    <span
-      className={cn(
-        "inline-flex items-center gap-2 px-3 py-1 rounded-sm text-xs font-medium",
-        style.bg,
-        style.text,
-      )}
-      data-bucket={bucket}
-    >
-      <span className={cn("w-1.5 h-1.5 rounded-full inline-block", style.dot)} aria-hidden />
-      {label}
-    </span>
-  );
-}
-
 function FactItem({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div className="min-w-0">
       <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground mb-1">
         {label}
       </p>
-      <div className="leading-snug">{children}</div>
+      {/* Reserve 2 lines of small text so all fact cells align on the bottom
+          regardless of whether a value wraps. */}
+      <div className="leading-snug min-h-[2.5rem]">{children}</div>
     </div>
   );
 }
@@ -777,8 +741,8 @@ function DecisionGate({ decision }: { decision: any }) {
   const headlineLabel =
     sliceRemaining != null
       ? overdue
-        ? "overdue on slice"
-        : "remaining on slice"
+        ? "past the next review"
+        : "until the next review"
       : "since defined";
 
   return (
@@ -814,12 +778,19 @@ function Magnitude({
       <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground mb-2">
         {label}
       </p>
-      {figure ? (
-        <p className={cn("text-3xl font-semibold tabular-nums tracking-tight mb-2", figureColor)}>{figure}</p>
-      ) : (
-        <p className="text-sm text-muted-foreground italic mb-2">Not quantified</p>
+      {figure && (
+        <p className={cn("text-3xl font-semibold tabular-nums tracking-tight mb-2", figureColor)}>
+          {figure}
+        </p>
       )}
-      <p className="text-sm text-foreground leading-snug line-clamp-2">{body}</p>
+      <p
+        className={cn(
+          "text-sm text-foreground leading-snug overflow-hidden",
+          figure ? "line-clamp-2" : "line-clamp-4",
+        )}
+      >
+        {body || <span className="text-muted-foreground italic">Add an {tone} description…</span>}
+      </p>
     </div>
   );
 }
