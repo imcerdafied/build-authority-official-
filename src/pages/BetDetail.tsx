@@ -280,12 +280,6 @@ export default function BetDetail() {
                       "text-sm text-foreground text-left block w-full leading-snug",
                       canWrite && "hover:text-accent transition-colors",
                     )}
-                    style={{
-                      display: "-webkit-box",
-                      WebkitLineClamp: 2,
-                      WebkitBoxOrient: "vertical",
-                      overflow: "hidden",
-                    }}
                   >
                     {decision.linked_okr_title}
                   </button>
@@ -404,10 +398,12 @@ export default function BetDetail() {
           )}
         </header>
 
-        {/* At-a-glance band — the hero of the page */}
+        {/* At-a-glance band — the hero of the page. No bottom border:
+            the next Section already provides a top hairline, so a bottom
+            border here would double up. */}
         <section
-          className="border-t border-b border-gray-300 py-10 mb-12"
-          style={{ borderTopWidth: "0.5px", borderBottomWidth: "0.5px" }}
+          className="border-t border-gray-300 py-10"
+          style={{ borderTopWidth: "0.5px" }}
         >
           <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
             <DecisionGate decision={decision} />
@@ -773,24 +769,44 @@ function Magnitude({
   body: string;
 }) {
   const figureColor = tone === "upside" ? "text-green-700" : "text-red-700";
+  // Split free-form bullet text on newlines and strip leading "- " / "· " /
+  // "* " markers so we can render proper list items instead of pre-formatted
+  // dash characters. If the source isn't a list, this just yields one item.
+  const items = body
+    ? body
+        .split(/\n+/)
+        .map((line) => line.replace(/^[\s•·\-\*]+\s*/, "").trim())
+        .filter(Boolean)
+    : [];
+
   return (
     <div className="min-w-0">
       <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground mb-2">
         {label}
       </p>
       {figure && (
-        <p className={cn("text-3xl font-semibold tabular-nums tracking-tight mb-2", figureColor)}>
+        <p className={cn("text-3xl font-semibold tabular-nums tracking-tight mb-3", figureColor)}>
           {figure}
         </p>
       )}
-      <p
-        className={cn(
-          "text-sm text-foreground leading-snug overflow-hidden",
-          figure ? "line-clamp-2" : "line-clamp-4",
-        )}
-      >
-        {body || <span className="text-muted-foreground italic">Add an {tone} description…</span>}
-      </p>
+      {items.length === 0 ? (
+        <p className="text-sm text-muted-foreground italic">
+          Add an {tone} description…
+        </p>
+      ) : items.length === 1 ? (
+        <p className="text-sm text-foreground leading-relaxed">{items[0]}</p>
+      ) : (
+        <ul className="space-y-2 text-sm text-foreground leading-relaxed">
+          {items.map((line, i) => (
+            <li key={i} className="grid grid-cols-[auto_1fr] gap-2.5">
+              <span className="text-muted-foreground select-none" aria-hidden>
+                ·
+              </span>
+              <span>{line}</span>
+            </li>
+          ))}
+        </ul>
+      )}
     </div>
   );
 }
