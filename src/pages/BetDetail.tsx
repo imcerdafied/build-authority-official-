@@ -435,7 +435,7 @@ export default function BetDetail() {
         </section>
 
         {/* Trigger Signal — structured list if multi-line, paragraph otherwise */}
-        <Section id="trigger-signal" label="TRIGGER SIGNAL">
+        <Section id="trigger-signal" label="Trigger Signal">
           {triggerLines.length > 1 ? (
             <ul className="space-y-2">
               {triggerLines.map((line, i) => (
@@ -464,7 +464,7 @@ export default function BetDetail() {
         </Section>
 
         {/* Outcome Target — pulled-out paragraph */}
-        <Section id="outcome-target" label="OUTCOME TARGET">
+        <Section id="outcome-target" label="Outcome Target">
           <div className="max-w-2xl">
             <InlineEdit
               value={decision.outcome_target ?? ""}
@@ -481,12 +481,12 @@ export default function BetDetail() {
         </Section>
 
         {/* Outcome Metrics */}
-        <Section id="outcome-metrics" label="OUTCOME METRICS">
+        <Section id="outcome-metrics" label="Outcome Metrics">
           <MetricsSidebar betId={decision.id} canWrite={canWrite} embedded />
         </Section>
 
         {/* What Moved — drift + score history combined */}
-        <Section id="what-moved" label="WHAT MOVED">
+        <Section id="what-moved" label="What Moved">
           {driftFlags.length === 0 && scoreEntries.length === 0 ? (
             <EmptyLine text="No movement logged yet." />
           ) : (
@@ -498,7 +498,7 @@ export default function BetDetail() {
         </Section>
 
         {/* Activity — collapsed by default if >5 */}
-        <Section id="activity" label="ACTIVITY">
+        <Section id="activity" label="Activity">
           <ActivityFeed
             decisionId={decision.id}
             expanded={activityExpanded}
@@ -594,8 +594,8 @@ function LifecyclePill({
 function FactItem({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div className="min-w-0">
-      <p className="font-mono text-[11px] uppercase tracking-[0.08em] text-muted-foreground mb-1">
-        {`// ${label}`}
+      <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground mb-1">
+        {label}
       </p>
       <div className="truncate">{children}</div>
     </div>
@@ -611,14 +611,18 @@ function HealthBlock({
   betTitle: string;
   owner: string;
 }) {
-  // Compact, vertically aligned with the fact strip. Only error treatment on the page.
+  // Compact, vertically aligned with the fact strip. Only error treatment on
+  // the page. Quiet when the bet has never moved (e.g. just-imported backlog).
+  if (move.tier === "none") {
+    return null;
+  }
   if (move.tier === "red") {
     return (
       <div className="text-right md:min-w-[180px]">
-        <p className="font-mono text-[11px] uppercase tracking-[0.08em] text-muted-foreground mb-1">
-          // HEALTH
+        <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground mb-1">
+          Health
         </p>
-        <p className="font-mono text-xs text-red-700 mb-1">ERR_NO_MOVEMENT</p>
+        <p className="font-mono text-xs text-signal-red mb-1">ERR_NO_MOVEMENT</p>
         <p className="text-sm text-foreground mb-1">No movement in {move.days} days</p>
         <a
           href={nudgeMailto(betTitle, move.days, owner)}
@@ -632,19 +636,19 @@ function HealthBlock({
   if (move.tier === "amber") {
     return (
       <div className="text-right md:min-w-[180px]">
-        <p className="font-mono text-[11px] uppercase tracking-[0.08em] text-muted-foreground mb-1">
-          // HEALTH
+        <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground mb-1">
+          Health
         </p>
-        <p className="text-sm text-foreground">Slowing · {move.days} days</p>
+        <p className="text-sm text-signal-amber">Slowing · {move.days} days</p>
       </div>
     );
   }
   return (
     <div className="text-right md:min-w-[180px]">
-      <p className="font-mono text-[11px] uppercase tracking-[0.08em] text-muted-foreground mb-1">
-        // HEALTH
+      <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground mb-1">
+        Health
       </p>
-      <p className="text-sm text-muted-foreground">{move.label || "Healthy"}</p>
+      <p className="text-sm text-muted-foreground">{move.label}</p>
     </div>
   );
 }
@@ -773,8 +777,8 @@ function DecisionGate({ decision }: { decision: any }) {
 
   return (
     <div className="min-w-0">
-      <p className="font-mono text-[11px] uppercase tracking-[0.08em] text-muted-foreground mb-2">
-        // DECISION GATE
+      <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground mb-2">
+        Decision Gate
       </p>
       <p className={cn("text-3xl font-semibold tabular-nums tracking-tight mb-1", headlineColor)}>
         {headline}
@@ -801,8 +805,8 @@ function Magnitude({
   const figureColor = tone === "upside" ? "text-green-700" : "text-red-700";
   return (
     <div className="min-w-0">
-      <p className="font-mono text-[11px] uppercase tracking-[0.08em] text-muted-foreground mb-2">
-        {`// ${label.toUpperCase()}`}
+      <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground mb-2">
+        {label}
       </p>
       {figure ? (
         <p className={cn("text-3xl font-semibold tabular-nums tracking-tight mb-2", figureColor)}>{figure}</p>
@@ -829,9 +833,9 @@ function Section({
       className="border-t border-gray-300 pt-8 mt-12"
       style={{ borderTopWidth: "0.5px" }}
     >
-      <p className="font-mono text-[11px] uppercase tracking-[0.08em] text-muted-foreground mb-4">
-        {`// ${label}`}
-      </p>
+      <h2 className="text-lg font-semibold text-foreground tracking-tight mb-4">
+        {label}
+      </h2>
       {children}
     </section>
   );
@@ -957,10 +961,10 @@ function RailActions({
   return (
     <>
       <aside className="hidden lg:block sticky top-8 h-fit space-y-8">
-        {/* // LIFECYCLE — vertical step list */}
+        {/* Lifecycle — vertical step list */}
         <div>
-          <p className="font-mono text-[11px] uppercase tracking-[0.08em] text-muted-foreground mb-3">
-            // LIFECYCLE
+          <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground mb-3">
+            Lifecycle
           </p>
           <ol className="space-y-1">
             {LIFECYCLE_STEPS.map((step, i) => {
@@ -994,10 +998,10 @@ function RailActions({
           </ol>
         </div>
 
-        {/* // LOG — quick navigation to logging sections */}
+        {/* Log — quick navigation to logging sections */}
         <div>
-          <p className="font-mono text-[11px] uppercase tracking-[0.08em] text-muted-foreground mb-3">
-            // LOG
+          <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground mb-3">
+            Log
           </p>
           <div className="space-y-1">
             <button

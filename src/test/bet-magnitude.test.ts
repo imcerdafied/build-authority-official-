@@ -108,9 +108,10 @@ describe("movementState", () => {
     expect(m.tier).toBe("none");
   });
 
-  it("turns red for an old bet that never moved", () => {
+  it("stays quiet for an old bet that never moved (no ERR_NO_MOVEMENT noise on backlog)", () => {
     const ts = isoDaysAgo(45);
     const m = movementState(ts, ts);
-    expect(m.tier).toBe("red");
+    expect(m.tier).toBe("none");
+    expect(m.code).toBeNull();
   });
 });

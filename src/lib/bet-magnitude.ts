@@ -134,12 +134,16 @@ const SLOWING_THRESHOLD = 30;
 
 /**
  * State-aware movement indicator. Uses updated_at as a proxy for last movement.
- * Per spec:
+ *
+ * Tiers:
  *   <14d → green "Moved Xd ago"
  *   14-30d → amber "Slowing · Xd"
  *   >30d → red "ERR_NO_MOVEMENT · Xd"
- * A brand-new bet (updated_at === created_at) under 30 days returns tier "none"
- * so a row doesn't scream stale on day one.
+ *
+ * Reset rule: a bet that has never moved since creation (updated_at ===
+ * created_at) returns tier "none" regardless of age. Bulk-imported bets that
+ * haven't been touched yet are not a movement signal — they're a backlog
+ * signal, which lives elsewhere.
  */
 export function movementState(
   updatedAt: string | null | undefined,
@@ -149,12 +153,12 @@ export function movementState(
   const days = Math.max(0, Math.floor((Date.now() - new Date(updatedAt).getTime()) / DAY_MS));
   const neverMoved = !!createdAt && new Date(updatedAt).getTime() === new Date(createdAt).getTime();
 
+  // Never moved since creation: stay quiet regardless of age.
+  if (neverMoved) {
+    return { tier: "none", days, label: "", code: null };
+  }
   if (days > SLOWING_THRESHOLD) {
     return { tier: "red", days, label: `${days}d`, code: "ERR_NO_MOVEMENT" };
-  }
-  if (neverMoved) {
-    // Under 30 days and never touched since creation: stay quiet on a new bet.
-    return { tier: "none", days, label: "", code: null };
   }
   if (days >= HEALTHY_THRESHOLD) {
     return { tier: "amber", days, label: `Slowing · ${days}d`, code: null };
