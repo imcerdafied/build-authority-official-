@@ -101,22 +101,33 @@ export default function AppLayout({ children }: { children: ReactNode }) {
             aria-label="Sections"
             className="hidden md:flex items-center gap-6 flex-1"
           >
-            {SUB_NAV.map((item) => (
-              <Link
-                key={item.to}
-                to={item.to}
-                className={cn(
-                  "text-sm transition-colors",
-                  location.pathname === item.to ||
-                    (item.to === "/bets" && location.pathname.startsWith("/bets"))
-                    ? "text-foreground font-medium"
-                    : "text-muted-foreground hover:text-foreground font-medium",
-                )}
-                onClick={closeMenu}
-              >
-                {item.label}
-              </Link>
-            ))}
+            {SUB_NAV.map((item) => {
+              const isActive =
+                location.pathname === item.to ||
+                (item.to === "/bets" && location.pathname.startsWith("/bets"));
+              return (
+                <Link
+                  key={item.to}
+                  to={item.to}
+                  aria-current={isActive ? "page" : undefined}
+                  className={cn(
+                    "relative text-sm font-medium transition-colors py-1",
+                    isActive
+                      ? "text-accent"
+                      : "text-muted-foreground hover:text-foreground",
+                  )}
+                  onClick={closeMenu}
+                >
+                  {item.label}
+                  {isActive && (
+                    <span
+                      className="absolute -bottom-[13px] left-0 right-0 h-[2px] bg-accent"
+                      aria-hidden
+                    />
+                  )}
+                </Link>
+              );
+            })}
           </nav>
 
           {/* Mobile menu button */}

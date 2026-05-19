@@ -291,9 +291,15 @@ export default function BetDetail() {
                     onClick={() => canWrite && setGoalPickerOpen(true)}
                     disabled={!canWrite}
                     className={cn(
-                      "text-sm text-foreground text-left truncate w-full",
-                      canWrite && "hover:underline",
+                      "text-sm text-foreground text-left block w-full leading-snug",
+                      canWrite && "hover:text-accent transition-colors",
                     )}
+                    style={{
+                      display: "-webkit-box",
+                      WebkitLineClamp: 2,
+                      WebkitBoxOrient: "vertical",
+                      overflow: "hidden",
+                    }}
                   >
                     {decision.linked_okr_title}
                   </button>
@@ -301,7 +307,7 @@ export default function BetDetail() {
                   <button
                     type="button"
                     onClick={() => setGoalPickerOpen(true)}
-                    className="text-sm text-muted-foreground hover:text-foreground transition-colors text-left underline-offset-4 hover:underline"
+                    className="text-sm text-accent hover:underline transition-colors text-left font-medium"
                   >
                     Assign a goal →
                   </button>
@@ -597,7 +603,7 @@ function FactItem({ label, children }: { label: string; children: React.ReactNod
       <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground mb-1">
         {label}
       </p>
-      <div className="truncate">{children}</div>
+      <div className="leading-snug">{children}</div>
     </div>
   );
 }
@@ -626,7 +632,7 @@ function HealthBlock({
         <p className="text-sm text-foreground mb-1">No movement in {move.days} days</p>
         <a
           href={nudgeMailto(betTitle, move.days, owner)}
-          className="text-sm font-medium text-foreground hover:underline"
+          className="text-sm font-medium text-accent hover:underline"
         >
           Nudge owner →
         </a>
@@ -686,7 +692,7 @@ function BetNavigator({
               className={cn(
                 "inline-flex items-center gap-1.5 px-2.5 py-1 rounded-[2px] text-xs transition-colors shrink-0 max-w-[180px]",
                 isCurrent
-                  ? "bg-foreground text-background font-medium"
+                  ? "bg-accent text-accent-foreground font-medium"
                   : "text-muted-foreground hover:text-foreground hover:bg-muted",
               )}
               style={{ border: "0.5px solid hsl(var(--border))" }}
@@ -980,7 +986,7 @@ function RailActions({
                     className={cn(
                       "w-full text-left text-sm px-2 py-1.5 rounded-[2px] flex items-center gap-2 transition-colors",
                       isCurrent
-                        ? "bg-foreground text-background font-medium cursor-default"
+                        ? "bg-accent text-accent-foreground font-medium cursor-default"
                         : isPast
                           ? "text-muted-foreground hover:bg-muted hover:text-foreground"
                           : "text-foreground hover:bg-muted",
@@ -1007,14 +1013,14 @@ function RailActions({
             <button
               onClick={() => scrollToId("what-moved")}
               disabled={!canEdit}
-              className="block w-full text-left text-sm text-foreground hover:underline px-2 py-1.5"
+              className="block w-full text-left text-sm font-medium text-accent hover:underline px-2 py-1.5"
             >
               Log movement →
             </button>
             <button
               onClick={() => scrollToId("outcome-metrics")}
               disabled={!canEdit}
-              className="block w-full text-left text-sm text-foreground hover:underline px-2 py-1.5"
+              className="block w-full text-left text-sm font-medium text-accent hover:underline px-2 py-1.5"
             >
               Add metric →
             </button>
