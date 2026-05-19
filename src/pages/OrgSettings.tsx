@@ -120,14 +120,12 @@ export default function OrgSettings() {
   };
 
   const handleSave = async () => {
-    const filledAreas = areas.filter((a) => a.label.trim());
-    if (filledAreas.length === 0) {
-      toast.error("At least one product area is required.");
-      return;
-    }
-
     setSaving(true);
     try {
+      // Zero filled areas is a valid state: the workspace simply doesn't
+      // use the Product Areas taxonomy. We persist an empty array rather
+      // than leaving stale rows behind.
+      const filledAreas = areas.filter((a) => a.label.trim());
       const productAreas: ProductArea[] = filledAreas.map((a, i) => ({
         key: SLOT_KEYS[i],
         label: a.label.trim(),
@@ -261,98 +259,119 @@ export default function OrgSettings() {
           )}
         </section>
 
-        {/* Product Areas */}
-        <section>
-          <h2 className="text-xs font-semibold text-muted-foreground mb-3">
-            Product Areas
-          </h2>
-          <p className="text-sm text-muted-foreground mb-3">
-            These organize your strategic bets into domains. 1 to 7 areas.
+        {/* Taxonomy — optional. Most workspaces don't need to model their bets
+            into Product Areas or Outcome Categories until they're managing
+            enough bets to justify roll-ups. Default-open only when the
+            workspace already has either configured. */}
+        <details
+          className="group"
+          open={orgAreas.length > 0 || (orgCategories?.length ?? 0) > 0}
+        >
+          <summary className="cursor-pointer list-none flex items-center gap-2 text-xs font-semibold text-muted-foreground hover:text-foreground transition-colors">
+            <span aria-hidden className="inline-block transition-transform group-open:rotate-90">▶</span>
+            Configure taxonomy (optional)
+          </summary>
+          <p className="text-sm text-muted-foreground mt-2 mb-6">
+            Use Product Areas and Outcome Categories to roll up bets in multi-
+            product or multi-team workspaces. Leave both blank for consulting
+            or zero-to-one workspaces — the portfolio works fine without them.
           </p>
-          <div className="space-y-2">
-            {areas.map((area, i) => (
-              <div key={i} className="flex items-center gap-2">
-                <span className="text-xs font-semibold text-muted-foreground w-5 shrink-0">
-                  {i + 1}.
-                </span>
-                <input
-                  type="text"
-                  value={area.label}
-                  onChange={(e) => updateArea(i, e.target.value)}
-                  className={inputClass}
-                  placeholder={`Product area ${i + 1}`}
-                />
-                {areas.length > 1 && (
+
+          <div className="space-y-8">
+            {/* Product Areas */}
+            <section>
+              <h2 className="text-xs font-semibold text-muted-foreground mb-3">
+                Product Areas
+              </h2>
+              <p className="text-sm text-muted-foreground mb-3">
+                Organize bets into domains. Up to 7 areas.
+              </p>
+              <div className="space-y-2">
+                {areas.map((area, i) => (
+                  <div key={i} className="flex items-center gap-2">
+                    <span className="text-xs font-semibold text-muted-foreground w-5 shrink-0">
+                      {i + 1}.
+                    </span>
+                    <input
+                      type="text"
+                      value={area.label}
+                      onChange={(e) => updateArea(i, e.target.value)}
+                      className={inputClass}
+                      placeholder={`Product area ${i + 1}`}
+                    />
+                    {areas.length > 1 && (
+                      <button
+                        onClick={() => removeArea(i)}
+                        className="text-muted-foreground hover:text-signal-red text-sm p-1 shrink-0"
+                      >
+                        ✕
+                      </button>
+                    )}
+                  </div>
+                ))}
+                {areas.length < 7 && (
                   <button
-                    onClick={() => removeArea(i)}
-                    className="text-muted-foreground hover:text-signal-red text-sm p-1 shrink-0"
+                    onClick={addArea}
+                    className="text-xs text-muted-foreground hover:text-foreground transition-colors"
                   >
-                    ✕
+                    + Add product area
                   </button>
                 )}
               </div>
-            ))}
-            {areas.length < 7 && (
+            </section>
+
+            {/* Outcome Categories */}
+            <section>
+              <h2 className="text-xs font-semibold text-muted-foreground mb-3">
+                Outcome Categories
+              </h2>
+              <p className="text-sm text-muted-foreground mb-3">
+                Classify what each bet is driving toward.
+              </p>
+              <div className="space-y-2">
+                {categories.map((cat, i) => (
+                  <div key={i} className="flex items-center gap-2">
+                    <input
+                      type="text"
+                      value={cat.label}
+                      onChange={(e) => updateCategory(i, e.target.value)}
+                      className={inputClass}
+                      placeholder={`Category ${i + 1}`}
+                    />
+                    {categories.length > 1 && (
+                      <button
+                        onClick={() => removeCategory(i)}
+                        className="text-muted-foreground hover:text-signal-red text-sm p-1 shrink-0"
+                      >
+                        ✕
+                      </button>
+                    )}
+                  </div>
+                ))}
+                <button
+                  onClick={addCategory}
+                  className="text-xs text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  + Add category
+                </button>
+              </div>
+            </section>
+
+            {/* Save taxonomy */}
+            <div className="pt-2">
               <button
-                onClick={addArea}
-                className="text-xs text-muted-foreground hover:text-foreground transition-colors"
-              >
-                + Add product area
-              </button>
-            )}
-          </div>
-        </section>
-
-        {/* Outcome Categories */}
-        <section>
-          <h2 className="text-xs font-semibold text-muted-foreground mb-3">
-            Outcome Categories
-          </h2>
-          <p className="text-sm text-muted-foreground mb-3">
-            Classify what each bet is driving toward.
-          </p>
-          <div className="space-y-2">
-            {categories.map((cat, i) => (
-              <div key={i} className="flex items-center gap-2">
-                <input
-                  type="text"
-                  value={cat.label}
-                  onChange={(e) => updateCategory(i, e.target.value)}
-                  className={inputClass}
-                  placeholder={`Category ${i + 1}`}
-                />
-                {categories.length > 1 && (
-                  <button
-                    onClick={() => removeCategory(i)}
-                    className="text-muted-foreground hover:text-signal-red text-sm p-1 shrink-0"
-                  >
-                    ✕
-                  </button>
+                onClick={handleSave}
+                disabled={saving}
+                className={cn(
+                  "text-sm font-semibold px-4 py-2.5 rounded-sm transition-colors",
+                  "bg-foreground text-background hover:bg-foreground/90 disabled:opacity-50",
                 )}
-              </div>
-            ))}
-            <button
-              onClick={addCategory}
-              className="text-xs text-muted-foreground hover:text-foreground transition-colors"
-            >
-              + Add category
-            </button>
+              >
+                {saving ? "Saving..." : "Save taxonomy"}
+              </button>
+            </div>
           </div>
-        </section>
-
-        {/* Save product areas + categories */}
-        <div className="pt-2">
-          <button
-            onClick={handleSave}
-            disabled={saving}
-            className={cn(
-              "text-sm font-semibold px-4 py-2.5 rounded-sm transition-colors",
-              "bg-foreground text-background hover:bg-foreground/90 disabled:opacity-50",
-            )}
-          >
-            {saving ? "Saving..." : "Save Product Areas & Categories"}
-          </button>
-        </div>
+        </details>
       </div>
     </div>
   );
