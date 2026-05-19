@@ -45,8 +45,8 @@ function PortfolioSummary({ activeDecisions }: { activeDecisions: SummaryDecisio
     children: React.ReactNode;
   }) => (
     <div className="flex flex-col">
-      <span className="font-mono text-[11px] uppercase tracking-[0.05em] text-muted-foreground mb-1">
-        {`// ${label}`}
+      <span className="text-xs font-medium uppercase tracking-wider text-muted-foreground mb-1">
+        {label}
       </span>
       <span className="text-2xl font-semibold tabular-nums tracking-tight leading-tight">{children}</span>
     </div>
@@ -259,10 +259,10 @@ export default function Bets() {
               <button
                 onClick={() => setClosedBetsOpen(!closedBetsOpen)}
                 aria-expanded={closedBetsOpen}
-                className="flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.05em] text-muted-foreground hover:text-foreground transition-colors"
+                className="flex items-center gap-2 text-xs font-medium uppercase tracking-wider text-muted-foreground hover:text-foreground transition-colors"
               >
                 {closedBetsOpen ? <ChevronDown className="w-3 h-3" /> : <ChevronRight className="w-3 h-3" />}
-                {`// CLOSED BETS (${closedCount})`}
+                {`Closed bets (${closedCount})`}
               </button>
               {closedBetsOpen && (
                 <div className="mt-4">
