@@ -78,17 +78,26 @@ function PortfolioSummary({
     return <span className="text-foreground">{agg.display}</span>;
   };
 
+  // Stalled is a critical signal when it exists and silent noise when zero.
+  // Same pattern as showMagnitudes — only render the column when it carries
+  // information worth reading.
+  const showStalled = stalled > 0;
+  if (!showMagnitudes && !showStalled) return null;
+
+  const colCount = (showMagnitudes ? 2 : 0) + (showStalled ? 1 : 0);
+  const gridClass =
+    colCount === 3
+      ? "md:grid-cols-3"
+      : colCount === 2
+        ? "md:grid-cols-2"
+        : "md:grid-cols-1";
+
   return (
     <div
       className="border-y border-border py-6 mb-6"
       style={{ borderTopWidth: "0.5px", borderBottomWidth: "0.5px" }}
     >
-      <div
-        className={cn(
-          "grid grid-cols-1 gap-6 md:gap-10",
-          showMagnitudes ? "md:grid-cols-3" : "md:grid-cols-1",
-        )}
-      >
+      <div className={cn("grid grid-cols-1 gap-6 md:gap-10", gridClass)}>
         {showMagnitudes && (
           <>
             <Col label="TOTAL UPSIDE">
@@ -99,11 +108,13 @@ function PortfolioSummary({
             </Col>
           </>
         )}
-        <Col label="STALLED">
-          <span className={stalledMajority ? "text-red-700" : "text-foreground"}>
-            {stalled} of {denom} {denom === 1 ? "bet" : "bets"}
-          </span>
-        </Col>
+        {showStalled && (
+          <Col label="STALLED">
+            <span className={stalledMajority ? "text-red-700" : "text-foreground"}>
+              {stalled} of {denom} {denom === 1 ? "bet" : "bets"}
+            </span>
+          </Col>
+        )}
       </div>
     </div>
   );
