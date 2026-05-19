@@ -26,6 +26,7 @@ const roleLabels: Record<string, string> = {
 
 const SUB_NAV: { label: string; to: string }[] = [
   { label: "Bets", to: "/bets" },
+  { label: "Initiatives", to: "/initiatives" },
   { label: "Review", to: "/review" },
 ];
 

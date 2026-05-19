@@ -11,6 +11,7 @@ import Bets from "@/pages/Bets";
 import BetDetail from "@/pages/BetDetail";
 import Loops from "@/pages/Loops";
 import Review from "@/pages/Review";
+import Initiatives from "@/pages/Initiatives";
 import HowItWorks from "@/pages/HowItWorks";
 import Signals from "@/pages/Signals";
 import Pods from "@/pages/Pods";
@@ -96,6 +97,7 @@ function AppContent() {
               {/* Bets altitude */}
               <Route path="/bets" element={<Bets />} />
               <Route path="/bets/:id" element={<BetDetail />} />
+              <Route path="/initiatives" element={<Initiatives />} />
               {/* Legacy URL preserved as a redirect */}
               <Route path="/decisions" element={<Navigate to="/bets" replace />} />
               <Route path="/loops" element={<Loops />} />

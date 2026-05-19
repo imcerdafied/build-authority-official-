@@ -2,7 +2,61 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useOrg } from "@/contexts/OrgContext";
 import type { BetInitiative } from "@/lib/types";
+import { isClosedBetLifecycle } from "@/lib/bet-status";
 import { recalculateBetState } from "@/lib/outcome-engine/recalculateBetState";
+
+export interface InitiativeWithBet extends BetInitiative {
+  bet: {
+    id: string;
+    title: string | null;
+    bet_label: string | null;
+    status: string;
+    created_at: string;
+  };
+}
+
+/**
+ * Workspace-scoped: every initiative across every active bet in the current
+ * org. Closed bets are filtered out — their initiatives aren't actionable.
+ * Sorted by parent bet (created_at order), then roadmap_position within bet.
+ */
+export function useAllInitiatives() {
+  const { currentOrg } = useOrg();
+  return useQuery<InitiativeWithBet[]>({
+    queryKey: ["all_initiatives", currentOrg?.id],
+    queryFn: async () => {
+      if (!currentOrg) return [];
+      const { data, error } = await supabase
+        .from("bet_initiatives")
+        .select(
+          "*, decisions!inner(id, title, bet_label, status, org_id, created_at)",
+        )
+        .eq("decisions.org_id", currentOrg.id);
+      if (error) throw error;
+      const rows = ((data ?? []) as any[]).map((r) => ({
+        ...r,
+        bet: {
+          id: r.decisions.id,
+          title: r.decisions.title,
+          bet_label: r.decisions.bet_label,
+          status: r.decisions.status,
+          created_at: r.decisions.created_at,
+        },
+      })) as InitiativeWithBet[];
+      // Drop closed bets — they're not part of the active execution surface.
+      const active = rows.filter((r) => !isClosedBetLifecycle(r.bet.status));
+      // Order: parent bet's created_at ASC (matches portfolio numbering),
+      // then roadmap_position within the bet.
+      return active.sort((a, b) => {
+        const ba = new Date(a.bet.created_at).getTime();
+        const bb = new Date(b.bet.created_at).getTime();
+        if (ba !== bb) return ba - bb;
+        return a.roadmap_position - b.roadmap_position;
+      });
+    },
+    enabled: !!currentOrg,
+  });
+}
 
 export function useInitiatives(betId: string | undefined) {
   const { currentOrg } = useOrg();
