@@ -6,7 +6,7 @@ import { ChevronDown, ChevronRight } from "lucide-react";
 import CreateDecisionForm from "@/components/CreateDecisionForm";
 import BetRow from "@/components/bets/BetRow";
 import { categoryLabels } from "@/pages/Decisions";
-import { aggregateMagnitudes, movementState } from "@/lib/bet-magnitude";
+import { aggregateMagnitudes, extractMagnitude, movementState } from "@/lib/bet-magnitude";
 import {
   BET_LIFECYCLE_LABELS,
   BET_LIFECYCLE_STATUSES,
@@ -28,7 +28,13 @@ interface SummaryDecision {
   created_at: string;
 }
 
-function PortfolioSummary({ activeDecisions }: { activeDecisions: SummaryDecision[] }) {
+function PortfolioSummary({
+  activeDecisions,
+  showMagnitudes,
+}: {
+  activeDecisions: SummaryDecision[];
+  showMagnitudes: boolean;
+}) {
   const upside = aggregateMagnitudes(activeDecisions.map((d) => d.exposure_value ?? null));
   const risk = aggregateMagnitudes(activeDecisions.map((d) => d.revenue_at_risk ?? null));
   const stalled = activeDecisions.filter(
@@ -77,13 +83,22 @@ function PortfolioSummary({ activeDecisions }: { activeDecisions: SummaryDecisio
       className="border-y border-border py-6 mb-6"
       style={{ borderTopWidth: "0.5px", borderBottomWidth: "0.5px" }}
     >
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-10">
-        <Col label="TOTAL UPSIDE">
-          <Magnitude agg={upside} />
-        </Col>
-        <Col label="TOTAL RISK">
-          <Magnitude agg={risk} />
-        </Col>
+      <div
+        className={cn(
+          "grid grid-cols-1 gap-6 md:gap-10",
+          showMagnitudes ? "md:grid-cols-3" : "md:grid-cols-1",
+        )}
+      >
+        {showMagnitudes && (
+          <>
+            <Col label="TOTAL UPSIDE">
+              <Magnitude agg={upside} />
+            </Col>
+            <Col label="TOTAL RISK">
+              <Magnitude agg={risk} />
+            </Col>
+          </>
+        )}
         <Col label="STALLED">
           <span className={stalledMajority ? "text-red-700" : "text-foreground"}>
             {stalled} of {denom} {denom === 1 ? "bet" : "bets"}
@@ -133,6 +148,13 @@ export default function Bets() {
   );
   const isEmpty = decisions.length === 0;
 
+  // Auto-hide Upside/Risk columns + totals when no active bet has a parseable
+  // dollar magnitude. Keeps a 0-to-1 workspace from screaming "Not quantified"
+  // on every row; columns reappear automatically once any bet gets a $-amount.
+  const showMagnitudes = activeDecisions.some(
+    (d) => extractMagnitude(d.exposure_value) !== null || extractMagnitude(d.revenue_at_risk) !== null,
+  );
+
   const filtersActive = !!(filterStatus || filterRisk || filterDomain);
   const filteredDecisions = orderedDecisions.filter((d) => {
     if (filterStatus && d.status !== filterStatus) return false;
@@ -168,7 +190,7 @@ export default function Bets() {
       </div>
 
       {/* Portfolio summary — aggregates across active bets */}
-      <PortfolioSummary activeDecisions={activeDecisions} />
+      <PortfolioSummary activeDecisions={activeDecisions} showMagnitudes={showMagnitudes} />
 
       {/* Filters */}
       <div className="flex flex-wrap items-center gap-2 mb-6">
@@ -245,7 +267,7 @@ export default function Bets() {
               style={{ borderTopWidth: "0.5px" }}
             >
               {filteredDecisions.map((d, index) => (
-                <BetRow key={d.id} d={d as any} index={index + 1} />
+                <BetRow key={d.id} d={d as any} index={index + 1} showMagnitudes={showMagnitudes} />
               ))}
             </div>
           )}

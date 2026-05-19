@@ -55,7 +55,7 @@ export const LIFECYCLE_BUCKET_STYLE: Record<
   { bg: string; text: string; dot: string }
 > = {
   defined: { bg: "bg-gray-100", text: "text-gray-700", dot: "bg-gray-500" },
-  activated: { bg: "bg-amber-100", text: "text-amber-800", dot: "bg-amber-500" },
+  activated: { bg: "bg-foreground/10", text: "text-foreground", dot: "bg-foreground" },
   shipping: { bg: "bg-accent/15", text: "text-accent", dot: "bg-accent" },
   closed: { bg: "bg-green-100", text: "text-green-800", dot: "bg-green-500" },
 };

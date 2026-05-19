@@ -22,9 +22,15 @@ interface BetRowProps {
     revenue_at_risk?: string | null;
   };
   index: number;
+  /**
+   * Whether to render the Upside / Risk slot. Set false when no bet in the
+   * portfolio has a parseable dollar magnitude — keeps a 0-to-1 workspace
+   * from screaming "Not quantified" on every row.
+   */
+  showMagnitudes?: boolean;
 }
 
-export default function BetRow({ d, index }: BetRowProps) {
+export default function BetRow({ d, index, showMagnitudes = true }: BetRowProps) {
   const bucket = lifecycleBucket(d.status);
   const style = LIFECYCLE_BUCKET_STYLE[bucket];
   const isAging = bucket === "activated" && d.is_aging;
@@ -74,7 +80,7 @@ export default function BetRow({ d, index }: BetRowProps) {
             className="text-[18px] font-semibold text-foreground leading-snug overflow-hidden"
             style={{ display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical" }}
           >
-            <span className="text-muted-foreground mr-1 font-mono tabular-nums">{index}.</span>
+            <span className="text-accent mr-1 font-mono tabular-nums">{index}.</span>
             {d.title || "Untitled"}
           </p>
           <p className="text-sm text-muted-foreground mt-1 truncate">
@@ -84,28 +90,32 @@ export default function BetRow({ d, index }: BetRowProps) {
           </p>
         </div>
 
-        {/* 3. Right column: magnitudes + movement. 220px hard cap. */}
+        {/* 3. Right column: (optional) magnitudes + movement. 220px hard cap. */}
         <div className="min-w-0 md:w-[220px] flex flex-col gap-1.5">
-          <div className="min-w-0">
-            <span className="font-mono text-[11px] uppercase tracking-[0.05em] text-muted-foreground">UPSIDE</span>
-            {upside ? (
-              <p className="font-mono text-base font-medium text-signal-green tabular-nums truncate leading-tight">
-                {upside.display}
-              </p>
-            ) : (
-              <p className="text-sm text-muted-foreground leading-tight">Not quantified</p>
-            )}
-          </div>
-          <div className="min-w-0">
-            <span className="font-mono text-[11px] uppercase tracking-[0.05em] text-muted-foreground">RISK</span>
-            {risk ? (
-              <p className="font-mono text-base font-medium text-signal-red tabular-nums truncate leading-tight">
-                {risk.display}
-              </p>
-            ) : (
-              <p className="text-sm text-muted-foreground leading-tight">Not quantified</p>
-            )}
-          </div>
+          {showMagnitudes && (
+            <>
+              <div className="min-w-0">
+                <span className="font-mono text-[11px] uppercase tracking-[0.05em] text-muted-foreground">UPSIDE</span>
+                {upside ? (
+                  <p className="font-mono text-base font-medium text-signal-green tabular-nums truncate leading-tight">
+                    {upside.display}
+                  </p>
+                ) : (
+                  <p className="text-sm text-muted-foreground leading-tight">Not quantified</p>
+                )}
+              </div>
+              <div className="min-w-0">
+                <span className="font-mono text-[11px] uppercase tracking-[0.05em] text-muted-foreground">RISK</span>
+                {risk ? (
+                  <p className="font-mono text-base font-medium text-signal-red tabular-nums truncate leading-tight">
+                    {risk.display}
+                  </p>
+                ) : (
+                  <p className="text-sm text-muted-foreground leading-tight">Not quantified</p>
+                )}
+              </div>
+            </>
+          )}
           {move.tier !== "none" && (
             <div className="min-w-0 flex items-center gap-1.5">
               {move.tier === "red" ? (
