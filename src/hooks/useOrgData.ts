@@ -58,7 +58,7 @@ export interface DecisionComputed {
   target_completion_date: string | null;
   // Client-computed fields
   age_days: number;
-  slice_remaining: number;
+  slice_remaining: number | null;
   is_exceeded: boolean;
   is_urgent: boolean;
   is_aging: boolean;
@@ -73,16 +73,16 @@ function computeDecisionFields(row: Record<string, unknown>): DecisionComputed {
   const ageDays = Math.floor((now - created) / (1000 * 60 * 60 * 24));
   const sliceDeadline = (row.slice_deadline_days as number) ?? 10;
   const sliceDueAt = row.slice_due_at as string | null;
-  let sliceRemaining: number;
-  if (sliceDueAt) {
-    sliceRemaining = Math.floor((new Date(sliceDueAt).getTime() - now) / (1000 * 60 * 60 * 24));
-  } else {
-    sliceRemaining = sliceDeadline - ageDays;
-  }
+  // Only compute a remaining-days value when there's an actual review cycle on
+  // the record. Fabricating `sliceDeadline - ageDays` when slice_due_at is NULL
+  // makes Defined bets look perpetually overdue.
+  const sliceRemaining: number | null = sliceDueAt
+    ? Math.floor((new Date(sliceDueAt).getTime() - now) / (1000 * 60 * 60 * 24))
+    : null;
   const isActive = !isClosedBetLifecycle(row.status as string);
   const hasStarted = isActive && lifecycle !== "defined";
-  const isExceeded = hasStarted && (sliceDueAt ? now > new Date(sliceDueAt).getTime() : ageDays > sliceDeadline);
-  const isUrgent = hasStarted && sliceRemaining >= 0 && sliceRemaining <= 3;
+  const isExceeded = hasStarted && sliceDueAt != null && now > new Date(sliceDueAt).getTime();
+  const isUrgent = hasStarted && sliceRemaining != null && sliceRemaining >= 0 && sliceRemaining <= 3;
   const isAging = hasStarted && ageDays > 14;
   const isUnbound = isActive && !row.outcome_target;
   const needsExecAttention = toBetRiskLevel(row.risk_level as string | null | undefined) === "at_risk";

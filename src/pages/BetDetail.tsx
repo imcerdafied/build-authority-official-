@@ -801,11 +801,20 @@ function DecisionGate({ decision }: { decision: any }) {
 function adaptiveDistance(days: number): string {
   const abs = Math.abs(days);
   if (abs === 0) return "today";
-  if (abs === 1) return "1d";
-  if (abs < 14) return `${abs}d`;
-  if (abs < 90) return `${Math.round(abs / 7)}w`;
-  if (abs < 365) return `${Math.round(abs / 30)}mo`;
-  return `${(abs / 365).toFixed(1)}y`;
+  if (abs === 1) return "1 day";
+  if (abs < 14) return `${abs} days`;
+  if (abs < 90) {
+    const w = Math.round(abs / 7);
+    return `${w} ${w === 1 ? "week" : "weeks"}`;
+  }
+  if (abs < 365) {
+    const m = Math.round(abs / 30);
+    return `${m} ${m === 1 ? "month" : "months"}`;
+  }
+  const y = abs / 365;
+  // Whole years render cleanly; fractional years carry one decimal.
+  const yStr = Number.isInteger(y) ? `${y}` : y.toFixed(1);
+  return `${yStr} ${y === 1 ? "year" : "years"}`;
 }
 
 function Magnitude({
