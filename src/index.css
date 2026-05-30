@@ -37,7 +37,7 @@
     --input: 0 0% 83%;
     --ring: 250 59% 58%;
 
-    --radius: 0.5rem;
+    --radius: 2px;
 
     /* BSPG grays as standalone tokens for direct use */
     --gray-900: 0 0% 10%;
