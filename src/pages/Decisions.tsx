@@ -20,6 +20,7 @@ import DriftIndicators from "@/components/DriftIndicators";
 import { DriftBadge } from "@/components/DriftIndicators";
 import StatusBadge from "@/components/StatusBadge";
 import { supabase } from "@/integrations/supabase/client";
+import { fetchSystemBetMotion } from "@/lib/systemMotion";
 import {
   BET_LIFECYCLE_LABELS,
   BET_LIFECYCLE_STATUSES,
@@ -1064,6 +1065,7 @@ export function BetCard({
 }) {
   const [logFormExpanded, setLogFormExpanded] = useState(false);
   const { currentOrg } = useOrg();
+  const betKey = String(index).replace(".", "");
 
   const { data: betOutcomes } = useQuery({
     queryKey: ['bet-outcomes', d.id],
@@ -1077,6 +1079,13 @@ export function BetCard({
     },
     enabled: !!currentOrg && !!d.id,
     staleTime: 60_000,
+  });
+
+  const { data: systemMotion, isLoading: systemMotionLoading } = useQuery({
+    queryKey: ['system-bet-motion', d.id, d.title, betKey],
+    queryFn: () => fetchSystemBetMotion({ betId: d.id, betTitle: d.title ?? "", betKey }),
+    enabled: !!d.id && !!d.title,
+    staleTime: 90_000,
   });
 
   const capacityDiverted = (d.capacity_diverted ?? 0) as number;
@@ -1306,6 +1315,71 @@ export function BetCard({
           logInterruptionOnClick={() => setLogFormExpanded(true)}
           canWrite={canWrite}
         />
+
+      <div className="px-4 md:px-5 py-3 border-t border-border/40">
+        <div className="flex items-center justify-between gap-3 mb-2">
+          <div className="text-xs text-muted-foreground flex items-center gap-1.5">
+            <span className="w-1.5 h-1.5 rounded-full bg-blue-400 inline-block" />
+            SYSTEM / OUTCOMES MOTION
+          </div>
+          <a
+            href="https://os.bspg.build/app/engagements/a05b65f0-0953-4653-9726-e65013ed096c/roadmap"
+            target="_blank"
+            rel="noreferrer"
+            className="text-xs font-semibold text-muted-foreground hover:text-foreground"
+          >
+            Open System
+          </a>
+        </div>
+        {systemMotionLoading && (
+          <p className="text-xs text-muted-foreground">Checking operating motion...</p>
+        )}
+        {!systemMotionLoading && !systemMotion && (
+          <p className="text-xs text-muted-foreground">No System motion found yet for this bet.</p>
+        )}
+        {systemMotion && (
+          <div className="space-y-3">
+            <div className="grid grid-cols-2 md:grid-cols-5 gap-2">
+              {[
+                ["Outcomes linked", systemMotion.summary.outcomes_linked],
+                ["Roadmap open", systemMotion.summary.roadmap.open],
+                ["Waiting", systemMotion.summary.roadmap.waiting + systemMotion.summary.gtm.waiting],
+                ["Proof points", systemMotion.summary.proof_points],
+                ["Owner", systemMotion.summary.owner || d.owner || "TBD"],
+              ].map(([label, value]) => (
+                <div key={label} className="rounded border border-border/50 bg-muted/15 px-2 py-2">
+                  <p className="text-[10px] uppercase tracking-wide text-muted-foreground">{label}</p>
+                  <p className="mt-0.5 text-sm font-semibold text-foreground">{value}</p>
+                </div>
+              ))}
+            </div>
+            {systemMotion.blockers.length > 0 && (
+              <div className="rounded border border-amber-200 bg-amber-50 px-3 py-2">
+                <p className="text-[10px] uppercase tracking-wide text-amber-700 font-semibold">GTM blockers</p>
+                <div className="mt-1 space-y-1">
+                  {systemMotion.blockers.slice(0, 2).map((blocker) => (
+                    <p key={blocker.id} className="text-xs text-amber-800">
+                      {blocker.target}: {blocker.needs_from || blocker.lane}
+                    </p>
+                  ))}
+                </div>
+              </div>
+            )}
+            <div className="flex flex-wrap gap-1.5">
+              {systemMotion.roadmap_items.slice(0, 4).map((item) => (
+                <span key={item.id} className="text-xs px-1.5 py-0.5 rounded border border-border/40 text-muted-foreground">
+                  {item.item_code ? `${item.item_code}: ` : ""}{item.title.length > 32 ? item.title.slice(0, 32) + "\u2026" : item.title}
+                </span>
+              ))}
+              {systemMotion.gtm_items.slice(0, 3).map((item) => (
+                <span key={item.id} className="text-xs px-1.5 py-0.5 rounded border border-blue-200 bg-blue-50 text-blue-700">
+                  GTM: {item.target}
+                </span>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
 
       {betOutcomes && betOutcomes.length > 0 && (
         <div className="px-4 md:px-5 py-3 border-t border-border/40">
