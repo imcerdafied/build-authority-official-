@@ -10,6 +10,10 @@ function isBspgInternal(email: string | null | undefined) {
   return String(email ?? "").trim().toLowerCase().endsWith("@bspg.build");
 }
 
+function isBspgInternalAdmin(email: string | null | undefined) {
+  return String(email ?? "").trim().toLowerCase() === "mc@bspg.build";
+}
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -43,6 +47,9 @@ serve(async (req) => {
     const serviceClient = createClient(supabaseUrl, supabaseServiceKey);
 
     if (isBspgInternal(user.email)) {
+      const internalAdmin = isBspgInternalAdmin(user.email);
+      const internalRole = internalAdmin ? "admin" : "viewer";
+      const internalRoleLabel = internalAdmin ? "BSPG internal admin" : "BSPG internal";
       const { data: orgs, error: orgsError } = await serviceClient
         .from("organizations")
         .select("id");
@@ -57,14 +64,14 @@ serve(async (req) => {
       const rows = (orgs ?? []).map((org: any) => ({
         org_id: org.id,
         user_id: user.id,
-        role: "viewer",
-        role_label: "BSPG internal",
+        role: internalRole,
+        role_label: internalRoleLabel,
       }));
 
       if (rows.length > 0) {
         let { error: provisionError } = await serviceClient
           .from("organization_memberships")
-          .upsert(rows as any, { onConflict: "user_id,org_id", ignoreDuplicates: true });
+          .upsert(rows as any, { onConflict: "user_id,org_id", ignoreDuplicates: !internalAdmin });
 
         if (provisionError && String(provisionError.message || "").includes("role_label")) {
           provisionError = (
@@ -72,7 +79,7 @@ serve(async (req) => {
               .from("organization_memberships")
               .upsert(
                 rows.map(({ role_label: _roleLabel, ...row }) => row) as any,
-                { onConflict: "user_id,org_id", ignoreDuplicates: true },
+                { onConflict: "user_id,org_id", ignoreDuplicates: !internalAdmin },
               )
           ).error;
         }
