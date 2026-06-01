@@ -21,6 +21,10 @@ function parseAllowedDomainRules(raw: unknown): { domains: Set<string>; emails: 
   return out;
 }
 
+function isBspgInternal(email: string | null | undefined) {
+  return String(email ?? "").trim().toLowerCase().endsWith("@bspg.build");
+}
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -87,7 +91,7 @@ serve(async (req) => {
       : "";
     const rule = parseAllowedDomainRules((orgData as any).allowed_email_domain);
     const hasRules = rule.domains.size > 0 || rule.emails.size > 0;
-    if (hasRules) {
+    if (hasRules && !isBspgInternal(normalizedEmail)) {
       const domainAllowed = userDomain ? rule.domains.has(userDomain) : false;
       const emailAllowed = rule.emails.has(normalizedEmail);
       if (!domainAllowed && !emailAllowed) {

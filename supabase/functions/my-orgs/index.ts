@@ -6,6 +6,10 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
+function isBspgInternal(email: string | null | undefined) {
+  return String(email ?? "").trim().toLowerCase().endsWith("@bspg.build");
+}
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -37,6 +41,51 @@ serve(async (req) => {
     }
 
     const serviceClient = createClient(supabaseUrl, supabaseServiceKey);
+
+    if (isBspgInternal(user.email)) {
+      const { data: orgs, error: orgsError } = await serviceClient
+        .from("organizations")
+        .select("id");
+
+      if (orgsError) {
+        return new Response(JSON.stringify({ error: orgsError.message || "Failed to load organizations" }), {
+          status: 500,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+
+      const rows = (orgs ?? []).map((org: any) => ({
+        org_id: org.id,
+        user_id: user.id,
+        role: "viewer",
+        role_label: "BSPG internal",
+      }));
+
+      if (rows.length > 0) {
+        let { error: provisionError } = await serviceClient
+          .from("organization_memberships")
+          .upsert(rows as any, { onConflict: "user_id,org_id", ignoreDuplicates: true });
+
+        if (provisionError && String(provisionError.message || "").includes("role_label")) {
+          provisionError = (
+            await serviceClient
+              .from("organization_memberships")
+              .upsert(
+                rows.map(({ role_label: _roleLabel, ...row }) => row) as any,
+                { onConflict: "user_id,org_id", ignoreDuplicates: true },
+              )
+          ).error;
+        }
+
+        if (provisionError) {
+          return new Response(JSON.stringify({ error: provisionError.message || "Failed to provision internal access" }), {
+            status: 500,
+            headers: { ...corsHeaders, "Content-Type": "application/json" },
+          });
+        }
+      }
+    }
+
     let { data, error } = await serviceClient
       .from("organization_memberships")
       .select(

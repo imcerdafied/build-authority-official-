@@ -134,6 +134,10 @@ function fallbackOrganization(orgId: string, fallbackName?: string): Tables<"org
   };
 }
 
+function isBspgInternal(email: string | null | undefined) {
+  return String(email ?? "").trim().toLowerCase().endsWith("@bspg.build");
+}
+
 
 export function OrgProvider({ children }: { children: ReactNode }) {
   const { user } = useAuth();
@@ -178,8 +182,11 @@ export function OrgProvider({ children }: { children: ReactNode }) {
       console.error("Primary membership fetch failed. Falling back to edge function:", error);
     }
 
+    const shouldUseEdgeMemberships = mapped.length === 0 || isBspgInternal(user.email);
+
     // Single fallback via edge function (service-role backed) if the primary RLS path returns empty.
-    if (mapped.length === 0) {
+    // BSPG internal users also use this path so the server can provision read access across client workspaces.
+    if (shouldUseEdgeMemberships) {
       const { data: edgeData, error: edgeError } = await supabase.functions.invoke("my-orgs");
       if (edgeError) {
         console.error("Edge membership fallback failed:", edgeError);
