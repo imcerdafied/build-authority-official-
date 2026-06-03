@@ -39,31 +39,43 @@ function AuthorityRoleSummary({
   activeDecisions: DecisionComputed[];
 }) {
   const total = activeDecisions.length;
-  const rationaleReady = activeDecisions.filter(
-    (d) => hasText(d.trigger_signal) && hasText(d.expected_impact),
-  ).length;
   const outcomesReady = activeDecisions.filter(
     (d) => hasText(d.trigger_signal) && hasText(d.outcome_target) && hasText(d.expected_impact),
   ).length;
   const systemReady = activeDecisions.filter(
     (d) => hasText(d.owner) && (hasText(d.slice_due_at) || hasText(d.target_completion_date)),
   ).length;
-  const needsShape = activeDecisions.filter(
+  const needsShape = total - outcomesReady;
+  const operatingGaps = total - systemReady;
+  const needsReview = activeDecisions.filter(
     (d) => !hasText(d.trigger_signal) || !hasText(d.outcome_target) || !hasText(d.expected_impact),
   ).length;
+  const allHandoffReady = total > 0 && needsShape === 0 && operatingGaps === 0;
 
-  const Stat = ({
+  const ReadinessFact = ({
     label,
     value,
     detail,
+    tone = "neutral",
   }: {
     label: string;
     value: string | number;
     detail: string;
+    tone?: "neutral" | "clear" | "attention";
   }) => (
-    <div className="rounded-[2px] border border-gray-300 bg-background p-3" style={{ borderWidth: "0.5px" }}>
+    <div
+      className={cn(
+        "rounded-[2px] border bg-background p-3",
+        tone === "clear" && "border-green-300 bg-green-50/40",
+        tone === "attention" && "border-amber-300 bg-amber-50/50",
+        tone === "neutral" && "border-gray-300",
+      )}
+      style={{ borderWidth: "0.5px" }}
+    >
       <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">{label}</p>
-      <p className="mt-2 text-2xl font-semibold tracking-tight tabular-nums text-foreground">{value}</p>
+      <p className="mt-2 text-2xl font-semibold tracking-tight tabular-nums text-foreground">
+        {value}
+      </p>
       <p className="mt-1 text-xs leading-snug text-muted-foreground">{detail}</p>
     </div>
   );
@@ -86,32 +98,51 @@ function AuthorityRoleSummary({
             Authority owns the durable why: sponsor, owner, trigger signal, upside, risk, rationale, and decision history. Outcomes_ turns ready bets into prompt-aware product work. System tracks whether the work moves.
           </p>
         </div>
-        {needsShape > 0 && (
-          <div className="rounded-[2px] border border-amber-300 bg-amber-50 px-3 py-2 text-sm text-amber-900" style={{ borderWidth: "0.5px" }}>
-            {needsShape} {needsShape === 1 ? "bet needs" : "bets need"} more rationale before handoff.
-          </div>
-        )}
+        <div className="rounded-[2px] border border-gray-300 bg-background px-3 py-2 text-sm text-muted-foreground" style={{ borderWidth: "0.5px" }}>
+          <span className="font-semibold tabular-nums text-foreground">{total}</span>{" "}
+          active strategic {total === 1 ? "record" : "records"}
+        </div>
       </div>
 
-      <div className="grid grid-cols-1 gap-3 md:grid-cols-4">
-        <Stat label="Open records" value={total} detail="Active strategic bets Authority is holding." />
-        <Stat label="Rationale ready" value={rationaleReady} detail="Trigger signal and expected impact are written." />
-        <Stat label="Outcomes ready" value={outcomesReady} detail="Enough context to shape roadmap or prompt work." />
-        <Stat label="System ready" value={systemReady} detail="Owner and date exist for operating follow-through." />
-      </div>
-
-      <div className="mt-4 grid grid-cols-1 gap-2 md:grid-cols-3">
-        {[
-          ["Authority", "Records the strategic bet and why it matters."],
-          ["Outcomes_", "Translates the bet into product context and build prompts."],
-          ["System", "Keeps execution, blockers, and momentum visible."],
-        ].map(([label, detail]) => (
-          <div key={label} className="rounded-[2px] bg-muted/25 px-3 py-2">
-            <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">{label}</p>
-            <p className="mt-1 text-sm leading-snug text-foreground">{detail}</p>
+      {allHandoffReady ? (
+        <div className="rounded-[2px] border border-green-300 bg-green-50/40 px-3 py-3" style={{ borderWidth: "0.5px" }}>
+          <p className="text-sm font-medium text-foreground">
+            All {total} open {total === 1 ? "bet has" : "bets have"} enough rationale for product shaping and operating follow-through.
+          </p>
+          <p className="mt-1 text-xs leading-snug text-muted-foreground">
+            The useful question is no longer “are these complete?” It is which bet should move first, and what proof would change the next decision.
+          </p>
+        </div>
+      ) : (
+        <>
+          <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
+            <ReadinessFact
+              label="Ready for handoff"
+              value={`${outcomesReady}/${total}`}
+              detail="Bets with trigger, outcome target, and expected impact."
+              tone={needsShape === 0 ? "clear" : "attention"}
+            />
+            <ReadinessFact
+              label="Needs shaping"
+              value={needsReview}
+              detail={needsReview === 0 ? "No product handoff gaps." : "Missing rationale, outcome, or impact context."}
+              tone={needsReview === 0 ? "clear" : "attention"}
+            />
+            <ReadinessFact
+              label="Operating gaps"
+              value={operatingGaps}
+              detail={operatingGaps === 0 ? "Owner and timing are in place." : "Missing owner or timing for follow-through."}
+              tone={operatingGaps === 0 ? "clear" : "attention"}
+            />
           </div>
-        ))}
-      </div>
+          <div className="mt-3 rounded-[2px] bg-muted/25 px-3 py-2">
+            <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">Next useful move</p>
+            <p className="mt-1 text-sm leading-snug text-foreground">
+              Tighten the bets with gaps before sending them into Outcomes_ or System. Once the gaps are clear, this page should guide priority rather than count readiness.
+            </p>
+          </div>
+        </>
+      )}
     </section>
   );
 }
