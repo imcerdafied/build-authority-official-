@@ -38,7 +38,9 @@ export interface SystemBetMotion {
   }>;
 }
 
-const SYSTEM_API_URL = (import.meta.env.VITE_SYSTEM_API_URL || "https://os.bspg.build").replace(/\/$/, "");
+// os.bspg.build serves only the System SPA; the Express API lives on Railway
+// (same mapping System's own client uses in client/src/api.js).
+const SYSTEM_API_URL = (import.meta.env.VITE_SYSTEM_API_URL || "https://build-something-os-production-69ee.up.railway.app").replace(/\/$/, "");
 
 export async function fetchSystemBetMotion(args: {
   betId: string;
