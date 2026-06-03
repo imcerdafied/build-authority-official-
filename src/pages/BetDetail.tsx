@@ -399,6 +399,11 @@ export default function BetDetail() {
           )}
         </header>
 
+        <PlatformRoleBlock
+          decision={decision}
+          onOpenInitiatives={() => scrollToId("key-initiatives")}
+        />
+
         {/* At-a-glance band — the hero of the page. No bottom border:
             the next Section already provides a top hairline, so a bottom
             border here would double up. */}
@@ -815,6 +820,70 @@ function DecisionGate({ decision }: { decision: any }) {
         <p className="text-sm text-foreground leading-snug mt-3">{triggerOneLine}</p>
       )}
     </div>
+  );
+}
+
+function PlatformRoleBlock({
+  decision,
+  onOpenInitiatives,
+}: {
+  decision: any;
+  onOpenInitiatives: () => void;
+}) {
+  const hasOutcomeContext = Boolean(decision.outcome_target || decision.expected_impact || decision.trigger_signal);
+  const hasExecutionContext = Boolean(decision.owner || decision.sponsor || decision.target_completion_date || decision.slice_due_at);
+
+  return (
+    <section
+      className="border-t border-gray-300 py-6"
+      style={{ borderTopWidth: "0.5px" }}
+      aria-label="Platform role"
+    >
+      <div className="mb-4 flex flex-col gap-2 md:flex-row md:items-start md:justify-between">
+        <div>
+          <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+            Platform Role
+          </p>
+          <p className="mt-1 max-w-2xl text-sm leading-snug text-muted-foreground">
+            Authority is the strategic record. Outcomes_ turns this into prompt-ready product work. System tracks whether the work actually moves.
+          </p>
+        </div>
+        <button
+          type="button"
+          onClick={onOpenInitiatives}
+          className="self-start text-sm font-medium text-foreground hover:text-accent transition-colors"
+        >
+          Review execution →
+        </button>
+      </div>
+      <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
+        <div className="rounded-[2px] border border-gray-300 bg-background p-3" style={{ borderWidth: "0.5px" }}>
+          <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">Authority</p>
+          <p className="mt-2 text-sm font-medium text-foreground">Bet record</p>
+          <p className="mt-1 text-xs leading-snug text-muted-foreground">
+            Owns sponsor, owner, gate, upside, risk, rationale, and the durable decision history.
+          </p>
+        </div>
+        <div className="rounded-[2px] border border-gray-300 bg-background p-3" style={{ borderWidth: "0.5px" }}>
+          <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">Outcomes_</p>
+          <p className="mt-2 text-sm font-medium text-foreground">
+            {hasOutcomeContext ? "Ready for product shaping" : "Needs product context"}
+          </p>
+          <p className="mt-1 text-xs leading-snug text-muted-foreground">
+            Uses the outcome target, trigger signal, and expected impact to shape roadmap cards and build prompts.
+          </p>
+        </div>
+        <div className="rounded-[2px] border border-gray-300 bg-background p-3" style={{ borderWidth: "0.5px" }}>
+          <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">System</p>
+          <p className="mt-2 text-sm font-medium text-foreground">
+            {hasExecutionContext ? "Ready for operating follow-through" : "Needs owner or date"}
+          </p>
+          <p className="mt-1 text-xs leading-snug text-muted-foreground">
+            Tracks claimed work, delivery status, prompt feedback, decisions, and momentum against this bet.
+          </p>
+        </div>
+      </div>
+    </section>
   );
 }
 
