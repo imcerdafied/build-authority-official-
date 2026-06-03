@@ -120,6 +120,41 @@ function PortfolioSummary({
   );
 }
 
+function PlatformPathPanel({ activeCount }: { activeCount: number }) {
+  return (
+    <section className="mb-6 border rounded-md bg-background px-4 py-4">
+      <div className="mb-3 flex flex-col gap-1 md:flex-row md:items-start md:justify-between">
+        <div>
+          <h2 className="text-sm font-semibold">Platform path</h2>
+          <p className="text-xs text-muted-foreground mt-1">
+            Authority is the strategic record. It keeps the bet, rationale, proof target, and constraint. Outcomes turns selected bets into prompt-ready product work. System tracks delivery momentum.
+          </p>
+        </div>
+        <span className="text-[11px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-sm border text-muted-foreground">
+          Strategy → Work → Momentum
+        </span>
+      </div>
+      <div className="grid gap-2 md:grid-cols-3">
+        <div className="rounded-sm border bg-muted/20 px-3 py-2">
+          <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Authority users see</p>
+          <p className="mt-1 text-sm font-medium">Bets, rationale, proof, and operating constraints</p>
+          <p className="mt-1 text-xs text-muted-foreground">{activeCount} open strategic record{activeCount === 1 ? "" : "s"}</p>
+        </div>
+        <div className="rounded-sm border bg-muted/20 px-3 py-2">
+          <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Outcomes creates</p>
+          <p className="mt-1 text-sm font-medium">Roadmap cards, readiness briefs, and build prompts</p>
+          <p className="mt-1 text-xs text-muted-foreground">Use when a bet becomes product work.</p>
+        </div>
+        <div className="rounded-sm border bg-muted/20 px-3 py-2">
+          <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">System tracks</p>
+          <p className="mt-1 text-sm font-medium">Owners, status, dependencies, and shipped momentum</p>
+          <p className="mt-1 text-xs text-muted-foreground">Use after the work is moving.</p>
+        </div>
+      </div>
+    </section>
+  );
+}
+
 export default function Bets() {
   const { data: decisions = [], isLoading: decisionsLoading } = useDecisions();
   const { isLoading: risksLoading } = useDecisionRisks();
@@ -202,6 +237,8 @@ export default function Bets() {
 
       {/* Portfolio summary — aggregates across active bets */}
       <PortfolioSummary activeDecisions={activeDecisions} showMagnitudes={showMagnitudes} />
+
+      <PlatformPathPanel activeCount={activeDecisions.length} />
 
       {/* Filters */}
       <div className="flex flex-wrap items-center gap-2 mb-6">
