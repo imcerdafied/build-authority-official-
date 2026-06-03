@@ -6,6 +6,7 @@ import { ChevronDown, ChevronRight } from "lucide-react";
 import CreateDecisionForm from "@/components/CreateDecisionForm";
 import BetRow from "@/components/bets/BetRow";
 import { categoryLabels } from "@/pages/Decisions";
+import type { DecisionComputed } from "@/hooks/useOrgData";
 import { aggregateMagnitudes, extractMagnitude, movementState } from "@/lib/bet-magnitude";
 import {
   BET_LIFECYCLE_LABELS,
@@ -26,6 +27,93 @@ interface SummaryDecision {
   revenue_at_risk?: string | null;
   updated_at: string;
   created_at: string;
+}
+
+function hasText(value: string | null | undefined): boolean {
+  return Boolean(String(value || "").trim());
+}
+
+function AuthorityRoleSummary({
+  activeDecisions,
+}: {
+  activeDecisions: DecisionComputed[];
+}) {
+  const total = activeDecisions.length;
+  const rationaleReady = activeDecisions.filter(
+    (d) => hasText(d.trigger_signal) && hasText(d.expected_impact),
+  ).length;
+  const outcomesReady = activeDecisions.filter(
+    (d) => hasText(d.trigger_signal) && hasText(d.outcome_target) && hasText(d.expected_impact),
+  ).length;
+  const systemReady = activeDecisions.filter(
+    (d) => hasText(d.owner) && (hasText(d.slice_due_at) || hasText(d.target_completion_date)),
+  ).length;
+  const needsShape = activeDecisions.filter(
+    (d) => !hasText(d.trigger_signal) || !hasText(d.outcome_target) || !hasText(d.expected_impact),
+  ).length;
+
+  const Stat = ({
+    label,
+    value,
+    detail,
+  }: {
+    label: string;
+    value: string | number;
+    detail: string;
+  }) => (
+    <div className="rounded-[2px] border border-gray-300 bg-background p-3" style={{ borderWidth: "0.5px" }}>
+      <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">{label}</p>
+      <p className="mt-2 text-2xl font-semibold tracking-tight tabular-nums text-foreground">{value}</p>
+      <p className="mt-1 text-xs leading-snug text-muted-foreground">{detail}</p>
+    </div>
+  );
+
+  return (
+    <section
+      className="mb-8 border-y border-border py-6"
+      style={{ borderTopWidth: "0.5px", borderBottomWidth: "0.5px" }}
+      aria-label="Authority role in the platform"
+    >
+      <div className="mb-5 flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
+        <div className="max-w-3xl">
+          <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+            Platform Role
+          </p>
+          <h2 className="mt-1 text-xl font-semibold tracking-tight text-foreground">
+            Strategic bets and rationale records
+          </h2>
+          <p className="mt-2 text-sm leading-snug text-muted-foreground">
+            Authority owns the durable why: sponsor, owner, trigger signal, upside, risk, rationale, and decision history. Outcomes_ turns ready bets into prompt-aware product work. System tracks whether the work moves.
+          </p>
+        </div>
+        {needsShape > 0 && (
+          <div className="rounded-[2px] border border-amber-300 bg-amber-50 px-3 py-2 text-sm text-amber-900" style={{ borderWidth: "0.5px" }}>
+            {needsShape} {needsShape === 1 ? "bet needs" : "bets need"} more rationale before handoff.
+          </div>
+        )}
+      </div>
+
+      <div className="grid grid-cols-1 gap-3 md:grid-cols-4">
+        <Stat label="Open records" value={total} detail="Active strategic bets Authority is holding." />
+        <Stat label="Rationale ready" value={rationaleReady} detail="Trigger signal and expected impact are written." />
+        <Stat label="Outcomes ready" value={outcomesReady} detail="Enough context to shape roadmap or prompt work." />
+        <Stat label="System ready" value={systemReady} detail="Owner and date exist for operating follow-through." />
+      </div>
+
+      <div className="mt-4 grid grid-cols-1 gap-2 md:grid-cols-3">
+        {[
+          ["Authority", "Records the strategic bet and why it matters."],
+          ["Outcomes_", "Translates the bet into product context and build prompts."],
+          ["System", "Keeps execution, blockers, and momentum visible."],
+        ].map(([label, detail]) => (
+          <div key={label} className="rounded-[2px] bg-muted/25 px-3 py-2">
+            <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">{label}</p>
+            <p className="mt-1 text-sm leading-snug text-foreground">{detail}</p>
+          </div>
+        ))}
+      </div>
+    </section>
+  );
 }
 
 function PortfolioSummary({
@@ -234,6 +322,8 @@ export default function Bets() {
           )}
         </div>
       </div>
+
+      <AuthorityRoleSummary activeDecisions={activeDecisions as DecisionComputed[]} />
 
       {/* Portfolio summary — aggregates across active bets */}
       <PortfolioSummary activeDecisions={activeDecisions} showMagnitudes={showMagnitudes} />
