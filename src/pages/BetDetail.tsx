@@ -443,7 +443,7 @@ export default function BetDetail() {
           className="border-t border-gray-300 py-6"
           style={{ borderTopWidth: "0.5px" }}
         >
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div className="min-w-0">
               <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground mb-2">
                 Trigger Signal
@@ -489,6 +489,22 @@ export default function BetDetail() {
                 multiline
               />
             </div>
+            <div className="min-w-0">
+              <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground mb-2">
+                Expected Impact
+              </p>
+              <InlineEdit
+                value={decision.expected_impact ?? ""}
+                field="expected_impact"
+                decisionId={decision.id}
+                canEdit={canWrite}
+                onSave={handleInlineSave}
+                logActivity={logActivity}
+                className="text-sm text-foreground leading-snug block"
+                placeholder="Add expected impact…"
+                multiline
+              />
+            </div>
           </div>
         </section>
 
@@ -513,6 +529,12 @@ export default function BetDetail() {
             service of this bet. Hides the RICE numerics that live elsewhere. */}
         <Section id="key-initiatives" label="Key Initiatives">
           <KeyInitiativesSection betId={decision.id} canWrite={canWrite} />
+        </Section>
+
+        {/* Decision History — lifecycle transitions only, pulled out of the
+            raw edit log so the strategic record reads as a timeline. */}
+        <Section id="decision-history" label="Decision History">
+          <DecisionHistory decision={decision} />
         </Section>
 
         {/* Activity — collapsed by default if >5 */}
@@ -977,7 +999,11 @@ function PlatformRoleBlock({
           </div>
           <p className="mt-1 text-xs leading-snug text-muted-foreground">
             {systemMotion
-              ? `${systemMotion.summary.proof_points} proof point${systemMotion.summary.proof_points === 1 ? "" : "s"} · ${systemWaiting} waiting`
+              ? systemMotion.blockers.length > 0
+                ? `Blocked: ${systemMotion.blockers[0].target}${systemMotion.blockers[0].needs_from ? ` (needs ${systemMotion.blockers[0].needs_from})` : ""}${systemMotion.blockers.length > 1 ? ` +${systemMotion.blockers.length - 1} more` : ""}`
+                : systemMotion.roadmap_items[0]
+                  ? `Latest: ${systemMotion.roadmap_items[0].title}${systemMotion.summary.latest_movement_at ? ` · moved ${new Date(systemMotion.summary.latest_movement_at).toLocaleDateString("en-US", { month: "short", day: "numeric" })}` : ""}`
+                  : `${systemMotion.summary.proof_points} proof point${systemMotion.summary.proof_points === 1 ? "" : "s"} · ${systemWaiting} waiting`
               : "Tracks claimed work, delivery status, prompt feedback, decisions, and momentum against this bet."}
           </p>
         </div>
@@ -1121,6 +1147,57 @@ function EmptyLine({
         </>
       )}
     </p>
+  );
+}
+
+function DecisionHistory({ decision }: { decision: any }) {
+  const { data: activity = [], isLoading } = useDecisionActivity(decision.id);
+  if (isLoading) {
+    return <p className="text-sm text-muted-foreground">Loading…</p>;
+  }
+  const lifecycleLabel = (value: string | null) => {
+    if (!value) return "—";
+    return (
+      (BET_LIFECYCLE_LABELS as Record<string, string>)[value] ??
+      String(value).replace(/_/g, " ")
+    );
+  };
+  const transitions = activity.filter((entry: any) =>
+    ["status", "lifecycle", "bet_lifecycle"].includes(String(entry.field_name)),
+  );
+  const dateLabel = (value: string) =>
+    new Date(value).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+  return (
+    <div>
+      <ul className="space-y-3">
+        {transitions.map((entry: any) => (
+          <li key={entry.id} className="grid grid-cols-[7rem_1fr] gap-4 items-baseline">
+            <span className="text-xs text-muted-foreground whitespace-nowrap">
+              {dateLabel(entry.created_at)}
+            </span>
+            <span className="text-sm text-foreground">
+              {lifecycleLabel(entry.old_value)}
+              <span className="mx-2 text-muted-foreground">→</span>
+              <span className="font-medium">{lifecycleLabel(entry.new_value)}</span>
+            </span>
+          </li>
+        ))}
+        {decision.created_at && (
+          <li className="grid grid-cols-[7rem_1fr] gap-4 items-baseline">
+            <span className="text-xs text-muted-foreground whitespace-nowrap">
+              {dateLabel(decision.created_at)}
+            </span>
+            <span className="text-sm text-muted-foreground">Bet created</span>
+          </li>
+        )}
+      </ul>
+      {decision.state_change_note && (
+        <p className="mt-4 text-sm leading-snug text-muted-foreground">
+          <span className="text-xs font-medium uppercase tracking-wider mr-2">Latest note</span>
+          {decision.state_change_note}
+        </p>
+      )}
+    </div>
   );
 }
 
