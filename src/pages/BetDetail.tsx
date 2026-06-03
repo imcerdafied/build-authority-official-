@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import { Link, useParams } from "react-router-dom";
-import { useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { useDecisions, useUpdateDecision, useOrgOKRs, useCreateOKR } from "@/hooks/useOrgData";
 import { useLogActivity, useDecisionActivity } from "@/hooks/useDecisionActivity";
@@ -29,7 +29,13 @@ import MetricsSidebar from "@/components/MetricsSidebar";
 import DriftIndicators from "@/components/DriftIndicators";
 import ScoreHistory from "@/components/ScoreHistory";
 import KeyInitiativesSection from "@/components/bets/KeyInitiativesSection";
+import { useOutcomeLoops } from "@/hooks/useOutcomeLoops";
+import { supabase } from "@/integrations/supabase/client";
+import { compareBetSequence, sequenceLabelFromTitle } from "@/lib/bet-sequence";
+import { fetchSystemBetMotion } from "@/lib/systemMotion";
 import { cn } from "@/lib/utils";
+
+const SYSTEM_APP_URL = (import.meta.env.VITE_SYSTEM_APP_URL || import.meta.env.VITE_SYSTEM_API_URL || "https://os.bspg.build").replace(/\/$/, "");
 
 function nudgeMailto(betTitle: string, days: number, owner: string): string {
   const subject = encodeURIComponent(`Authority: ${betTitle} needs attention`);
@@ -48,7 +54,7 @@ export default function BetDetail() {
   const createOKR = useCreateOKR();
   const updateDecision = useUpdateDecision();
   const logActivity = useLogActivity();
-  const { currentRole } = useOrg();
+  const { currentRole, currentOrg } = useOrg();
   const { user } = useAuth();
 
   const categories = BET_CATEGORY_OPTIONS as unknown as { key: string; label: string }[];
@@ -58,7 +64,7 @@ export default function BetDetail() {
   const activeOrdered = useMemo(() => {
     const active = decisions.filter((d) => !isClosedBetLifecycle(d.status));
     return [...active].sort(
-      (a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime(),
+      compareBetSequence,
     );
   }, [decisions]);
 
@@ -401,6 +407,7 @@ export default function BetDetail() {
 
         <PlatformRoleBlock
           decision={decision}
+          orgId={currentOrg?.id ?? null}
           onOpenInitiatives={() => scrollToId("key-initiatives")}
         />
 
@@ -825,13 +832,55 @@ function DecisionGate({ decision }: { decision: any }) {
 
 function PlatformRoleBlock({
   decision,
+  orgId,
   onOpenInitiatives,
 }: {
   decision: any;
+  orgId: string | null;
   onOpenInitiatives: () => void;
 }) {
-  const hasOutcomeContext = Boolean(decision.outcome_target || decision.expected_impact || decision.trigger_signal);
-  const hasExecutionContext = Boolean(decision.owner || decision.sponsor || decision.target_completion_date || decision.slice_due_at);
+  const hasProductContext = Boolean(decision.outcome_target && decision.expected_impact && decision.trigger_signal);
+  const hasExecutionContext = Boolean(decision.owner && (decision.target_completion_date || decision.slice_due_at));
+  const betKey = String(decision.bet_label || sequenceLabelFromTitle(decision.title) || "").replace(".", "");
+  const { data: loops = [] } = useOutcomeLoops(decision.id);
+  const { data: linkedOutcomes = [], isLoading: outcomesLoading } = useQuery({
+    queryKey: ["platform-linked-outcomes", orgId, decision.id],
+    queryFn: async () => {
+      if (!orgId) return [];
+      const { data, error } = await supabase
+        .from("outcomes" as any)
+        .select("id, title, status")
+        .eq("org_id", orgId)
+        .eq("bet_id", decision.id)
+        .order("created_at", { ascending: false });
+      if (error) throw error;
+      return (data ?? []) as Array<{ id: string; title: string; status: string | null }>;
+    },
+    enabled: !!orgId && !!decision.id,
+    staleTime: 60_000,
+  });
+  const { data: systemMotion, isLoading: systemMotionLoading } = useQuery({
+    queryKey: ["detail-system-bet-motion", decision.id, decision.title, betKey],
+    queryFn: () => fetchSystemBetMotion({ betId: decision.id, betTitle: decision.title ?? "", betKey }),
+    enabled: !!decision.id && !!decision.title,
+    staleTime: 90_000,
+  });
+
+  const productWorkCount = loops.length + linkedOutcomes.length;
+  const systemWorkCount = systemMotion
+    ? systemMotion.summary.roadmap.total + systemMotion.summary.gtm.total
+    : 0;
+  const systemWaiting = systemMotion
+    ? systemMotion.summary.roadmap.waiting + systemMotion.summary.gtm.waiting
+    : 0;
+
+  const statusStyle = (state: "ready" | "missing" | "active") =>
+    cn(
+      "rounded-[2px] border px-2 py-1 text-xs font-medium",
+      state === "active" && "border-green-300 bg-green-50/40 text-green-800",
+      state === "ready" && "border-blue-300 bg-blue-50/40 text-blue-800",
+      state === "missing" && "border-amber-300 bg-amber-50/50 text-amber-900",
+    );
 
   return (
     <section
@@ -842,46 +891,110 @@ function PlatformRoleBlock({
       <div className="mb-4 flex flex-col gap-2 md:flex-row md:items-start md:justify-between">
         <div>
           <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
-            Platform Role
+            Platform Handoff
           </p>
+          <h2 className="mt-1 text-lg font-semibold tracking-tight text-foreground">
+            Where this bet goes next
+          </h2>
           <p className="mt-1 max-w-2xl text-sm leading-snug text-muted-foreground">
-            Authority is the strategic record. Outcomes_ turns this into prompt-ready product work. System tracks whether the work actually moves.
+            Authority keeps the durable why. Outcomes_ shapes product work and prompts. System tracks delivery, blockers, and proof once work is moving.
           </p>
         </div>
-        <button
-          type="button"
-          onClick={onOpenInitiatives}
-          className="self-start text-sm font-medium text-foreground hover:text-accent transition-colors"
-        >
-          Review execution →
-        </button>
+        <div className="flex flex-wrap gap-2">
+          {linkedOutcomes[0] ? (
+            <Link
+              to={`/build/outcomes/${linkedOutcomes[0].id}`}
+              className="rounded-[2px] bg-foreground px-3 py-1.5 text-sm font-medium text-background hover:opacity-[0.9] transition-opacity"
+            >
+              Open Outcomes work
+            </Link>
+          ) : (
+            <Link
+              to="/build"
+              className="rounded-[2px] border border-gray-300 px-3 py-1.5 text-sm font-medium text-foreground hover:bg-muted transition-colors"
+              style={{ borderWidth: "0.5px" }}
+            >
+              Shape in Outcomes
+            </Link>
+          )}
+          <button
+            type="button"
+            onClick={onOpenInitiatives}
+            className="rounded-[2px] border border-gray-300 px-3 py-1.5 text-sm font-medium text-foreground hover:bg-muted transition-colors"
+            style={{ borderWidth: "0.5px" }}
+          >
+            Review execution
+          </button>
+          <a
+            href={SYSTEM_APP_URL}
+            target="_blank"
+            rel="noreferrer"
+            className="rounded-[2px] border border-gray-300 px-3 py-1.5 text-sm font-medium text-foreground hover:bg-muted transition-colors"
+            style={{ borderWidth: "0.5px" }}
+          >
+            Open System
+          </a>
+        </div>
       </div>
       <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
         <div className="rounded-[2px] border border-gray-300 bg-background p-3" style={{ borderWidth: "0.5px" }}>
           <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">Authority</p>
-          <p className="mt-2 text-sm font-medium text-foreground">Bet record</p>
+          <div className="mt-2 flex items-center justify-between gap-3">
+            <p className="text-sm font-medium text-foreground">Strategic record</p>
+            <span className={statusStyle("active")}>Source</span>
+          </div>
           <p className="mt-1 text-xs leading-snug text-muted-foreground">
             Owns sponsor, owner, gate, upside, risk, rationale, and the durable decision history.
           </p>
         </div>
         <div className="rounded-[2px] border border-gray-300 bg-background p-3" style={{ borderWidth: "0.5px" }}>
           <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">Outcomes_</p>
-          <p className="mt-2 text-sm font-medium text-foreground">
-            {hasOutcomeContext ? "Ready for product shaping" : "Needs product context"}
-          </p>
+          <div className="mt-2 flex items-center justify-between gap-3">
+            <p className="text-sm font-medium text-foreground">
+              {outcomesLoading ? "Checking product work" : productWorkCount > 0 ? `${productWorkCount} linked item${productWorkCount === 1 ? "" : "s"}` : hasProductContext ? "Ready to shape" : "Needs context"}
+            </p>
+            <span className={statusStyle(productWorkCount > 0 ? "active" : hasProductContext ? "ready" : "missing")}>
+              {productWorkCount > 0 ? "Linked" : hasProductContext ? "Ready" : "Gap"}
+            </span>
+          </div>
           <p className="mt-1 text-xs leading-snug text-muted-foreground">
-            Uses the outcome target, trigger signal, and expected impact to shape roadmap cards and build prompts.
+            {linkedOutcomes[0]
+              ? `Latest: ${linkedOutcomes[0].title}`
+              : loops[0]
+                ? `Loop: ${loops[0].title}`
+                : "Uses the outcome target, trigger signal, and expected impact to shape roadmap cards and build prompts."}
           </p>
         </div>
         <div className="rounded-[2px] border border-gray-300 bg-background p-3" style={{ borderWidth: "0.5px" }}>
           <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">System</p>
-          <p className="mt-2 text-sm font-medium text-foreground">
-            {hasExecutionContext ? "Ready for operating follow-through" : "Needs owner or date"}
-          </p>
+          <div className="mt-2 flex items-center justify-between gap-3">
+            <p className="text-sm font-medium text-foreground">
+              {systemMotionLoading ? "Checking motion" : systemMotion ? `${systemWorkCount} tracked item${systemWorkCount === 1 ? "" : "s"}` : hasExecutionContext ? "Ready to track" : "Needs owner/date"}
+            </p>
+            <span className={statusStyle(systemMotion ? "active" : hasExecutionContext ? "ready" : "missing")}>
+              {systemMotion ? "Tracked" : hasExecutionContext ? "Ready" : "Gap"}
+            </span>
+          </div>
           <p className="mt-1 text-xs leading-snug text-muted-foreground">
-            Tracks claimed work, delivery status, prompt feedback, decisions, and momentum against this bet.
+            {systemMotion
+              ? `${systemMotion.summary.proof_points} proof point${systemMotion.summary.proof_points === 1 ? "" : "s"} · ${systemWaiting} waiting`
+              : "Tracks claimed work, delivery status, prompt feedback, decisions, and momentum against this bet."}
           </p>
         </div>
+      </div>
+      <div className="mt-3 rounded-[2px] bg-muted/25 px-3 py-2">
+        <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">Next useful move</p>
+        <p className="mt-1 text-sm leading-snug text-foreground">
+          {productWorkCount === 0
+            ? hasProductContext
+              ? "Shape this bet into Outcomes work so the product team can turn the rationale into prompts and roadmap items."
+              : "Fill in trigger signal, outcome target, and expected impact before handing this bet to product work."
+            : systemMotion
+              ? "Use System to watch movement and proof; use Authority only when the strategic rationale changes."
+              : hasExecutionContext
+                ? "Connect the active work in System so delivery, blockers, and proof are visible from the bet."
+                : "Add owner and timing before this becomes operating work in System."}
+        </p>
       </div>
     </section>
   );

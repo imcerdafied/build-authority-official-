@@ -15,6 +15,7 @@ import {
   isClosedBetLifecycle,
   toBetRiskLevel,
 } from "@/lib/bet-status";
+import { compareBetSequence } from "@/lib/bet-sequence";
 import { cn } from "@/lib/utils";
 
 function formatDate(ts: string): string {
@@ -29,36 +30,8 @@ interface SummaryDecision {
   created_at: string;
 }
 
-interface SequencedDecision {
-  title?: string | null;
-  created_at: string;
-}
-
 function hasText(value: string | null | undefined): boolean {
   return Boolean(String(value || "").trim());
-}
-
-function sequenceFromTitle(title: string | null | undefined) {
-  const match = String(title || "").trim().match(/^(\d+)([a-z])?\s*[\).:-]/i);
-  if (!match) return null;
-  return {
-    number: Number(match[1]),
-    suffix: (match[2] || "").toUpperCase(),
-  };
-}
-
-function compareBetSequence(a: SequencedDecision, b: SequencedDecision): number {
-  const aSequence = sequenceFromTitle(a.title);
-  const bSequence = sequenceFromTitle(b.title);
-  const createdDelta = new Date(a.created_at).getTime() - new Date(b.created_at).getTime();
-
-  if (!aSequence && !bSequence) return createdDelta;
-  if (aSequence && !bSequence) return -1;
-  if (!aSequence && bSequence) return 1;
-  if (!aSequence || !bSequence) return createdDelta;
-  if (aSequence.number !== bSequence.number) return aSequence.number - bSequence.number;
-  if (aSequence.suffix !== bSequence.suffix) return aSequence.suffix.localeCompare(bSequence.suffix);
-  return createdDelta;
 }
 
 function AuthorityRoleSummary({
