@@ -8,6 +8,7 @@ import { cn } from "@/lib/utils";
 import ChatAdvisor from "@/components/ChatAdvisor";
 import FeedbackButton from "@/components/FeedbackButton";
 import WorkspaceSwitcher from "@/components/WorkspaceSwitcher";
+import SuiteSwitcher from "@/components/SuiteSwitcher";
 import CreateWorkspaceModal from "@/components/CreateWorkspaceModal";
 import { supabase } from "@/integrations/supabase/client";
 import {
@@ -85,8 +86,9 @@ export default function AppLayout({ children }: { children: ReactNode }) {
         <div className="max-w-6xl mx-auto px-4 lg:px-6 py-3 flex items-center gap-6">
           {/* Left cluster: logo + workspace switcher inline */}
           <div className="flex items-center gap-4 min-w-0">
+            <SuiteSwitcher current="authority" />
             <Link to="/bets" className="flex items-center shrink-0" onClick={closeMenu}>
-              <img src="/logo.svg" alt="Authority" className="h-6 w-auto" />
+              <img src="/logo.svg" alt="Authority_" className="h-6 w-auto" />
             </Link>
             <span
               className="w-px h-5 bg-border hidden md:inline-block"
