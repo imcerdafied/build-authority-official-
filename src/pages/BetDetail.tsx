@@ -446,7 +446,7 @@ export default function BetDetail() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div className="min-w-0">
               <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground mb-2">
-                Trigger Signal
+                Where it came from · Trigger Signal
               </p>
               {triggerLines.length > 1 ? (
                 <ul className="space-y-1.5">
@@ -475,7 +475,7 @@ export default function BetDetail() {
             </div>
             <div className="min-w-0">
               <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground mb-2">
-                Outcome Target
+                Proof Target · Outcome Target
               </p>
               <InlineEdit
                 value={decision.outcome_target ?? ""}
@@ -491,7 +491,7 @@ export default function BetDetail() {
             </div>
             <div className="min-w-0">
               <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground mb-2">
-                Expected Impact
+                Why this exists · Expected Impact
               </p>
               <InlineEdit
                 value={decision.expected_impact ?? ""}
@@ -916,7 +916,7 @@ function PlatformRoleBlock({
             Platform Handoff
           </p>
           <h2 className="mt-1 text-lg font-semibold tracking-tight text-foreground">
-            Where this bet goes next
+            Where it goes next
           </h2>
           <p className="mt-1 max-w-2xl text-sm leading-snug text-muted-foreground">
             Authority_ keeps the durable why. Outcomes_ shapes product work and prompts. System_ tracks delivery, blockers, and proof once work is moving.
