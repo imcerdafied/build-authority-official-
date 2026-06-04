@@ -1599,8 +1599,8 @@ export default function Decisions() {
               <a href={import.meta.env.VITE_TRUENORTHOS_URL ?? "https://truenorthos.vercel.app"} target="_blank" rel="noopener noreferrer" className="hover:text-foreground transition-colors">
                 🎯 Goals altitude (TrueNorthOS) → Set your OKRs first
               </a>
-              <a href={import.meta.env.VITE_OUTCOMEOS_URL ?? "https://outcomeos.vercel.app"} target="_blank" rel="noopener noreferrer" className="hover:text-foreground transition-colors">
-                🔨 Build altitude (OutcomeOS) → Track what you build
+              <a href={import.meta.env.VITE_OUTCOMEOS_URL ?? "https://outcomeos.build"} target="_blank" rel="noopener noreferrer" className="hover:text-foreground transition-colors">
+                🔨 Build altitude (Outcomes_) → Track what you build
               </a>
             </div>
           </div>

@@ -919,7 +919,7 @@ function PlatformRoleBlock({
             Where this bet goes next
           </h2>
           <p className="mt-1 max-w-2xl text-sm leading-snug text-muted-foreground">
-            Authority keeps the durable why. Outcomes_ shapes product work and prompts. System tracks delivery, blockers, and proof once work is moving.
+            Authority_ keeps the durable why. Outcomes_ shapes product work and prompts. System_ tracks delivery, blockers, and proof once work is moving.
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
@@ -936,7 +936,7 @@ function PlatformRoleBlock({
               className="rounded-[2px] border border-gray-300 px-3 py-1.5 text-sm font-medium text-foreground hover:bg-muted transition-colors"
               style={{ borderWidth: "0.5px" }}
             >
-              Shape in Outcomes
+              Shape in Outcomes_
             </Link>
           )}
           <button
@@ -954,13 +954,13 @@ function PlatformRoleBlock({
             className="rounded-[2px] border border-gray-300 px-3 py-1.5 text-sm font-medium text-foreground hover:bg-muted transition-colors"
             style={{ borderWidth: "0.5px" }}
           >
-            Open System
+            Open System_
           </a>
         </div>
       </div>
       <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
         <div className="rounded-[2px] border border-gray-300 bg-background p-3" style={{ borderWidth: "0.5px" }}>
-          <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">Authority</p>
+          <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">Authority_</p>
           <div className="mt-2 flex items-center justify-between gap-3">
             <p className="text-sm font-medium text-foreground">Strategic record</p>
             <span className={statusStyle("active")}>Source</span>
@@ -988,7 +988,7 @@ function PlatformRoleBlock({
           </p>
         </div>
         <div className="rounded-[2px] border border-gray-300 bg-background p-3" style={{ borderWidth: "0.5px" }}>
-          <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">System</p>
+          <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">System_</p>
           <div className="mt-2 flex items-center justify-between gap-3">
             <p className="text-sm font-medium text-foreground">
               {systemMotionLoading ? "Checking motion" : systemMotion ? `${systemWorkCount} tracked item${systemWorkCount === 1 ? "" : "s"}` : hasExecutionContext ? "Ready to track" : "Needs owner/date"}
@@ -1013,13 +1013,13 @@ function PlatformRoleBlock({
         <p className="mt-1 text-sm leading-snug text-foreground">
           {productWorkCount === 0
             ? hasProductContext
-              ? "Shape this bet into Outcomes work so the product team can turn the rationale into prompts and roadmap items."
+              ? "Shape this bet into Outcomes_ work so the product team can turn the rationale into prompts and roadmap items."
               : "Fill in trigger signal, outcome target, and expected impact before handing this bet to product work."
             : systemMotion
-              ? "Use System to watch movement and proof; use Authority only when the strategic rationale changes."
+              ? "Use System_ to watch movement and proof; use Authority_ only when the strategic rationale changes."
               : hasExecutionContext
-                ? "Connect the active work in System so delivery, blockers, and proof are visible from the bet."
-                : "Add owner and timing before this becomes operating work in System."}
+                ? "Connect the active work in System_ so delivery, blockers, and proof are visible from the bet."
+                : "Add owner and timing before this becomes operating work in System_."}
         </p>
       </div>
     </section>
