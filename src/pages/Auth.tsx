@@ -96,7 +96,7 @@ export default function Auth({ skipInviteCode }: AuthProps = {}) {
     <div className="min-h-screen bg-background flex items-center justify-center px-4">
       <div className="w-full max-w-[420px]">
         <div className="mb-8 flex justify-center">
-          <img src="/logo.svg" alt="Authority" className="h-8 w-auto" />
+          <img src="/logo.svg" alt="Authority_" className="h-8 w-auto" />
         </div>
 
         <div
@@ -104,7 +104,7 @@ export default function Auth({ skipInviteCode }: AuthProps = {}) {
           style={{ borderWidth: "0.5px" }}
         >
           <h1 className="text-xl font-semibold text-foreground tracking-tight mb-1">
-            Welcome to Authority.
+            Welcome to Authority_.
           </h1>
           <p className="text-sm text-muted-foreground mb-6">
             System of record for strategic bets.
@@ -128,7 +128,7 @@ export default function Auth({ skipInviteCode }: AuthProps = {}) {
           )}
 
           <p className="text-xs text-muted-foreground mt-6">
-            Authority is bundled with every BSPG embedded team engagement. Sign in
+            Authority_ is bundled with every BSPG embedded team engagement. Sign in
             with the email your workspace was provisioned to.
           </p>
         </div>
@@ -154,7 +154,7 @@ export default function Auth({ skipInviteCode }: AuthProps = {}) {
             href="/"
             className="text-muted-foreground hover:text-foreground transition-colors"
           >
-            About Authority
+            About Authority_
           </a>
         </div>
       </div>

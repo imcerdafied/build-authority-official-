@@ -6,7 +6,7 @@ import { contactHref } from "@/lib/contact";
 // domain does not match any existing workspace. Replaces the prior self-serve
 // OrgSetup screen so non-clients cannot mint workspaces themselves.
 
-const CONTACT_HREF = contactHref("Authority: requesting access");
+const CONTACT_HREF = contactHref("Authority_: requesting access");
 
 export default function ContactForAccess() {
   const { user } = useAuth();
@@ -20,15 +20,15 @@ export default function ContactForAccess() {
     <div className="min-h-screen flex items-center justify-center bg-background px-6">
       <div className="w-full max-w-md">
         <div className="mb-8 flex justify-center">
-          <img src="/logo.svg" alt="Authority" className="h-7 w-auto" />
+          <img src="/logo.svg" alt="Authority_" className="h-7 w-auto" />
         </div>
 
         <div className="rounded-[2px] border border-border bg-card p-8" style={{ borderWidth: "0.5px" }}>
           <h1 className="text-xl font-semibold text-foreground tracking-tight mb-3">
-            Authority is bundled with BSPG engagements.
+            Authority_ is bundled with BSPG engagements.
           </h1>
           <p className="text-sm text-muted-foreground leading-relaxed mb-6">
-            Authority is not licensed or sold standalone. It is included with every BSPG embedded
+            Authority_ is not licensed or sold standalone. It is included with every BSPG embedded
             team engagement. Reach out and we can talk about whether an engagement makes sense for
             your team.
           </p>

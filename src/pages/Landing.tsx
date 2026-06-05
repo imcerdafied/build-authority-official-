@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
 import { contactHref } from "@/lib/contact";
 
-const CONTACT_HREF = contactHref("Authority: interested in an engagement");
+const CONTACT_HREF = contactHref("Authority_: interested in an engagement");
 
 // === Nav — full-width, logo at left edge, pill at right edge ===
 function LandingNav() {
@@ -12,8 +12,8 @@ function LandingNav() {
       aria-label="Primary"
       className="px-6 md:px-10 py-6 flex items-center justify-between"
     >
-      <Link to="/" aria-label="Authority home" className="leading-none">
-        <img src="/logo.svg" alt="Authority" className="h-7 w-auto" />
+      <Link to="/" aria-label="Authority_ home" className="leading-none">
+        <img src="/logo.svg" alt="Authority_" className="h-7 w-auto" />
       </Link>
 
       <div className="hidden md:flex items-center gap-8">
@@ -54,7 +54,7 @@ function Hero() {
         </h1>
 
         <p className="mt-6 max-w-[680px] text-base md:text-lg text-muted-foreground leading-relaxed">
-          Authority is a system of record for strategic bets. A durable record of what was decided,
+          Authority_ is a system of record for strategic bets. A durable record of what was decided,
           who owns it, and what it moved.
         </p>
 
@@ -183,13 +183,13 @@ function Drift() {
       </SectionHeading>
       <p className="mt-6 text-base text-muted-foreground leading-relaxed max-w-3xl">
         Strategic bets drift quietly. Owners get fuzzy. Movement stalls. The org keeps moving but
-        the named bet stops being a named bet. Authority catches the drift before it ships.
+        the named bet stops being a named bet. Authority_ catches the drift before it ships.
       </p>
 
       <div className="mt-12 grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-6">
         <div>
           <p className="text-[11px] font-mono uppercase tracking-[0.08em] text-muted-foreground mb-4">
-            Without Authority
+            Without Authority_
           </p>
           <ul className="space-y-3 text-sm text-foreground leading-snug">
             {COMPARISONS.map((c) => (
@@ -202,7 +202,7 @@ function Drift() {
         </div>
         <div>
           <p className="text-[11px] font-mono uppercase tracking-[0.08em] text-muted-foreground mb-4">
-            With Authority
+            With Authority_
           </p>
           <ul className="space-y-3 text-sm text-foreground leading-snug">
             {COMPARISONS.map((c) => (
@@ -223,16 +223,16 @@ function LicenseToBuild() {
   return (
     <Section id="engagement">
       <SectionHeading>
-        Authority is the license to build<span className="text-accent">.</span>
+        Authority_ is the license to build<span className="text-accent">.</span>
       </SectionHeading>
       <div className="mt-6 max-w-3xl space-y-4 text-base text-muted-foreground leading-relaxed">
         <p>
-          Strategy without rigor is theater. Authority gives every strategic bet a durable record,
+          Strategy without rigor is theater. Authority_ gives every strategic bet a durable record,
           an explicit owner, and a measurable outcome. When the record is real, the work that
           follows is sanctioned.
         </p>
         <p>
-          Authority is not a SaaS subscription. It is the operating system that runs underneath
+          Authority_ is not a SaaS subscription. It is the operating system that runs underneath
           every BSPG embedded team engagement. We bring the software. We bring the operators. We
           make the rigor real.
         </p>
@@ -250,7 +250,7 @@ function SampleBet() {
       </SectionHeading>
       <p className="mt-6 text-base text-muted-foreground leading-relaxed max-w-3xl">
         Every strategic bet lives as a single durable record. Here is what one looks like in
-        Authority.
+        Authority_.
       </p>
 
       <div
@@ -368,7 +368,7 @@ function FinalCta() {
           Bring rigor to your bets<span className="text-accent">.</span>
         </h2>
         <p className="mt-6 text-base md:text-lg text-muted-foreground leading-relaxed max-w-2xl">
-          Authority is included in every BSPG embedded team engagement. Tell us what you are trying
+          Authority_ is included in every BSPG embedded team engagement. Tell us what you are trying
           to ship.
         </p>
         <div className="mt-10 flex flex-wrap items-center gap-3">
@@ -391,7 +391,7 @@ function Footer() {
     <footer className="border-t border-border bg-card" style={{ borderTopWidth: "0.5px" }}>
       <div className="px-6 md:px-10 py-10 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div className="flex items-center gap-3">
-          <img src="/logo.svg" alt="Authority" className="h-5 w-auto opacity-80" />
+          <img src="/logo.svg" alt="Authority_" className="h-5 w-auto opacity-80" />
           <span className="font-mono text-[11px] uppercase tracking-[0.08em] text-muted-foreground">
             a BSPG operating system
           </span>
