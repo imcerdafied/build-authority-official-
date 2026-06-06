@@ -21,7 +21,7 @@ const STATUS_LABEL: Record<InitiativeStatus, string> = {
 
 const STATUS_STYLE: Record<InitiativeStatus, { dot: string; pill: string }> = {
   proposed: { dot: "bg-muted-foreground", pill: "bg-muted text-muted-foreground" },
-  active: { dot: "bg-accent", pill: "bg-accent/15 text-accent" },
+  active: { dot: "bg-brand", pill: "bg-brand/15 text-brand" },
   shipped: { dot: "bg-signal-green", pill: "bg-signal-green/15 text-signal-green" },
   paused: { dot: "bg-signal-amber", pill: "bg-signal-amber/15 text-signal-amber" },
 };
@@ -144,7 +144,7 @@ export default function KeyInitiativesSection({ betId, canWrite }: KeyInitiative
         <button
           type="button"
           onClick={() => setAdding(true)}
-          className="mt-4 text-sm font-medium text-accent hover:underline"
+          className="mt-4 text-sm font-medium text-brand hover:underline"
         >
           + Log initiative
         </button>
@@ -218,7 +218,7 @@ function InitiativeReadRow({
               type="button"
               onClick={onToggle}
               aria-expanded={expanded}
-              className="mt-1.5 text-xs font-medium text-accent hover:underline"
+              className="mt-1.5 text-xs font-medium text-brand hover:underline"
             >
               {expanded ? "Hide details" : "Show details"}
             </button>

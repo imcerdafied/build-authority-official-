@@ -7,6 +7,7 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider, useAuth } from "@/contexts/AuthContext";
 import { OrgProvider, useOrg } from "@/contexts/OrgContext";
 import AppLayout from "@/components/AppLayout";
+import PageSkeleton from "@/components/PageSkeleton";
 import Bets from "@/pages/Bets";
 import BetDetail from "@/pages/BetDetail";
 import Loops from "@/pages/Loops";
@@ -54,11 +55,7 @@ function AuthGate({ children }: { children: React.ReactNode }) {
   const [showAccessGate, setShowAccessGate] = React.useState(false);
 
   if (authLoading || orgLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
-        <p className="text-sm text-muted-foreground">Loading...</p>
-      </div>
-    );
+    return <PageSkeleton fullScreen />;
   }
 
   if (!user) return <Auth />;

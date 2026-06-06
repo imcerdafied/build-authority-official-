@@ -4,6 +4,7 @@ import { useOrg } from "@/contexts/OrgContext";
 import StatusBadge from "@/components/StatusBadge";
 import CreateSignalForm from "@/components/CreateSignalForm";
 import { cn } from "@/lib/utils";
+import PageSkeleton from "@/components/PageSkeleton";
 import type { Database } from "@/integrations/supabase/types";
 
 type SignalType = Database["public"]["Enums"]["signal_type"];
@@ -26,7 +27,7 @@ export default function Signals() {
   const canWrite = currentRole === "admin" || currentRole === "pod_lead";
   const canDelete = currentRole === "admin";
 
-  if (isLoading) return <p className="text-sm text-muted-foreground">Loading...</p>;
+  if (isLoading) return <PageSkeleton />;
 
   const unlinked = signals.filter((s) => !s.decision_id);
   const severe = unlinked.length > 3;

@@ -1,5 +1,6 @@
 import { useDecisions } from "@/hooks/useOrgData";
 import { isClosedBetLifecycle } from "@/lib/bet-status";
+import PageSkeleton from "@/components/PageSkeleton";
 
 function formatDate(ts: string): string {
   return new Date(ts).toLocaleDateString("en-US", {
@@ -13,7 +14,7 @@ export default function ClosedBets() {
   const { data: decisions = [], isLoading } = useDecisions();
 
   if (isLoading) {
-    return <p className="text-sm text-muted-foreground">Loading...</p>;
+    return <PageSkeleton />;
   }
 
   const closed = decisions

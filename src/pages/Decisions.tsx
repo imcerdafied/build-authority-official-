@@ -8,6 +8,7 @@ import { useOrg } from "@/contexts/OrgContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
 import CreateDecisionForm from "@/components/CreateDecisionForm";
+import PageSkeleton from "@/components/PageSkeleton";
 import GoalChip from "@/components/GoalChip";
 import TagPill from "@/components/bets/TagPill";
 import SectionBlock from "@/components/bets/SectionBlock";
@@ -1490,7 +1491,7 @@ export default function Decisions() {
     qc.invalidateQueries({ queryKey: ["decision_activity", id] });
   };
 
-  if (decisionsLoading || risksLoading) return <p className="text-sm text-muted-foreground">Loading...</p>;
+  if (decisionsLoading || risksLoading) return <PageSkeleton />;
 
   const activeDecisions = decisions.filter((d) => !isClosedBetLifecycle(d.status));
   const closedDecisions = decisions

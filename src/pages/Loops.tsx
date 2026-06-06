@@ -5,6 +5,7 @@ import { useOrg } from "@/contexts/OrgContext";
 import LoopCard from "@/components/loops/LoopCard";
 import LoopDetail from "@/components/loops/LoopDetail";
 import { cn } from "@/lib/utils";
+import PageSkeleton from "@/components/PageSkeleton";
 
 const STATUS_FILTERS: { value: LoopStatus | ""; label: string }[] = [
   { value: "", label: "All" },
@@ -39,7 +40,7 @@ export default function Loops() {
   const betsWithLoops = Array.from(new Set(loops.map((l) => l.bet_id)));
 
   if (isLoading) {
-    return <p className="text-sm text-muted-foreground">Loading...</p>;
+    return <PageSkeleton />;
   }
 
   if (selectedLoop) {

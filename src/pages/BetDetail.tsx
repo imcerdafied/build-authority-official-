@@ -285,7 +285,7 @@ export default function BetDetail() {
                     disabled={!canWrite}
                     className={cn(
                       "text-sm text-foreground text-left block w-full leading-snug",
-                      canWrite && "hover:text-accent transition-colors",
+                      canWrite && "hover:text-brand transition-colors",
                     )}
                   >
                     {decision.linked_okr_title}
@@ -294,7 +294,7 @@ export default function BetDetail() {
                   <button
                     type="button"
                     onClick={() => setGoalPickerOpen(true)}
-                    className="text-sm text-accent hover:underline transition-colors text-left font-medium"
+                    className="text-sm text-brand hover:underline transition-colors text-left font-medium"
                   >
                     Assign a goal →
                   </button>
@@ -644,7 +644,7 @@ function HealthBlock({
         <p className="text-sm text-foreground mb-1">No movement in {move.days} days</p>
         <a
           href={nudgeMailto(betTitle, move.days, owner)}
-          className="text-sm font-medium text-accent hover:underline"
+          className="text-sm font-medium text-brand hover:underline"
         >
           Nudge owner →
         </a>
@@ -1339,14 +1339,14 @@ function RailActions({
             <button
               onClick={() => scrollToId("what-moved")}
               disabled={!canEdit}
-              className="block w-full text-left text-sm font-medium text-accent hover:underline px-2 py-1.5"
+              className="block w-full text-left text-sm font-medium text-brand hover:underline px-2 py-1.5"
             >
               Log movement →
             </button>
             <button
               onClick={() => scrollToId("outcome-metrics")}
               disabled={!canEdit}
-              className="block w-full text-left text-sm font-medium text-accent hover:underline px-2 py-1.5"
+              className="block w-full text-left text-sm font-medium text-brand hover:underline px-2 py-1.5"
             >
               Add metric →
             </button>

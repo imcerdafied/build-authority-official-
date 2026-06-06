@@ -10,6 +10,7 @@ import {
   useUpdateMemberRole,
 } from "@/hooks/useTeam";
 import { supabase } from "@/integrations/supabase/client";
+import PageSkeleton from "@/components/PageSkeleton";
 import { cn } from "@/lib/utils";
 import { trackEvent } from "@/lib/telemetry";
 
@@ -146,7 +147,7 @@ export default function Team() {
   };
 
   if (membersLoading || invitesLoading) {
-    return <p className="text-sm text-muted-foreground">Loading...</p>;
+    return <PageSkeleton />;
   }
 
   if (!canManageMembers) {
