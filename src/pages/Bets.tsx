@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useSearchParams } from "react-router-dom";
-import { useDecisions, useDecisionRisks } from "@/hooks/useOrgData";
+import { useDecisions, useDecisionRisks, useOrgOKRs } from "@/hooks/useOrgData";
 import { useOrg } from "@/contexts/OrgContext";
 import { ChevronDown, ChevronRight } from "lucide-react";
 import CreateDecisionForm from "@/components/CreateDecisionForm";
@@ -277,6 +277,7 @@ function PlatformPathPanel({ activeCount }: { activeCount: number }) {
 
 export default function Bets() {
   const { data: decisions = [], isLoading: decisionsLoading } = useDecisions();
+  const { data: okrs = [], isLoading: okrsLoading } = useOrgOKRs();
   const { isLoading: risksLoading } = useDecisionRisks();
   const { currentRole } = useOrg();
   const canWrite = currentRole === "admin" || currentRole === "pod_lead";
@@ -297,7 +298,7 @@ export default function Bets() {
 
   const clearFilters = () => setSearchParams(new URLSearchParams(), { replace: true });
 
-  if (decisionsLoading || risksLoading) {
+  if (decisionsLoading || okrsLoading || risksLoading) {
     return <p className="text-sm text-muted-foreground">Loading…</p>;
   }
 
@@ -313,6 +314,10 @@ export default function Bets() {
     new Set(orderedDecisions.map((d) => String(d.surface || "").trim()).filter(Boolean)),
   );
   const isEmpty = decisions.length === 0;
+  // First-run workspace: a freshly seeded org tenant with no OKRs and no bets.
+  // Used to surface the bulk strategy import as the primary activation action
+  // and to suppress portfolio explainers that have nothing to explain yet.
+  const isFirstRun = okrs.length === 0 && decisions.length === 0;
 
   // Auto-hide Upside/Risk columns + totals when no active bet has a parseable
   // dollar magnitude. Keeps a 0-to-1 workspace from screaming "Not quantified"
@@ -355,12 +360,16 @@ export default function Bets() {
         </div>
       </div>
 
-      <AuthorityRoleSummary activeDecisions={activeDecisions as DecisionComputed[]} />
+      {!isFirstRun && (
+        <>
+          <AuthorityRoleSummary activeDecisions={activeDecisions as DecisionComputed[]} />
 
-      {/* Portfolio summary — aggregates across active bets */}
-      <PortfolioSummary activeDecisions={activeDecisions} showMagnitudes={showMagnitudes} />
+          {/* Portfolio summary — aggregates across active bets */}
+          <PortfolioSummary activeDecisions={activeDecisions} showMagnitudes={showMagnitudes} />
 
-      <PlatformPathPanel activeCount={activeDecisions.length} />
+          <PlatformPathPanel activeCount={activeDecisions.length} />
+        </>
+      )}
 
       {/* Filters */}
       <div className="flex flex-wrap items-center gap-2 mb-6">
@@ -394,10 +403,15 @@ export default function Bets() {
         )}
       </div>
 
-      {showCreate && <CreateDecisionForm onClose={() => setShowCreate(false)} />}
+      {(showCreate || isFirstRun) && (
+        <CreateDecisionForm
+          onClose={() => setShowCreate(false)}
+          firstRun={isFirstRun && !showCreate}
+        />
+      )}
 
       {/* Zero-bet empty state — single line, no centered card */}
-      {isEmpty && !showCreate ? (
+      {isEmpty && !showCreate && !isFirstRun ? (
         <div
           className="border-y border-border py-6"
           style={{ borderTopWidth: "0.5px", borderBottomWidth: "0.5px" }}

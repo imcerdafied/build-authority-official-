@@ -11,7 +11,7 @@ import { fetchOutcomeCategories, type OutcomeCategoryItem } from "@/lib/taxonomy
 import { useOrgDomains } from "@/hooks/useOrgData";
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
-export default function CreateDecisionForm({ onClose, navigateAfter = false }: { onClose: () => void; navigateAfter?: boolean }) {
+export default function CreateDecisionForm({ onClose, navigateAfter = false, firstRun = false }: { onClose: () => void; navigateAfter?: boolean; firstRun?: boolean }) {
   const createDecision = useCreateDecision();
   const { currentOrg, currentRole, productAreas, customOutcomeCategories } = useOrg();
 
@@ -619,11 +619,17 @@ export default function CreateDecisionForm({ onClose, navigateAfter = false }: {
       <div className="flex items-start justify-between mb-6">
         <div>
           <p className="font-mono text-[11px] uppercase tracking-[0.08em] text-muted-foreground mb-2">
-            // REGISTER BET
+            {firstRun ? "// FILL YOUR WORKSPACE" : "// REGISTER BET"}
           </p>
           <h2 className="text-xl font-semibold text-foreground tracking-tight">
-            New high-impact bet
+            {firstRun ? "Import a strategy to fill your workspace" : "New high-impact bet"}
           </h2>
+          {firstRun && (
+            <p className="text-sm text-muted-foreground mt-2 max-w-xl">
+              Your workspace is empty. Paste a strategy source below and map it
+              into bets in one pass, or register a single bet in the form.
+            </p>
+          )}
         </div>
         <button
           type="button"
@@ -634,15 +640,17 @@ export default function CreateDecisionForm({ onClose, navigateAfter = false }: {
         </button>
       </div>
 
-      {/* Bulk strategy import — collapsible section */}
-      <details className="mb-8 group">
+      {/* Bulk strategy import — collapsible, but expanded as the first-run action */}
+      <details className="mb-8 group" open={firstRun}>
         <summary className="cursor-pointer list-none flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.08em] text-muted-foreground hover:text-foreground transition-colors mb-3">
           <span className="group-open:rotate-90 transition-transform">▸</span>
-          {`// BULK STRATEGY IMPORT`}
+          {firstRun ? `// IMPORT A STRATEGY TO FILL YOUR WORKSPACE` : `// BULK STRATEGY IMPORT`}
         </summary>
         <div className="space-y-3 pl-4">
           <p className="text-sm text-muted-foreground">
-            Import one strategy source to map multiple bets, then create all mapped bets at once.
+            {firstRun
+              ? "Start here. Import one strategy source to map multiple bets, then create all mapped bets at once and fill your workspace."
+              : "Import one strategy source to map multiple bets, then create all mapped bets at once."}
           </p>
           <textarea
             value={strategyText}
