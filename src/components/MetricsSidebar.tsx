@@ -97,7 +97,7 @@ export default function MetricsSidebar({ betId, canWrite, embedded = false }: Me
           {canWrite && (
             <button
               onClick={() => setShowAdd(true)}
-              className="text-accent font-medium hover:underline"
+              className="text-brand font-medium hover:underline"
             >
               + Add metric
             </button>
@@ -143,7 +143,7 @@ export default function MetricsSidebar({ betId, canWrite, embedded = false }: Me
         <div className="flex justify-end mb-3">
           <button
             onClick={() => setShowAdd(true)}
-            className="text-sm font-medium text-accent hover:underline"
+            className="text-sm font-medium text-brand hover:underline"
           >
             + Add metric
           </button>

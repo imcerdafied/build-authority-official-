@@ -50,7 +50,7 @@ function Hero() {
           className="font-sans font-semibold text-foreground tracking-tight leading-[1.05]"
           style={{ fontSize: "clamp(2.5rem, 7vw, 4.5rem)", letterSpacing: "-0.025em" }}
         >
-          Make bets stick<span className="text-accent">.</span>
+          Make bets stick<span className="text-brand">.</span>
         </h1>
 
         <p className="mt-6 max-w-[680px] text-base md:text-lg text-muted-foreground leading-relaxed">
@@ -108,14 +108,14 @@ function FlowDiagram() {
               className="flex-1 bg-card border border-border rounded-[2px] p-4 md:p-5 text-center"
               style={{ borderWidth: "0.5px" }}
             >
-              <p className="font-mono text-[11px] uppercase tracking-[0.08em] text-accent mb-2">
+              <p className="font-mono text-[11px] uppercase tracking-[0.08em] text-brand mb-2">
                 {n.label}
               </p>
               <p className="text-xs text-muted-foreground leading-relaxed">{n.body}</p>
             </div>
             {i < nodes.length - 1 && (
               <div
-                className="flex items-center justify-center text-accent shrink-0"
+                className="flex items-center justify-center text-brand shrink-0"
                 aria-hidden="true"
               >
                 <ArrowRight className="h-5 w-5 rotate-90 md:rotate-0" />
@@ -179,7 +179,7 @@ function Drift() {
   return (
     <Section variant="card">
       <SectionHeading>
-        Strategy on slides doesn&apos;t show up in the work<span className="text-accent">.</span>
+        Strategy on slides doesn&apos;t show up in the work<span className="text-brand">.</span>
       </SectionHeading>
       <p className="mt-6 text-base text-muted-foreground leading-relaxed max-w-3xl">
         Strategic bets drift quietly. Owners get fuzzy. Movement stalls. The org keeps moving but
@@ -207,7 +207,7 @@ function Drift() {
           <ul className="space-y-3 text-sm text-foreground leading-snug">
             {COMPARISONS.map((c) => (
               <li key={c.with} className="flex gap-3">
-                <span className="text-accent shrink-0">·</span>
+                <span className="text-brand shrink-0">·</span>
                 <span>{c.with}</span>
               </li>
             ))}
@@ -223,7 +223,7 @@ function LicenseToBuild() {
   return (
     <Section id="engagement">
       <SectionHeading>
-        Authority_ is the license to build<span className="text-accent">.</span>
+        Authority_ is the license to build<span className="text-brand">.</span>
       </SectionHeading>
       <div className="mt-6 max-w-3xl space-y-4 text-base text-muted-foreground leading-relaxed">
         <p>
@@ -246,7 +246,7 @@ function SampleBet() {
   return (
     <Section variant="card">
       <SectionHeading>
-        A bet, recorded<span className="text-accent">.</span>
+        A bet, recorded<span className="text-brand">.</span>
       </SectionHeading>
       <p className="mt-6 text-base text-muted-foreground leading-relaxed max-w-3xl">
         Every strategic bet lives as a single durable record. Here is what one looks like in
@@ -259,7 +259,7 @@ function SampleBet() {
       >
         <div className="bg-foreground text-background px-6 py-5">
           <div className="text-xs text-background/50 mb-2 flex items-center gap-2">
-            <span className="w-1.5 h-1.5 rounded-full bg-accent inline-block" />
+            <span className="w-1.5 h-1.5 rounded-full bg-brand inline-block" />
             GOAL: Defend Acme&apos;s enterprise renewal base in 2026
           </div>
           <p className="text-lg md:text-xl font-semibold leading-snug mb-4">
@@ -365,7 +365,7 @@ function FinalCta() {
           className="font-sans font-semibold text-foreground tracking-tight leading-[1.05]"
           style={{ fontSize: "clamp(2rem, 5vw, 3.5rem)", letterSpacing: "-0.025em" }}
         >
-          Bring rigor to your bets<span className="text-accent">.</span>
+          Bring rigor to your bets<span className="text-brand">.</span>
         </h2>
         <p className="mt-6 text-base md:text-lg text-muted-foreground leading-relaxed max-w-2xl">
           Authority_ is included in every BSPG embedded team engagement. Tell us what you are trying

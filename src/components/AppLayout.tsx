@@ -116,7 +116,7 @@ export default function AppLayout({ children }: { children: ReactNode }) {
                   className={cn(
                     "relative text-sm font-medium transition-colors py-1",
                     isActive
-                      ? "text-accent"
+                      ? "text-brand"
                       : "text-muted-foreground hover:text-foreground",
                   )}
                   onClick={closeMenu}
@@ -124,7 +124,7 @@ export default function AppLayout({ children }: { children: ReactNode }) {
                   {item.label}
                   {isActive && (
                     <span
-                      className="absolute -bottom-[13px] left-0 right-0 h-[2px] bg-accent"
+                      className="absolute -bottom-[13px] left-0 right-0 h-[2px] bg-brand"
                       aria-hidden
                     />
                   )}
