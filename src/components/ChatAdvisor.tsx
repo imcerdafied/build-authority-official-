@@ -1,14 +1,23 @@
 import { useState, useRef, useEffect } from "react";
 import { useOrg } from "@/contexts/OrgContext";
 import { supabase } from "@/integrations/supabase/client";
+import { useDecisions } from "@/hooks/useOrgData";
+import { isClosedBetLifecycle } from "@/lib/bet-status";
 
-const WELCOME_MESSAGE =
-  "I'm the Authority Agent. I have full context on your 5 active bets — their exposure, activity, and interruptions. Ask me anything: which bet is most at risk, what a field means, why the constraint exists, or what a stale bet costs you.";
+function buildWelcomeMessage(activeCount: number): string {
+  if (activeCount === 0) {
+    return "I'm the Authority Agent. Once you register a bet, I'll have full context on its exposure, activity, and interruptions. Ask me anything: what a field means, why the constraint exists, or how to frame your first bet.";
+  }
+  const betLabel = activeCount === 1 ? "active bet" : "active bets";
+  return `I'm the Authority Agent. I have full context on your ${activeCount} ${betLabel}, their exposure, activity, and interruptions. Ask me anything: which bet is most at risk, what a field means, why the constraint exists, or what a stale bet costs you.`;
+}
 
 export default function ChatAdvisor({ chatOpen, setChatOpen }: { chatOpen: boolean; setChatOpen: (open: boolean) => void }) {
   const { currentOrg } = useOrg();
+  const { data: decisions } = useDecisions();
+  const activeCount = (decisions ?? []).filter((d) => !isClosedBetLifecycle(d.status)).length;
   const [messages, setMessages] = useState<{ role: "user" | "assistant"; content: string }[]>([
-    { role: "assistant", content: WELCOME_MESSAGE },
+    { role: "assistant", content: buildWelcomeMessage(activeCount) },
   ]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
@@ -17,6 +26,17 @@ export default function ChatAdvisor({ chatOpen, setChatOpen }: { chatOpen: boole
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
+
+  // Keep the welcome message in sync with the loaded bet count until the
+  // conversation actually starts (one assistant message, no user turns yet).
+  useEffect(() => {
+    setMessages((prev) => {
+      if (prev.length !== 1 || prev[0].role !== "assistant") return prev;
+      const next = buildWelcomeMessage(activeCount);
+      if (prev[0].content === next) return prev;
+      return [{ role: "assistant", content: next }];
+    });
+  }, [activeCount]);
 
   const handleSend = async () => {
     const trimmed = input.trim();
