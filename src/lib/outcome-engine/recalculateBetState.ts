@@ -5,6 +5,7 @@ import { calculateV3Score } from "./calculateV3Score";
 import { rankInitiatives } from "./rankInitiatives";
 import { detectOutcomeDrift } from "./detectOutcomeDrift";
 import { logScoreMovement } from "./logScoreMovement";
+import { recordReceipt } from "@/lib/agentReceipts";
 
 /**
  * Orchestrator: recalculates all initiative scores, ranks, drift flags,
@@ -111,6 +112,47 @@ export async function recalculateBetState(
 
   // Fire all writes in parallel
   await Promise.all([...logPromises, bulkUpdate, monitoringUpsert]);
+
+  // Agent write-point: this orchestrator is an automated scoring engine, not a
+  // human edit. Record a fail-open receipt so the workspace ledger shows that
+  // the engine re-scored and re-ranked this bet's initiatives. A ledger error
+  // must never break the recalculation, so we resolve org scope and write
+  // inside a guarded block. Bets live in the decisions table, so bet_id maps
+  // to decisions.id and the org comes from decisions.org_id.
+  try {
+    const changedCount = logPromises.length;
+    const { data: bet } = await supabase
+      .from("decisions")
+      .select("org_id, title, bet_label")
+      .eq("id", betId)
+      .maybeSingle();
+    const orgId = (bet as { org_id?: string } | null)?.org_id;
+    if (orgId) {
+      const betLabel =
+        (bet as { bet_label?: string | null; title?: string | null } | null)?.bet_label ||
+        (bet as { title?: string | null } | null)?.title ||
+        "Bet";
+      await recordReceipt({
+        orgId,
+        actorType: "agent",
+        actorLabel: "Outcome Engine",
+        action: "bet.initiatives.rescored",
+        targetType: "bet",
+        targetId: betId,
+        targetLabel: betLabel,
+        source: "outcome_engine",
+        summary: `Re-scored and re-ranked ${ranked.length} initiative${ranked.length === 1 ? "" : "s"} for "${betLabel}" (${changedCount} changed) on ${triggerEvent}.`,
+        metadata: {
+          trigger_event: triggerEvent,
+          initiatives_total: ranked.length,
+          initiatives_changed: changedCount,
+          drift_flags: driftFlags.length,
+        },
+      });
+    }
+  } catch {
+    // Fail-open: ledger problems never affect the recalculation result.
+  }
 
   return { initiatives: ranked, driftFlags };
 }
