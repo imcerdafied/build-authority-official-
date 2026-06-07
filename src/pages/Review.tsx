@@ -3,6 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useOrg } from "@/contexts/OrgContext";
 import { useDecisions } from "@/hooks/useOrgData";
 import StatusBadge from "@/components/StatusBadge";
+import AgentReceiptsPanel from "@/components/AgentReceiptsPanel";
 import { isClosedBetLifecycle } from "@/lib/bet-status";
 import { cn } from "@/lib/utils";
 
@@ -123,6 +124,8 @@ export default function Review() {
         <h1 className="text-[40px] font-black text-foreground leading-none tracking-tight">Weekly Review</h1>
         <p className="text-base text-gray-700 mt-2">{getWeekRange()}</p>
       </div>
+
+      <AgentReceiptsPanel />
 
       <div className="bg-muted/30 border rounded-lg p-4 md:p-5 mb-8">
         <div className="flex flex-col md:flex-row md:flex-wrap gap-6 md:gap-8">
