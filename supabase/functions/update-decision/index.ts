@@ -6,6 +6,48 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
+// Fail-open agent-receipt writer for this edge function. Mirrors the row shape
+// of the app-side recordReceipt helper (src/lib/agentReceipts.ts). A ledger
+// problem must never break the decision update that triggered it, so every
+// error is swallowed.
+async function recordReceiptSafe(
+  // deno-lint-ignore no-explicit-any
+  client: any,
+  receipt: {
+    orgId: string;
+    action: string;
+    actorType?: string;
+    actorId?: string | null;
+    actorLabel?: string | null;
+    targetType?: string | null;
+    targetId?: string | null;
+    targetLabel?: string | null;
+    source?: string | null;
+    summary?: string | null;
+    metadata?: Record<string, unknown>;
+  },
+): Promise<void> {
+  try {
+    if (!receipt?.action || !receipt?.orgId) return;
+    const { error } = await client.from("agent_receipts").insert({
+      org_id: receipt.orgId,
+      actor_type: receipt.actorType ?? "system",
+      actor_id: receipt.actorId != null ? String(receipt.actorId) : null,
+      actor_label: receipt.actorLabel ?? null,
+      action: receipt.action,
+      target_type: receipt.targetType ?? null,
+      target_id: receipt.targetId != null ? String(receipt.targetId) : null,
+      target_label: receipt.targetLabel ?? null,
+      source: receipt.source ?? null,
+      summary: receipt.summary ?? null,
+      metadata: receipt.metadata ?? {},
+    });
+    if (error) console.error("[agent-receipt]", error.message);
+  } catch (err) {
+    console.error("[agent-receipt]", err instanceof Error ? err.message : err);
+  }
+}
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -49,7 +91,7 @@ serve(async (req) => {
     const serviceClient = createClient(supabaseUrl, supabaseServiceKey);
     const { data: decision, error: decisionError } = await serviceClient
       .from("decisions")
-      .select("id,org_id,owner_user_id")
+      .select("id,org_id,owner_user_id,status,title,bet_label")
       .eq("id", id)
       .maybeSingle();
 
@@ -123,6 +165,38 @@ serve(async (req) => {
       return new Response(JSON.stringify({ error: updateError.message || "Update failed" }), {
         status: 400,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    // Agent write-point: a lifecycle/status change on a bet is a meaningful
+    // state transition for the workspace ledger. This path is user-triggered
+    // (the caller is an authenticated member), so actor_type is "user" and
+    // source is "manual". Only record when status actually changed. Fail-open:
+    // a ledger problem never affects the update result above.
+    const priorStatus = (decision as { status?: string | null }).status ?? null;
+    const nextStatus = (updated as { status?: string | null })?.status ?? null;
+    if ("status" in sanitized && nextStatus !== priorStatus) {
+      const betLabel =
+        (decision as { bet_label?: string | null }).bet_label ||
+        (decision as { title?: string | null }).title ||
+        "Bet";
+      await recordReceiptSafe(serviceClient, {
+        orgId: decision.org_id,
+        actorType: "user",
+        actorId: user.id,
+        actorLabel: user.email ?? null,
+        action: "decision.state.changed",
+        targetType: "bet",
+        targetId: id,
+        targetLabel: betLabel,
+        source: "manual",
+        summary: `Bet "${betLabel}" moved from ${priorStatus ?? "unset"} to ${nextStatus ?? "unset"}.`,
+        metadata: {
+          from_status: priorStatus,
+          to_status: nextStatus,
+          state_change_note:
+            (sanitized as { state_change_note?: unknown }).state_change_note ?? null,
+        },
       });
     }
 
