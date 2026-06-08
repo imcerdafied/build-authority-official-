@@ -9,6 +9,7 @@ import type { Database } from "@/integrations/supabase/types";
 import type { TablesInsert } from "@/integrations/supabase/types";
 import { fetchOutcomeCategories, type OutcomeCategoryItem } from "@/lib/taxonomy";
 import { useOrgDomains } from "@/hooks/useOrgData";
+import { recordReceipt } from "@/lib/agentReceipts";
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 export default function CreateDecisionForm({ onClose, navigateAfter = false, firstRun = false }: { onClose: () => void; navigateAfter?: boolean; firstRun?: boolean }) {
@@ -493,7 +494,7 @@ export default function CreateDecisionForm({ onClose, navigateAfter = false, fir
       const solutionDomain = resolveSolutionDomain(s.product_area);
       const mappedCategory = mapOutcomeCategory(s.outcome_category_key) || outcomeCategories[0]?.key || null;
       try {
-        await createDecision.mutateAsync({
+        const createdBet = await createDecision.mutateAsync({
           title: s.title,
           owner: s.owner,
           sponsor: sponsorForBatch,
@@ -513,6 +514,32 @@ export default function CreateDecisionForm({ onClose, navigateAfter = false, fir
           linked_okr_id: linkedOkrId,
         } as any);
         created += 1;
+
+        // Agent write-point: these bets were suggested by the strategy-mapping
+        // agent and are now accepted and persisted as real decisions. The
+        // map-strategy-bets function itself only returns suggestions, so the
+        // accept/persist moment is here. Record a fail-open receipt so the
+        // workspace ledger shows the agent-suggested bet that landed.
+        if (currentOrg?.id && createdBet?.id) {
+          await recordReceipt({
+            orgId: currentOrg.id,
+            actorType: "agent",
+            actorId: user?.id ?? null,
+            actorLabel: "Strategy Mapper",
+            action: "bet.suggested",
+            targetType: "bet",
+            targetId: createdBet.id,
+            targetLabel: s.title,
+            source: "agent",
+            summary: `Accepted agent-suggested bet "${s.title}" from a mapped strategy source.`,
+            metadata: {
+              product_area: s.product_area || null,
+              trigger_signal: s.trigger_signal || null,
+              linked_okr_id: linkedOkrId,
+              accepted_by: user?.id ?? null,
+            },
+          });
+        }
       } catch {
         failed += 1;
       }

@@ -6,6 +6,48 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
+// Fail-open agent-receipt writer for this edge function. Mirrors the row shape
+// of the app-side recordReceipt helper (src/lib/agentReceipts.ts). A ledger
+// problem must never break the projection generation that triggered it, so
+// every error is swallowed.
+async function recordReceiptSafe(
+  // deno-lint-ignore no-explicit-any
+  client: any,
+  receipt: {
+    orgId: string;
+    action: string;
+    actorType?: string;
+    actorId?: string | null;
+    actorLabel?: string | null;
+    targetType?: string | null;
+    targetId?: string | null;
+    targetLabel?: string | null;
+    source?: string | null;
+    summary?: string | null;
+    metadata?: Record<string, unknown>;
+  },
+): Promise<void> {
+  try {
+    if (!receipt?.action || !receipt?.orgId) return;
+    const { error } = await client.from("agent_receipts").insert({
+      org_id: receipt.orgId,
+      actor_type: receipt.actorType ?? "system",
+      actor_id: receipt.actorId != null ? String(receipt.actorId) : null,
+      actor_label: receipt.actorLabel ?? null,
+      action: receipt.action,
+      target_type: receipt.targetType ?? null,
+      target_id: receipt.targetId != null ? String(receipt.targetId) : null,
+      target_label: receipt.targetLabel ?? null,
+      source: receipt.source ?? null,
+      summary: receipt.summary ?? null,
+      metadata: receipt.metadata ?? {},
+    });
+    if (error) console.error("[agent-receipt]", error.message);
+  } catch (err) {
+    console.error("[agent-receipt]", err instanceof Error ? err.message : err);
+  }
+}
+
 interface DecisionInput {
   id: string;
   org_id: string;
@@ -263,6 +305,29 @@ Be analytical, concise, and credible. No hype. No speculation beyond reasonable 
 
     if (insertError) {
       console.error("Insert error:", insertError);
+    } else {
+      // Agent write-point: this function runs the AI projection engine and
+      // persists regenerated scenario projections for the decision. Record a
+      // fail-open receipt so the workspace ledger shows the engine re-scored
+      // the decision's projections. Fail-open: a ledger problem never affects
+      // the projection result. The trigger is user-initiated, so actor_id
+      // carries the requesting user while actor_type stays "agent".
+      await recordReceiptSafe(supabase, {
+        orgId: trustedDecision.org_id,
+        actorType: "agent",
+        actorId: user.id,
+        actorLabel: "Projection Engine",
+        action: "decision.projection.generated",
+        targetType: "bet",
+        targetId: trustedDecision.id,
+        targetLabel: trustedDecision.title || "Bet",
+        source: "projection",
+        summary: `Generated ${scenarios.length} scenario projection${scenarios.length === 1 ? "" : "s"} for "${trustedDecision.title || "bet"}".`,
+        metadata: {
+          scenarios: scenarios.length,
+          metadata_hash: metadataHash,
+        },
+      });
     }
 
     return new Response(
